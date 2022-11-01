@@ -1,10 +1,10 @@
-supergfxctl (1.0-99nobara5) kinetic; urgency=low
+supergfxctl (4.0.5-99nobara5) kinetic; urgency=low
 
   * Try To fix offline rust fetching
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
 
-supergfxctl (1.0-99nobara1) kinetic; urgency=low
+supergfxctl (4.0.5-99nobara1) kinetic; urgency=low
 
   * Initial Creation
 
