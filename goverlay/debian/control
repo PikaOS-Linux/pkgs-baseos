@@ -1,0 +1,33 @@
+Source: goverlay
+Section: games
+Priority: optional
+Maintainer: Debian Games Team <pkg-games-devel@lists.alioth.debian.org>
+Uploaders: Stephan Lachnit <stephanlachnit@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               fpc,
+               lcl,
+               lcl-qt5,
+               lazarus-src,
+               libgl-dev,
+Rules-Requires-Root: no
+Standards-Version: 4.6.1
+Homepage: https://github.com/benjamimgois/goverlay
+Vcs-Browser: https://salsa.debian.org/games-team/goverlay
+Vcs-Git: https://salsa.debian.org/games-team/goverlay.git
+
+Package: goverlay
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         mangohud,
+         mesa-utils,
+         vulkan-tools,
+         git,
+Recommends: vkbasalt,
+Suggests: breeze,
+          adwaita-qt,
+Description: Graphical UI to help manage Vulkan / OpenGL overlays
+ GOverlay can configure Vulkan / OpenGL overlays with a preview. Currently
+ supported are MangoHud, vkBasalt and ReplaySorcery.
+ It is recommended to set the Qt style to Breeze or Adwaita using the
+ environment variable QT_STYLE_OVERRIDE.

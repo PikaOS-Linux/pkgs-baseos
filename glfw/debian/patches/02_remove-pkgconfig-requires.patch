@@ -1,0 +1,27 @@
+From: James Cowgill <jcowgill@debian.org>
+Date: Fri, 24 Jun 2016 19:17:55 +0100
+Subject: Do not emit the Requires.private line in the pkgconfig file
+
+This allows libglfw-dev to drop the dependencies on these packages. The line
+has no purpose in the Debian package because none of the libraries emit any
+cflags and we do not ship a static library. Also, since libglfw-dev is shared
+by the x11 and wayland backends, it is not possible to know which one will be
+used (and which dependencies are needed) at build time.
+
+Forwarded: not-needed
+---
+ src/glfw3.pc.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/glfw3.pc.in b/src/glfw3.pc.in
+index f74298d..0adc8b9 100644
+--- a/src/glfw3.pc.in
++++ b/src/glfw3.pc.in
+@@ -7,7 +7,6 @@ Name: GLFW
+ Description: A multi-platform library for OpenGL, window and input
+ Version: @GLFW_VERSION@
+ URL: https://www.glfw.org/
+-Requires.private: @GLFW_PKG_DEPS@
+ Libs: -L${libdir} -l@GLFW_LIB_NAME@
+ Libs.private: @GLFW_PKG_LIBS@
+ Cflags: -I${includedir}

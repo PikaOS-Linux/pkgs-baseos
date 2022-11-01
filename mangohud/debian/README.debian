@@ -1,0 +1,11 @@
+mangohud for Debian
+----------------
+
+Upstream includes a file include/nvml.h, which is probably non-free. However,
+upstream offers two tarballs, one with this file, and one without it. In
+Debian, we use the DFSG variant of the upstream tarballs. If one wants to use
+Nvidia's ML library, it's a simple as adding libnvidia-ml-dev to the build
+dependencies and change -Dwith_nvml=disabled to -Dwith_nvml=system in the
+rules file.
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Fri, 30 Oct 2020 13:28:02 +0100

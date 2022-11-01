@@ -1,0 +1,62 @@
+From: Bastien Nocera <hadess@hadess.net>
+Date: Thu, 15 Sep 2022 18:03:22 +0200
+Subject: bluetooth: Show the Bluetooth switch in more cases
+
+In older versions of GNOME, when a menu was used for Bluetooth devices,
+we tried to avoid showing the Bluetooth menu to folks who didn't use
+Bluetooth.
+
+This kept causing problems as the menu would disappear if no
+devices were setup and the platform "airplane mode" removed the
+Bluetooth device from the USB bus, making it impossible to detect
+whether a Bluetooth device existed, compared to a user unplugging a
+removable Bluetooth device.
+
+Closes: #5749
+Part-of: <https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/2488>
+(cherry picked from commit 57aa91e2b3f129ff12c6f87146096708e9ac2867)
+---
+ js/ui/status/bluetooth.js | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/js/ui/status/bluetooth.js b/js/ui/status/bluetooth.js
+index d4de597..f5ed177 100644
+--- a/js/ui/status/bluetooth.js
++++ b/js/ui/status/bluetooth.js
+@@ -64,7 +64,10 @@ const BtClient = GObject.registerClass({
+             g_interface_info: rfkillManagerInfo,
+         });
+         this._proxy.connect('g-properties-changed', (p, properties) => {
+-            if ('BluetoothHardwareAirplaneMode' in properties.unpack())
++            const changedProperties = properties.unpack();
++            if ('BluetoothHardwareAirplaneMode' in changedProperties)
++                this.notify('available');
++            else if ('BluetoothHasAirplaneMode' in changedProperties)
+                 this.notify('available');
+         });
+         this._proxy.init_async(GLib.PRIORITY_DEFAULT, null)
+@@ -79,21 +82,19 @@ const BtClient = GObject.registerClass({
+             this._connectDeviceNotify(deviceStore.get_item(i));
+ 
+         this._client.connect('device-removed', (c, path) => {
+-            this._syncHadSetupDevices();
+             this._deviceNotifyConnected.delete(path);
+             this.emit('devices-changed');
+         });
+         this._client.connect('device-added', (c, device) => {
+-            this._syncHadSetupDevices();
+             this._connectDeviceNotify(device);
+             this.emit('devices-changed');
+         });
+     }
+ 
+     get available() {
+-        // If there were set up devices, assume there is an adapter
+-        // that can be powered on as long as we're not hard blocked
+-        return this._hadSetupDevices
++        // If we have an rfkill switch, make sure it's not a hardware
++        // one as we can't get out of it in software
++        return this._proxy.BluetoothHasAirplaneMode
+             ? !this._proxy.BluetoothHardwareAirplaneMode
+             : this.active;
+     }

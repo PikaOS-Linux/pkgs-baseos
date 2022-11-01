@@ -1,0 +1,11 @@
+libglfw.so.3 libglfw3 #MINVER#
+* Build-Depends-Package: libglfw3-dev
+#include "libglfw3.symbols.common"
+ glfwGetGLXContext@Base 3.0
+ glfwGetGLXWindow@Base 3.2
+ glfwGetX11Adapter@Base 3.1
+ glfwGetX11Display@Base 3.0
+ glfwGetX11Monitor@Base 3.1
+ glfwGetX11SelectionString@Base 3.3
+ glfwGetX11Window@Base 3.0
+ glfwSetX11SelectionString@Base 3.3

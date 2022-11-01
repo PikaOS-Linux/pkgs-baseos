@@ -1,0 +1,27 @@
+From: Daniel van Vugt <daniel.van.vugt@canonical.com>
+Date: Wed, 12 Oct 2022 14:47:19 +0800
+Subject: config: Assume screen recording is always available
+
+Which is safer than calling gst_init_check() as it may deadlock when it
+spawns client `gst-plugin-scanner` which then tries to connect back to
+us (for some plugins like gstvaapi).
+
+Fixes: https://launchpad.net/bugs/1988488
+---
+ js/misc/config.js.in | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/js/misc/config.js.in b/js/misc/config.js.in
+index 7fc0e63..5092c1e 100644
+--- a/js/misc/config.js.in
++++ b/js/misc/config.js.in
+@@ -21,8 +21,4 @@ var LIBMUTTER_API_VERSION = '@LIBMUTTER_API_VERSION@'
+ 
+ var HAVE_BLUETOOTH = pkg.checkSymbol('GnomeBluetooth', '3.0',
+     'Client.default_adapter_state')
+-var HAVE_RECORDER =
+-    pkg.checkSymbol('Gst', '1.0') &&
+-    imports.gi.Gst.init_check(null) &&
+-    imports.gi.Gst.ElementFactory.find('pipewiresrc') &&
+-    imports.gi.Gst.ElementFactory.find('filesrc');
++var HAVE_RECORDER = true;

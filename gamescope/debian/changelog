@@ -1,0 +1,23 @@
+gamescope (3.11.47-1) kinetic; urgency=medium
+
+  * Initial Push to PPA
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
+
+gamescope (3.11.39-1) unstable; urgency=medium
+
+  * New upstream version 3.11.39
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Mon, 22 Aug 2022 11:38:53 +0200
+
+gamescope (3.11.32-2) unstable; urgency=medium
+
+  * Fix debian/watch
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Fri, 05 Aug 2022 10:28:35 +0200
+
+gamescope (3.11.32-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #989085)
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Mon, 25 Jul 2022 13:48:23 +0200

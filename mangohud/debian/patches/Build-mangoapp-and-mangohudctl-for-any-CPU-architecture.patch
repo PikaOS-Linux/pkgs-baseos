@@ -1,0 +1,64 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Thu, 12 May 2022 13:37:22 +0100
+Subject: Build mangoapp and mangohudctl for any CPU architecture
+Forwarded: https://github.com/flightlessmango/MangoHud/pull/798
+
+On 32-bit-only machines, building these for the 32-bit architecture
+makes sense.
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ meson.build     | 13 +++++++------
+ src/meson.build |  4 ++--
+ 2 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 43d6528..83a4fd6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -237,16 +237,17 @@ imgui_options = [
+ sizeof_ptr = cc.sizeof('void*')
+ if sizeof_ptr == 8
+   pre_args += '-DMANGOHUD_ARCH="64bit"'
+-  if get_option('mangoapp')
+-    imgui_options += [
+-      'opengl=enabled',
+-      'glfw=enabled',
+-    ]
+-  endif
+ elif sizeof_ptr == 4
+   pre_args += '-DMANGOHUD_ARCH="32bit"'
+ endif
+ 
++if get_option('mangoapp')
++  imgui_options += [
++    'opengl=enabled',
++    'glfw=enabled',
++  ]
++endif
++
+ dearimgui_sp = subproject('imgui', default_options: imgui_options)
+ dearimgui_dep = dearimgui_sp.get_variable('imgui_dep')
+ 
+diff --git a/src/meson.build b/src/meson.build
+index 3249e84..71d7e38 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -215,7 +215,7 @@ if is_unixy
+   )
+ endif
+ 
+-if get_option('mangoapp') and sizeof_ptr == 8
++if get_option('mangoapp')
+   pre_args += '-DIMGUI_IMPL_OPENGL_LOADER_GLEW'
+   pre_args += '-DMANGOAPP'
+   mangoapp = executable(
+@@ -253,7 +253,7 @@ if get_option('mangoapp') and sizeof_ptr == 8
+   )
+ endif
+ 
+-if get_option('mangohudctl') and sizeof_ptr == 8
++if get_option('mangohudctl')
+ mangoapp = executable(
+   'mangohudctl',
+   files('app/control.cpp'),

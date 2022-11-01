@@ -1,0 +1,18 @@
+Source: xpadneo-dkms
+Section: games
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13),
+               dh-autoreconf,
+               quilt,
+               dh-dkms,
+               dkms
+Standards-Version: 4.6.1
+Homepage: https://github.com/atar-axis/xpadneo
+Rules-Requires-Root: no
+
+Package: xpadneo-dkms
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}, ${shlibs:Depends}, dkms, bluez
+Description: A DKMS package to provide XPADNEO an advanced Bluetooth Linux Driver for Xbox One Wireless Gamepad

@@ -1,0 +1,60 @@
+Source: glew
+Priority: optional
+Section: libs
+Maintainer: Alastair McKinstry <mckinstry@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               docbook-to-man,
+               libgl1-mesa-dev | libgl-dev,
+               libglu1-mesa-dev | libglu-dev,
+               libx11-dev,
+               libxi-dev,
+               libxmu-dev
+Standards-Version: 4.6.0
+Homepage: http://glew.sourceforge.net
+Vcs-Git: https://salsa.debian.org/debian/glew -b debian/latest
+Vcs-Browser: https://salsa.debian.org/debian/glew
+
+Package: glew-utils
+Section: utils
+Architecture: any
+Depends: libglew2.2 (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: OpenGL Extension Wrangler - utilities
+ For more information about GLEW please refer to the description of the
+ libglew-dev package.
+ .
+ This package contains the utilities which can be used to query the
+ supported OpenGL extensions.
+
+Package: libglew-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libgl1-mesa-dev | libgl-dev,
+         libglew2.2 (= ${binary:Version}),
+         libglu1-mesa-dev | libglu-dev,
+         ${misc:Depends}
+Description: OpenGL Extension Wrangler - development environment
+ The OpenGL Extension Wrangler, GLEW for short, is a library that
+ handles initialization of OpenGL extensions in a portable and simple
+ way. Once the program initializes the library and checks the
+ availability of extensions, it can safely call the entry points defined
+ by the extension. Currently GLEW supports almost all the extensions
+ found in the OpenGL extension registry (http://www.opengl.org/registry).
+ .
+ This package contains the development documentation as well as the
+ required header files.
+
+Package: libglew2.2
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Suggests: glew-utils
+Description: OpenGL Extension Wrangler - runtime environment
+ For more information about GLEW please refer to the description of the
+ libglew-dev package.
+ .
+ This package contains the runtime support files.

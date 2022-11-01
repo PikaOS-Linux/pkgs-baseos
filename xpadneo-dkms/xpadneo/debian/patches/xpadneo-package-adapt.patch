@@ -1,0 +1,21 @@
+diff -uraN a/Makefile b/Makefile
+--- a/Makefile	1970-01-01 02:00:00.000000000 +0200
++++ b/Makefile	2022-10-04 19:12:45.651268524 +0300
+@@ -0,0 +1,12 @@
++VERSION=0.9.5
++
++all:
++	true
++
++install:
++	sed 's/"@DO_NOT_CHANGE@"/"'"${VERSION}"'"/g' <hid-xpadneo/dkms.conf.in >hid-xpadneo/dkms.conf
++	install -d $(DESTDIR)/usr/src/
++	cp -r hid-xpadneo $(DESTDIR)/usr/src/
++	install -d $(DESTDIR)/etc/modules-load.d
++	ln -s /usr/src/hid-xpadneo $(DESTDIR)/usr/src/hid-xpadneo-"${VERSION}"
++	cp -r modules-load-d-xpadneo.conf  $(DESTDIR)/etc/modules-load.d/xpadneo.conf
+diff -uraN a/modules-load-d-xpadneo.conf b/modules-load-d-xpadneo.conf
+--- a/modules-load-d-xpadneo.conf	1970-01-01 02:00:00.000000000 +0200
++++ b/modules-load-d-xpadneo.conf	2022-09-25 20:44:46.000000000 +0300
+@@ -0,0 +1 @@
++hid_xpadneo

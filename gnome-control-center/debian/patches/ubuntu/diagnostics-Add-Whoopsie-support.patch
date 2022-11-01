@@ -1,0 +1,397 @@
+From: =?utf-8?b?Ik1hcmNvIFRyZXZpc2FuIChUcmV2acOxbyki?= <mail@3v1n0.net>
+Date: Sat, 4 Jun 2022 14:57:01 +0200
+Subject: diagnostics: Add Whoopsie support
+
+---
+ meson.build                                        |   9 +
+ meson_options.txt                                  |   1 +
+ panels/diagnostics/cc-diagnostics-panel.c          | 224 +++++++++++++++++++++
+ panels/diagnostics/cc-diagnostics-panel.ui         |  10 +-
+ .../gnome-diagnostics-panel.desktop.in.in          |   2 +-
+ panels/diagnostics/meson.build                     |   7 +-
+ 6 files changed, 250 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3510f83..7c42185 100644
+--- a/meson.build
++++ b/meson.build
+@@ -220,6 +220,14 @@ endif
+ config_h.set('HAVE_MALCONTENT', enable_malcontent,
+              description: 'Define to 1 if malcontent support is enabled')
+ 
++# Whoopsie (Ubuntu error reporting service)
++enable_whoopsie = get_option('whoopsie')
++if enable_whoopsie
++  whoopsie_dep = dependency('libwhoopsie-preferences')
++endif
++config_h.set('HAVE_WHOOPSIE', enable_whoopsie,
++             description: 'Define to 1 if Whoopsie is enabled')
++
+ if host_is_linux
+   # network manager
+   network_manager_deps = [
+@@ -322,4 +330,5 @@ summary({
+   'IBus': enable_ibus,
+   'Snap': enable_snap,
+   'Malcontent': enable_malcontent,
++  'Whoopsie': enable_whoopsie,
+ }, section: 'Optional Dependencies')
+diff --git a/meson_options.txt b/meson_options.txt
+index 461ae34..03976f2 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -9,3 +9,4 @@ option('profile', type: 'combo', choices: ['default','development'], value: 'def
+ option('malcontent', type: 'boolean', value: false, description: 'build with malcontent support')
+ option('distributor_logo', type: 'string', description: 'absolute path to distributor logo for the About panel')
+ option('dark_mode_distributor_logo', type: 'string', description: 'absolute path to distributor logo dark mode variant')
++option('whoopsie', type: 'boolean', value: false, description: 'build with Whoopsie support')
+diff --git a/panels/diagnostics/cc-diagnostics-panel.c b/panels/diagnostics/cc-diagnostics-panel.c
+index 9aeca6e..4b4d4cf 100644
+--- a/panels/diagnostics/cc-diagnostics-panel.c
++++ b/panels/diagnostics/cc-diagnostics-panel.c
+@@ -18,6 +18,8 @@
+  * Author: Matthias Clasen <mclasen@redhat.com>
+  */
+ 
++#include <config.h>
++
+ #include "cc-diagnostics-panel.h"
+ #include "cc-diagnostics-resources.h"
+ #include "cc-util.h"
+@@ -26,6 +28,10 @@
+ #include <gio/gdesktopappinfo.h>
+ #include <glib/gi18n.h>
+ 
++#ifdef HAVE_WHOOPSIE
++#  include <whoopsie-preferences/libwhoopsie-preferences.h>
++#endif
++
+ struct _CcDiagnosticsPanel
+ {
+   CcPanel              parent_instance;
+@@ -34,6 +40,13 @@ struct _CcDiagnosticsPanel
+   GtkSwitch           *abrt_switch;
+ 
+   GSettings           *privacy_settings;
++
++#ifdef HAVE_WHOOPSIE
++  AdwActionRow        *abrt_row;
++  AdwComboRow         *whoopsie_combo_row;
++  WhoopsiePreferences *whoopsie;
++  GCancellable        *cancellable;
++#endif
+ };
+ 
+ CC_PANEL_REGISTER (CcDiagnosticsPanel, cc_diagnostics_panel)
+@@ -68,9 +81,190 @@ abrt_vanished_cb (GDBusConnection *connection,
+                   gpointer         user_data)
+ {
+   g_debug ("ABRT vanished");
++#ifndef HAVE_WHOOPSIE
+   set_panel_visibility (CC_PANEL_VISIBLE_IN_SEARCH);
++#endif
++}
++
++#ifdef HAVE_WHOOPSIE
++typedef enum
++{
++  WHOOPSIE_BUTTON_SETTING_NEVER,
++  WHOOPSIE_BUTTON_SETTING_AUTO,
++  WHOOPSIE_BUTTON_SETTING_MANUAL,
++} WhoopsieButtonSettingType;
++
++static void
++whoopsie_set_report_crashes_done (GObject *source_object,
++                                  GAsyncResult *res,
++                                  gpointer user_data)
++{
++  CcDiagnosticsPanel *self = user_data;
++  g_autoptr(GError) error = NULL;
++
++  if (!whoopsie_preferences_call_set_report_crashes_finish (self->whoopsie, res, &error))
++    {
++      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
++        return;
++
++      g_warning ("Failed to toggle crash reporting: %s", error->message);
++    }
+ }
+ 
++static void
++whoopsie_set_report_crashes_mode_done (GObject *source_object,
++                                       GAsyncResult *res,
++                                       gpointer user_data)
++{
++  CcDiagnosticsPanel *self = user_data;
++  g_autoptr(GError) error = NULL;
++
++  if (!whoopsie_preferences_call_set_automatically_report_crashes_finish (self->whoopsie, res, &error))
++    {
++      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
++        return;
++
++      g_warning ("Failed to toggle crash reporting mode: %s", error->message);
++    }
++}
++
++static void
++whoopsie_combo_row_changed_cb (CcDiagnosticsPanel *self)
++{
++  g_autoptr (GObject) item = NULL;
++  GListModel *model;
++  gint selected_index;
++  gint value;
++
++  model = adw_combo_row_get_model (self->whoopsie_combo_row);
++  selected_index = adw_combo_row_get_selected (self->whoopsie_combo_row);
++  if (selected_index == -1)
++    return;
++
++  item = g_list_model_get_item (model, selected_index);
++  value = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (item), "value"));
++
++  whoopsie_preferences_call_set_report_crashes (self->whoopsie,
++                                                value != WHOOPSIE_BUTTON_SETTING_NEVER,
++                                                self->cancellable,
++                                                whoopsie_set_report_crashes_done,
++                                                self);
++
++  whoopsie_preferences_call_set_automatically_report_crashes (self->whoopsie,
++                                                              value == WHOOPSIE_BUTTON_SETTING_AUTO,
++                                                              self->cancellable,
++                                                              whoopsie_set_report_crashes_mode_done,
++                                                              self);
++}
++
++static void
++set_value_for_combo_row (AdwComboRow *combo_row, gint value)
++{
++  g_autoptr (GObject) new_item = NULL;
++  GListModel *model;
++  guint i;
++
++  /* try to make the UI match the setting */
++  model = adw_combo_row_get_model (combo_row);
++  for (i = 0; i < g_list_model_get_n_items (model); i++)
++    {
++      g_autoptr (GObject) item = g_list_model_get_item (model, i);
++      gint value_tmp = GPOINTER_TO_UINT (g_object_get_data (item, "value"));
++      if (value_tmp == value)
++        {
++          adw_combo_row_set_selected (combo_row, i);
++          return;
++        }
++    }
++}
++
++static void
++whoopsie_properties_changed (CcDiagnosticsPanel *self)
++{
++  WhoopsieButtonSettingType value = WHOOPSIE_BUTTON_SETTING_NEVER;
++
++  if (whoopsie_preferences_get_automatically_report_crashes (self->whoopsie))
++    value = WHOOPSIE_BUTTON_SETTING_AUTO;
++  else if (whoopsie_preferences_get_report_crashes (self->whoopsie))
++    value = WHOOPSIE_BUTTON_SETTING_MANUAL;
++
++  g_signal_handlers_block_by_func (self->whoopsie_combo_row, whoopsie_combo_row_changed_cb, self);
++  set_value_for_combo_row (self->whoopsie_combo_row, value);
++  g_signal_handlers_unblock_by_func (self->whoopsie_combo_row, whoopsie_combo_row_changed_cb, self);
++}
++
++static void
++populate_whoopsie_button_row (AdwComboRow *combo_row)
++{
++  g_autoptr (GtkStringList) string_list = NULL;
++  struct {
++    char *name;
++    WhoopsieButtonSettingType value;
++  } actions[] = {
++    { NC_("Whoopsie error reporting", "Never"), WHOOPSIE_BUTTON_SETTING_NEVER },
++    { NC_("Whoopsie error reporting", "Automatic"), WHOOPSIE_BUTTON_SETTING_AUTO },
++    { NC_("Whoopsie error reporting", "Manual"), WHOOPSIE_BUTTON_SETTING_MANUAL },
++  };
++  guint item_index = 0;
++  guint i;
++
++  string_list = gtk_string_list_new (NULL);
++  for (i = 0; i < G_N_ELEMENTS (actions); i++)
++    {
++      g_autoptr (GObject) item = NULL;
++
++      gtk_string_list_append (string_list, _(actions[i].name));
++
++      item = g_list_model_get_item (G_LIST_MODEL (string_list), item_index++);
++      g_object_set_data (item, "value", GUINT_TO_POINTER (actions[i].value));
++    }
++
++  adw_combo_row_set_model (combo_row, G_LIST_MODEL (string_list));
++}
++
++static void
++on_new_whoopsie_proxy_cb (GObject *object,
++                          GAsyncResult *res,
++                          gpointer data)
++{
++  CcDiagnosticsPanel *self = data;
++  g_autoptr(GError) error = NULL;
++
++  self->whoopsie = whoopsie_preferences_proxy_new_for_bus_finish (res, &error);
++
++  if (error)
++    {
++      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
++        g_warning ("Failed to get whoopsie proxy: %s", error->message);
++
++      gtk_widget_hide (GTK_WIDGET (self->whoopsie_combo_row));
++      gtk_widget_show (GTK_WIDGET (self->abrt_row));
++      return;
++    }
++
++  g_debug ("Whoopsie available");
++  gtk_widget_show (GTK_WIDGET (self->whoopsie_combo_row));
++  gtk_widget_set_sensitive (GTK_WIDGET (self->whoopsie_combo_row), TRUE);
++
++
++  g_signal_handlers_block_by_func (self->whoopsie_combo_row,
++                                   whoopsie_combo_row_changed_cb, self);
++  populate_whoopsie_button_row (self->whoopsie_combo_row);
++  g_signal_handlers_unblock_by_func (self->whoopsie_combo_row,
++                                     whoopsie_combo_row_changed_cb, self);
++
++  g_signal_connect_object (self->whoopsie, "g-properties-changed",
++                           G_CALLBACK (whoopsie_properties_changed),
++                           self, G_CONNECT_SWAPPED);
++
++  whoopsie_properties_changed (self);
++}
++#else
++static void
++whoopsie_combo_row_changed_cb (CcDiagnosticsPanel *self)
++{}
++#endif
++
+ void
+ cc_diagnostics_panel_static_init_func (void)
+ {
+@@ -82,7 +276,9 @@ cc_diagnostics_panel_static_init_func (void)
+                     NULL,
+                     NULL);
+ 
++#ifndef HAVE_WHOOPSIE
+   set_panel_visibility (CC_PANEL_VISIBLE_IN_SEARCH);
++#endif
+ }
+ 
+ static void
+@@ -92,6 +288,12 @@ cc_diagnostics_panel_finalize (GObject *object)
+ 
+   g_clear_object (&self->privacy_settings);
+ 
++#if HAVE_WHOOPISE
++  g_cancellable_cancel (self->cancellable);
++  g_clear_object (&self->cancellable);
++  g_clear_object (&self->whoopsie);
++#endif
++
+   G_OBJECT_CLASS (cc_diagnostics_panel_parent_class)->finalize (object);
+ }
+ 
+@@ -107,6 +309,12 @@ cc_diagnostics_panel_class_init (CcDiagnosticsPanelClass *klass)
+ 
+   gtk_widget_class_bind_template_child (widget_class, CcDiagnosticsPanel, diagnostics_group);
+   gtk_widget_class_bind_template_child (widget_class, CcDiagnosticsPanel, abrt_switch);
++
++#ifdef HAVE_WHOOPSIE
++  gtk_widget_class_bind_template_child (widget_class, CcDiagnosticsPanel, abrt_row);
++  gtk_widget_class_bind_template_child (widget_class, CcDiagnosticsPanel, whoopsie_combo_row);
++#endif
++  gtk_widget_class_bind_template_callback (widget_class, whoopsie_combo_row_changed_cb);
+ }
+ 
+ static void
+@@ -127,6 +335,22 @@ cc_diagnostics_panel_init (CcDiagnosticsPanel *self)
+                    self->abrt_switch, "active",
+                    G_SETTINGS_BIND_DEFAULT);
+ 
++#ifdef HAVE_WHOOPSIE
++  /* check for whoopsie */
++  self->cancellable = g_cancellable_new ();
++  whoopsie_preferences_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
++                                          G_DBUS_PROXY_FLAGS_NONE,
++                                          "com.ubuntu.WhoopsiePreferences",
++                                          "/com/ubuntu/WhoopsiePreferences",
++                                          self->cancellable,
++                                          on_new_whoopsie_proxy_cb,
++                                          self);
++
++  gtk_widget_show (GTK_WIDGET (self->whoopsie_combo_row));
++  gtk_widget_hide (GTK_WIDGET (self->abrt_row));
++  gtk_widget_set_sensitive (GTK_WIDGET (self->whoopsie_combo_row), FALSE);
++#endif
++
+   os_name = g_get_os_info (G_OS_INFO_KEY_NAME);
+   if (!os_name)
+     os_name = g_strdup ("GNOME");
+diff --git a/panels/diagnostics/cc-diagnostics-panel.ui b/panels/diagnostics/cc-diagnostics-panel.ui
+index a08a4ca..7a0a3f9 100644
+--- a/panels/diagnostics/cc-diagnostics-panel.ui
++++ b/panels/diagnostics/cc-diagnostics-panel.ui
+@@ -7,7 +7,7 @@
+           <object class="AdwPreferencesGroup" id="diagnostics_group">
+             <property name="title" translatable="yes">Problem Reporting</property>
+             <child>
+-              <object class="AdwActionRow">
++              <object class="AdwActionRow" id ="abrt_row">
+                 <property name="title" translatable="yes">_Automatic Problem Reporting</property>
+                 <property name="use-underline">True</property>
+                 <property name="activatable-widget">abrt_switch</property>
+@@ -21,6 +21,14 @@
+                 </child>
+               </object>
+             </child>
++            <child>
++              <object class="AdwComboRow" id="whoopsie_combo_row">
++                <property name="visible">False</property>
++                <property name="title" translatable="yes">Send error reports to Canonical</property>
++                <property name="use_underline">True</property>
++                <signal name="notify::selected-item" handler="whoopsie_combo_row_changed_cb" object="CcDiagnosticsPanel" swapped="yes"/>
++              </object>
++            </child>
+           </object>
+         </child>
+       </object>
+diff --git a/panels/diagnostics/gnome-diagnostics-panel.desktop.in.in b/panels/diagnostics/gnome-diagnostics-panel.desktop.in.in
+index 68d4cb0..57f148d 100644
+--- a/panels/diagnostics/gnome-diagnostics-panel.desktop.in.in
++++ b/panels/diagnostics/gnome-diagnostics-panel.desktop.in.in
+@@ -16,4 +16,4 @@ X-GNOME-Bugzilla-Product=gnome-control-center
+ X-GNOME-Bugzilla-Component=privacy
+ X-GNOME-Bugzilla-Version=@VERSION@
+ # Translators: Search terms to find the Diagnostics panel. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+-Keywords=diagnostics;crash;
++Keywords=diagnostics;crash;error;bug;whoopsie;launchpad;issue;
+diff --git a/panels/diagnostics/meson.build b/panels/diagnostics/meson.build
+index 0061d38..c44ff31 100644
+--- a/panels/diagnostics/meson.build
++++ b/panels/diagnostics/meson.build
+@@ -28,13 +28,18 @@ sources += gnome.compile_resources(
+   export: true
+ )
+ 
++deps = common_deps
++if enable_whoopsie
++  deps += whoopsie_dep
++endif
++
+ cflags += '-DGNOMELOCALEDIR="@0@"'.format(control_center_localedir)
+ 
+ panels_libs += static_library(
+   cappletname,
+   sources: sources,
+   include_directories: [top_inc, common_inc],
+-  dependencies: common_deps,
++  dependencies: deps,
+   c_args: cflags
+ )
+ 

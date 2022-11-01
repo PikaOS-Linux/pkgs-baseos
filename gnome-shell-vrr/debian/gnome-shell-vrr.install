@@ -1,0 +1,12 @@
+opt/nobara/mutter-vrr/bin/gnome-extensions
+opt/nobara/mutter-vrr/bin/gnome-shell
+opt/nobara/mutter-vrr/bin/gnome-shell-extension-tool
+opt/nobara/mutter-vrr/bin/gnome-shell-perf-tool
+opt/nobara/mutter-vrr/lib/gnome-shell
+opt/nobara/mutter-vrr/libexec
+opt/nobara/mutter-vrr/share/applications/evolution-calendar.desktop
+opt/nobara/mutter-vrr/share/applications/org.gnome.Shell*.desktop
+opt/nobara/mutter-vrr/share/bash-completion/completions/gnome-extensions
+opt/nobara/mutter-vrr/share/dbus-1/services
+opt/nobara/mutter-vrr/share/man
+opt/nobara/mutter-vrr/share/xdg-desktop-portal

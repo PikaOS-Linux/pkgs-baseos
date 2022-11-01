@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_BUILD_MAINT_OPTIONS := hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND := -Wl,--as-needed
+
+CONFIGURE_COMMON = -DBUILD_SHARED_LIBS=ON
+
+# When executed, this becomes true if wayland should be skipped
+SKIP_WAYLAND := (! dh_listpackages | grep -q ^libglfw3-wayland$$)
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	dh_auto_clean -Bbuild-x11
+	dh_auto_clean -Bbuild-wayland
+
+override_dh_auto_configure:
+	dh_auto_configure -Bbuild-x11 -- $(CONFIGURE_COMMON) -DGLFW_BUILD_DOCS=ON
+	$(SKIP_WAYLAND) || dh_auto_configure -Bbuild-wayland -- $(CONFIGURE_COMMON) -DGLFW_USE_WAYLAND=ON
+
+override_dh_auto_build:
+	dh_auto_build -Bbuild-x11
+	$(SKIP_WAYLAND) || dh_auto_build -Bbuild-wayland
+
+override_dh_auto_install:
+	dh_auto_install -Bbuild-x11
+	$(SKIP_WAYLAND) || dh_auto_install -Bbuild-wayland -- DESTDIR=$(CURDIR)/debian/tmp/wayland
+
+override_dh_installdocs:
+	dh_installdocs -plibglfw3-doc --doc-main-package=libglfw3-dev
+	dh_installdocs --remaining-packages
+
+override_dh_installexamples:
+	dh_installexamples -plibglfw3-doc --doc-main-package=libglfw3-dev -XCMakeLists.txt
+	dh_installexamples --remaining-packages

@@ -1,0 +1,75 @@
+Source: mangohud
+Section: games
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian Games Team <team+pkg-games@tracker.debian.org>
+Uploaders: Stephan Lachnit <stephanlachnit@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               meson,
+               pkg-config,
+               glslang-tools,
+               mesa-common-dev,
+               libdbus-1-dev,
+               libdrm-dev,
+               libvulkan-dev,
+               libglew-dev,
+               libopengl-dev,
+               nlohmann-json3-dev,
+               libglfw3-dev,
+               libspdlog-dev,
+               libx11-dev,
+               libwayland-dev,
+               libxnvctrl-dev,
+               libxrandr-dev,
+               python3-mako,
+               python3-setuptools,
+Rules-Requires-Root: no
+Standards-Version: 4.6.1
+Homepage: https://github.com/flightlessmango/MangoHud
+Vcs-Browser: https://salsa.debian.org/games-team/mangohud
+Vcs-Git: https://salsa.debian.org/games-team/mangohud.git
+
+Package: mangohud
+Section: misc
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Recommends: mangoctl,
+Suggests: libxnvctrl0,
+          goverlay,
+Description: Vulkan/OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more
+ MangoHud is a highly customizable overlay for Vulkan and OpenGL application to
+ monitoring FPS, temperatures, CPU/GPU load and more.
+ .
+ This package includes the libraries for MangoHud and includes a script called
+ mangohud to start it on any OpenGL or Vulkan application.
+ To get data for Nvidia GPUs, you need to install libxnvctrl0.
+
+Package: mangoapp
+Section: misc
+Architecture: any
+Multi-Arch: no
+Depends: mangohud (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Suggests: gamescope,
+Description: Application to render MangoHud with gamescope
+ MangoHud is a highly customizable overlay for Vulkan and OpenGL application to
+ monitoring FPS, temperatures, CPU/GPU load and more.
+ .
+ This package contains an application called mangoapp to use mangohud with the
+ gamescope compositor.
+
+Package: mangohudctl
+Section: misc
+Architecture: any
+Multi-Arch: no
+Depends: mangohud (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Description: Application to control MangoHud
+ MangoHud is a highly customizable overlay for Vulkan and OpenGL application to
+ monitoring FPS, temperatures, CPU/GPU load and more.
+ .
+ This package contains an optional CLI application to control MangoHud.

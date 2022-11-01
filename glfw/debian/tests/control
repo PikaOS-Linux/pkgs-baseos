@@ -1,0 +1,27 @@
+Tests: build
+Depends:
+ build-essential,
+ libglfw3,
+ libglfw3-dev,
+ pkg-config,
+
+Tests: build-wayland
+Depends:
+ build-essential,
+ libglfw3-dev,
+ libglfw3-wayland,
+ pkg-config,
+
+Tests: cmake
+Depends:
+ build-essential,
+ cmake,
+ libglfw3,
+ libglfw3-dev,
+
+Tests: cmake-wayland
+Depends:
+ build-essential,
+ cmake,
+ libglfw3-dev,
+ libglfw3-wayland,

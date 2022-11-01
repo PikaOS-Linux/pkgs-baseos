@@ -1,0 +1,39 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: GOverlay
+Upstream-Contact: Benjamimg Gois <benjamim.gois@gmail.com>
+Source: https://github.com/benjamimgois/goverlay
+
+Files: *
+Copyright: 2020-2021 Benjamimg Gois <benjamim.gois@gmail.com>
+License: GPL-3.0-or-later
+
+Files: data/io.github.benjamimgois.goverlay.metainfo.xml
+Copyright: 2020-2021 Benjamimg Gois <benjamim.gois@gmail.com>
+License: FSFAP
+
+Files: debian/*
+Copyright: 2020-2022 Stephan Lachnit <stephanlachnit@debian.org>
+License: GPL-3.0-or-later
+
+License: GPL-3.0-or-later
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems the full text of the GNU General Public License
+ version 3 can be found in the file
+ `/usr/share/common-licenses/GPL-3'.
+
+License: FSFAP
+ Copying and distribution of this file, with or without modification, are
+ permitted in any medium without royalty provided the copyright notice and
+ this notice are preserved. This file is offered as-is, without any warranty.

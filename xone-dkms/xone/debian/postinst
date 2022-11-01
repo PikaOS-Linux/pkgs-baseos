@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+dkms install -m xone/0.3
+
+echo 'by installing xone you agree to 'https://www.microsoft.com/en-us/legal/terms-of-use' '
+
+echo 'Downloading Firmware of microsoft server *THIS DID NOT COME WITH THE PACKAGE*'
+
+/usr/bin/xone-firmware --skip-disclaimer
+

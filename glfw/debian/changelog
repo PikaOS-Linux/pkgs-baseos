@@ -1,0 +1,5 @@
+glfw3 (3.3.8-1) kinetic; urgency=medium
+
+  * Add in ppa for i386 builds
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300

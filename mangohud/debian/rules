@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+        -Duse_system_vulkan=enabled \
+        -Duse_system_spdlog=enabled \
+        -Dwith_nvml=disabled \
+        -Dwith_xnvctrl=enabled \
+        -Dwith_wayland=enabled \
+        -Dmangoapp=true \
+        -Dmangohudctl=true \
+        -Dmangoapp_layer=true

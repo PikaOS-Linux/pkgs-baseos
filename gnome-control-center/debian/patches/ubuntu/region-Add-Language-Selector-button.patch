@@ -1,0 +1,91 @@
+From: Jeremy Bicha <jbicha@ubuntu.com>
+Date: Thu, 14 Sep 2017 09:23:42 -0400
+Subject: region: Add Language Selector button
+
+Workaround for https://launchpad.net/bugs/1631750
+---
+ panels/region/cc-region-panel.c  | 21 +++++++++++++++++++++
+ panels/region/cc-region-panel.ui | 24 +++++++++++++++++++++++-
+ 2 files changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/panels/region/cc-region-panel.c b/panels/region/cc-region-panel.c
+index 337d7d4..7c1e061 100644
+--- a/panels/region/cc-region-panel.c
++++ b/panels/region/cc-region-panel.c
+@@ -554,6 +554,26 @@ setup_language_section (CcRegionPanel *self)
+         update_region_from_setting (self);
+ }
+ 
++
++static void
++show_language_support (CcRegionPanel *self)
++{
++        g_autoptr(GAppInfo) app_info = NULL;
++        g_autoptr(GdkAppLaunchContext) ctx = NULL;
++        g_autoptr(GError) error = NULL;
++
++        app_info = G_APP_INFO (g_desktop_app_info_new ("gnome-language-selector.desktop"));
++
++        if (app_info == NULL) {
++                g_warning ("Failed to launch language-selector: couldn't create GDesktopAppInfo");
++                return;
++        }
++
++        ctx = gdk_display_get_app_launch_context (gdk_display_get_default ());
++        if (!g_app_info_launch (app_info, NULL, G_APP_LAUNCH_CONTEXT (ctx), &error))
++                g_warning ("Failed to launch language-selector: %s", error->message);
++}
++
+ static void
+ update_login_region (CcRegionPanel *self)
+ {
+@@ -842,6 +862,7 @@ cc_region_panel_class_init (CcRegionPanelClass * klass)
+         gtk_widget_class_bind_template_callback (widget_class, on_user_formats_row_activated_cb);
+         gtk_widget_class_bind_template_callback (widget_class, on_user_language_row_activated_cb);
+         gtk_widget_class_bind_template_callback (widget_class, restart_now);
++        gtk_widget_class_bind_template_callback (widget_class, show_language_support);
+ }
+ 
+ static void
+diff --git a/panels/region/cc-region-panel.ui b/panels/region/cc-region-panel.ui
+index 52331ac..504f810 100644
+--- a/panels/region/cc-region-panel.ui
++++ b/panels/region/cc-region-panel.ui
+@@ -46,6 +46,29 @@
+               </object>
+             </child>
+ 
++            <child>
++              <object class="AdwPreferencesGroup">
++                <property name="title" translatable="yes">System</property>
++
++                <child>
++                  <object class="AdwActionRow">
++                    <property name="use-underline">True</property>
++                    <property name="title" translatable="yes">Manage Installed Languages</property>
++                    <property name="activatable">True</property>
++                    <signal name="activated" handler="show_language_support" object="CcRegionPanel" swapped="no" />
++
++                    <child>
++                      <object class="GtkImage">
++                        <property name="valign">center</property>
++                        <property name="icon-name">go-next-symbolic</property>
++                      </object>
++                    </child>
++                  </object>
++                </child>
++
++              </object>
++            </child>
++
+             <child>
+               <object class="AdwPreferencesGroup">
+                 <property name="title" translatable="yes">Your Account</property>
+@@ -120,7 +143,6 @@
+                     </child>
+                   </object>
+                 </child>
+-
+               </object>
+             </child>
+ 

@@ -1,0 +1,17 @@
+xpadneo-dkms (0.9.5-5) kinetic; urgency=medium
+
+  * Change Section.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300
+
+xpadneo-dkms (0.9.5-1) kinetic; urgency=medium
+
+  * A few fixes.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300
+ 
+ xpadneo-dkms (0.9.5-1) kinetic; urgency=medium
+
+  * Initial release.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300

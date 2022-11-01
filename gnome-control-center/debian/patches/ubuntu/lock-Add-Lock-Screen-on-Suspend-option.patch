@@ -1,0 +1,96 @@
+From: Tim Lunn <tim@feathertop.org>
+Date: Mon, 3 Jun 2013 17:27:45 +1000
+Subject: lock: Add "Lock Screen on Suspend" option
+
+https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/938076
+---
+ panels/screen/cc-screen-panel.c  | 22 ++++++++++++++++++++++
+ panels/screen/cc-screen-panel.ui | 14 ++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/panels/screen/cc-screen-panel.c b/panels/screen/cc-screen-panel.c
+index 244d583..347a171 100644
+--- a/panels/screen/cc-screen-panel.c
++++ b/panels/screen/cc-screen-panel.c
+@@ -53,6 +53,9 @@ struct _CcScreenPanel
+   GtkSwitch           *privacy_screen_switch;
+   GtkSwitch           *show_notifications_switch;
+   GtkSwitch           *usb_protection_switch;
++
++  AdwPreferencesGroup *lock_on_suspend_row;
++  GtkSwitch           *lock_on_suspend_switch;
+ };
+ 
+ CC_PANEL_REGISTER (CcScreenPanel, cc_screen_panel)
+@@ -278,6 +281,8 @@ cc_screen_panel_class_init (CcScreenPanelClass *klass)
+   gtk_widget_class_bind_template_child (widget_class, CcScreenPanel, show_notifications_switch);
+   gtk_widget_class_bind_template_child (widget_class, CcScreenPanel, usb_protection_row);
+   gtk_widget_class_bind_template_child (widget_class, CcScreenPanel, usb_protection_switch);
++  gtk_widget_class_bind_template_child (widget_class, CcScreenPanel, lock_on_suspend_row);
++  gtk_widget_class_bind_template_child (widget_class, CcScreenPanel, lock_on_suspend_switch);
+ 
+   gtk_widget_class_bind_template_callback (widget_class, lock_after_name_cb);
+   gtk_widget_class_bind_template_callback (widget_class, on_blank_screen_delay_changed_cb);
+@@ -320,6 +325,7 @@ update_display_config (CcScreenPanel *self)
+ static void
+ cc_screen_panel_init (CcScreenPanel *self)
+ {
++  g_autoptr(GSettingsSchema) schema = NULL;
+   guint value;
+ 
+   g_resources_register (cc_screen_get_resource ());
+@@ -333,6 +339,8 @@ cc_screen_panel_init (CcScreenPanel *self)
+   self->notification_settings = g_settings_new ("org.gnome.desktop.notifications");
+   self->session_settings = g_settings_new ("org.gnome.desktop.session");
+ 
++  g_object_get (self->lock_settings, "settings-schema", &schema, NULL);
++
+   g_settings_bind (self->lock_settings,
+                    "lock-enabled",
+                    self->automatic_screen_lock_switch,
+@@ -353,6 +361,20 @@ cc_screen_panel_init (CcScreenPanel *self)
+                    "active",
+                    G_SETTINGS_BIND_DEFAULT);
+ 
++  if (g_settings_schema_has_key (schema, "ubuntu-lock-on-suspend"))
++    {
++      g_settings_bind (self->lock_settings,
++                       "ubuntu-lock-on-suspend",
++                       self->lock_on_suspend_switch,
++                       "active",
++                       G_SETTINGS_BIND_DEFAULT);
++    }
++  else
++    {
++      g_warning ("No ubuntu-lock-on-suspend settings key found");
++      gtk_widget_hide (GTK_WIDGET (self->lock_on_suspend_row));
++    }
++
+   value = g_settings_get_uint (self->session_settings, "idle-delay");
+   set_blank_screen_delay_value (self, value);
+ 
+diff --git a/panels/screen/cc-screen-panel.ui b/panels/screen/cc-screen-panel.ui
+index 64c9006..780f243 100644
+--- a/panels/screen/cc-screen-panel.ui
++++ b/panels/screen/cc-screen-panel.ui
+@@ -74,6 +74,20 @@
+               </object>
+             </child>
+ 
++            <!-- Automatic Screen Lock Delay row -->
++            <child>
++              <object class="AdwActionRow" id="lock_on_suspend_row">
++                <property name="title" translatable="yes">Lock Screen on Suspend</property>
++                <property name="activatable-widget">lock_on_suspend_switch</property>
++                <property name="use-underline">true</property>
++                <child>
++                  <object class="GtkSwitch" id="lock_on_suspend_switch">
++                    <property name="valign">center</property>
++                  </object>
++                </child>
++              </object>
++            </child>
++
+             <!-- USB protection row -->
+             <child>
+               <object class="AdwActionRow" id="usb_protection_row">

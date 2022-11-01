@@ -1,0 +1,96 @@
+From: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Date: Tue, 31 Jul 2018 04:44:12 +0100
+Subject: printers: Temporarily add an additional advanced printer button.
+
+The printers panel doesn't support printer sharing and other features.
+Workaround it for now by adding in multiple places an advanced printer
+button starting system-config-printer to avoid doubling the panel in Settings.
+Origin: ubuntu
+
+Bug-Ubuntu: https://launchpad.net/bugs/1706524a
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=692532
+---
+ panels/printers/cc-printers-panel.c | 24 ++++++++++++++++++++++++
+ panels/printers/printers.ui         | 13 +++++++++++++
+ 2 files changed, 37 insertions(+)
+
+diff --git a/panels/printers/cc-printers-panel.c b/panels/printers/cc-printers-panel.c
+index 4337633..0b87b4f 100644
+--- a/panels/printers/cc-printers-panel.c
++++ b/panels/printers/cc-printers-panel.c
+@@ -25,6 +25,7 @@
+ #include "pp-printer.h"
+ 
+ #include <string.h>
++#include <gio/gdesktopappinfo.h>
+ #include <glib/gi18n-lib.h>
+ #include <glib/gstdio.h>
+ #include <polkit/polkit.h>
+@@ -979,6 +980,25 @@ printer_add_cb (CcPrintersPanel *self)
+   gtk_widget_show (GTK_WIDGET (self->pp_new_printer_dialog));
+ }
+ 
++static void
++show_system_config_printer (void)
++{
++  g_autoptr(GAppInfo) app_info = NULL;
++  g_autoptr(GdkAppLaunchContext) ctx = NULL;
++  g_autoptr(GError) error = NULL;
++
++  app_info = G_APP_INFO (g_desktop_app_info_new ("system-config-printer.desktop"));
++
++  if (app_info == NULL) {
++    g_warning ("Failed to launch system-config-printer: couldn't create GDesktopAppInfo");
++    return;
++  }
++
++  ctx = gdk_display_get_app_launch_context (gdk_display_get_default ());
++  if (!g_app_info_launch (app_info, NULL, G_APP_LAUNCH_CONTEXT (ctx), &error))
++    g_warning ("Failed to launch system-config-printer: %s", error->message);
++}
++
+ static void
+ update_sensitivity (gpointer user_data)
+ {
+@@ -1233,6 +1253,10 @@ cc_printers_panel_init (CcPrintersPanel *self)
+   self->notification = (GtkRevealer*)
+     gtk_builder_get_object (self->builder, "notification");
+ 
++  widget = (GtkWidget*) gtk_builder_get_object (self->builder, "system-config-printer-button1");
++  g_signal_connect_swapped (widget, "clicked",
++                            G_CALLBACK (show_system_config_printer), NULL);
++
+   widget = (GtkWidget*)
+     gtk_builder_get_object (self->builder, "notification-undo-button");
+   g_signal_connect_object (widget, "clicked", G_CALLBACK (on_printer_deletion_undone), self, G_CONNECT_SWAPPED);
+diff --git a/panels/printers/printers.ui b/panels/printers/printers.ui
+index accbad7..e2cfd37 100644
+--- a/panels/printers/printers.ui
++++ b/panels/printers/printers.ui
+@@ -125,6 +125,7 @@
+                 <property name="vexpand">True</property>
+                 <child>
+                   <object class="GtkBox">
++                    <property name="orientation">vertical</property>
+                     <child>
+                       <object class="GtkListBox" id="content">
+                         <property name="selection-mode">GTK_SELECTION_NONE</property>
+@@ -135,6 +136,18 @@
+                         </style>
+                       </object>
+                     </child>
++
++                    <child>
++                      <object class="GtkButton" id="system-config-printer-button1">
++                        <property name="label" translatable="yes">Additional Printer Settings…</property>
++                        <property name="can_focus">True</property>
++                        <property name="receives_default">True</property>
++                        <property name="hexpand">False</property>
++                        <property name="halign">end</property>
++                        <property name="margin-end">60</property>
++                        <property name="margin-bottom">24</property>
++                      </object>
++                    </child>
+                   </object>
+                 </child>
+               </object>

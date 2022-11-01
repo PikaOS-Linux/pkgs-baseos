@@ -1,0 +1,2 @@
+version=4
+https://github.com/DadSchoorse/vkBasalt/tags (?:.*?/)?v?@ANY_VERSION@@ARCHIVE_EXT@

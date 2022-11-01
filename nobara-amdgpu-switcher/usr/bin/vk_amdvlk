@@ -1,0 +1,52 @@
+#!/usr/bin/bash
+
+# This script applies amdvlk-pro/amdvlk/radv Vulkan driver for specific application.
+# You can see the list of available drivers with vulkaninfo utility, see the driverName and driverID lines.
+# 
+# Usage:
+#   <vk_radv|vk_amdvlk|vk_pro> <app and its parameters>
+# For example:
+#   $ vk_pro vkmark
+# This will start vkmark with AMDGPU PRO vulkan driver.
+
+# When amdvlk is installed, then VK_ICD_FILENAMES is ignored and AMD_VULKAN_ICD is read instead. However, AMD_VULKAN_ICD does not allow you (afaics) select pro driver.
+# So we revert this behavior to standard one.
+export DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1=1
+
+RADV_DIR="/usr/share/vulkan/icd.d"
+PRO_DIR="/opt/amdgpu-pro/etc/vulkan/icd.d"
+VLK_DIR="/etc/vulkan/icd.d"
+LEGACY_DIR="/opt/amdgpu-pro/vulkan-legacy/etc/vulkan/icd.d"
+
+vk_radv() {
+    export VK_ICD_FILENAMES="${RADV_DIR}/radeon_icd.i686.json:${RADV_DIR}/radeon_icd.x86_64.json"
+}
+
+vk_amdvlk() {
+    export VK_ICD_FILENAMES="${VLK_DIR}/amd_icd32.json:${VLK_DIR}/amd_icd64.json"
+}
+
+vk_pro() {
+    export LD_LIBRARY_PATH="/opt/amdgpu/lib/x86_64-linux-gnu:/opt/amdgpu/i386-linux-gnu:${LD_LIBRARY_PATH}"
+    export VK_ICD_FILENAMES="${PRO_DIR}/amd_icd32.json:${PRO_DIR}/amd_icd64.json"
+}
+
+vk_legacy() {
+    export VK_ICD_FILENAMES="${LEGACY_DIR}/amd_icd32.json:${LEGACY_DIR}/amd_icd64.json"
+}
+
+if [[ $(basename $0) == vk_radv ]]; then
+    vk_radv
+elif [[ $(basename $0) == vk_amdvlk ]]; then
+    vk_amdvlk
+elif [[ $(basename $0) == vk_pro ]]; then
+    vk_pro
+elif [[ $(basename $0) == vk_legacy ]]; then
+    vk_legacy
+else
+    echo "Unknown function"
+    exit 1
+fi
+
+# applied variables, now execute the rest of the command
+"$@"

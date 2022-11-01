@@ -1,0 +1,35 @@
+From: =?utf-8?q?Florian_M=C3=BCllner?= <fmuellner@gnome.org>
+Date: Mon, 3 Oct 2022 18:30:13 +0200
+Subject: status/volume: Include origin in device names
+
+The description alone may not be descriptive enough, so include
+the origin (if available) to disambiguate the name.
+
+This is consistent with the Sound Settings panel.
+
+https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/5829
+
+Part-of: <https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/2502>
+(cherry picked from commit 0ce2bc343b024142dddfe6e6bb57b51bfa407df9)
+---
+ js/ui/status/volume.js | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/js/ui/status/volume.js b/js/ui/status/volume.js
+index 71a91cb..bd49cc3 100644
+--- a/js/ui/status/volume.js
++++ b/js/ui/status/volume.js
+@@ -113,8 +113,11 @@ const StreamSlider = GObject.registerClass({
+         if (!device)
+             return;
+ 
+-        const item = new PopupMenu.PopupImageMenuItem(
+-            device.get_description(), device.get_gicon());
++        const {description, origin} = device;
++        const name = origin
++            ? `${description} – ${origin}`
++            : description;
++        const item = new PopupMenu.PopupImageMenuItem(name, device.get_gicon());
+         item.connect('activate', () => this._activateDevice(device));
+ 
+         this._deviceSection.addMenuItem(item);

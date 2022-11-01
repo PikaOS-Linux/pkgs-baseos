@@ -1,0 +1,126 @@
+Source: glfw3
+Section: libs
+Priority: optional
+Maintainer: Debian Games Team <pkg-games-devel@lists.alioth.debian.org>
+Uploaders:
+ Mahyuddin Susanto <udienz@ubuntu.com>,
+ Roman Valov <roman.valov@gmail.com>,
+ James Cowgill <jcowgill@debian.org>,
+ Boyuan Yang <byang@debian.org>,
+Build-Depends:
+ cmake (>= 3.0),
+ debhelper-compat (= 13),
+ dh-exec,
+ extra-cmake-modules (>= 1.6) [linux-any],
+ libegl1-mesa-dev [linux-any],
+ libgl1-mesa-dev | libgl-dev,
+ libwayland-dev [linux-any],
+ libx11-dev,
+ libxcursor-dev,
+ libxi-dev,
+ libxinerama-dev,
+ libxkbcommon-dev,
+ libxrandr-dev,
+ pkg-config [linux-any],
+ wayland-protocols (>= 1.15) [linux-any],
+Build-Depends-Indep:
+ doxygen,
+Standards-Version: 4.6.1
+Homepage: https://www.glfw.org/
+Vcs-Git: https://salsa.debian.org/games-team/glfw3.git
+Vcs-Browser: https://salsa.debian.org/games-team/glfw3
+Rules-Requires-Root: no
+
+Package: libglfw3
+Architecture: any
+Multi-Arch: same
+Pre-Depends:
+ ${misc:Pre-Depends},
+Depends:
+ libgl1,
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ libegl1,
+ libgles1,
+ libgles2,
+ libosmesa6,
+ libvulkan1,
+Description: portable library for OpenGL, window and input (x11 libraries)
+ GLFW is an Open Source, multi-platform library for creating
+ windows with OpenGL contexts and managing input and events.
+ It is easy to integrate into existing applications and does
+ not lay claim to the main loop.
+ .
+ This package provides the shared library built with the X11 backend.
+
+Package: libglfw3-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Pre-Depends:
+ ${misc:Pre-Depends},
+Depends:
+ libgl1-mesa-dev | libgl-dev,
+ libglfw3 (= ${binary:Version}) | libglfw3-wayland (= ${binary:Version}) [linux-any],
+ ${misc:Depends},
+Recommends:
+ libegl1-mesa-dev,
+ libvulkan-dev,
+ libwayland-dev,
+ libx11-dev,
+ libxrandr-dev,
+Suggests:
+ libglfw3-doc,
+Conflicts:
+ libglfw-dev,
+Description: portable library for OpenGL, window and input (development files)
+ GLFW is an Open Source, multi-platform library for creating
+ windows with OpenGL contexts and managing input and events.
+ It is easy to integrate into existing applications and does
+ not lay claim to the main loop.
+ .
+ This package provides development files.
+
+Package: libglfw3-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ libjs-jquery,
+ ${misc:Depends},
+Description: portable library for OpenGL, window and input (documentation)
+ GLFW is an Open Source, multi-platform library for creating
+ windows with OpenGL contexts and managing input and events.
+ It is easy to integrate into existing applications and does
+ not lay claim to the main loop.
+ .
+ This package provides documentation.
+
+Package: libglfw3-wayland
+Architecture: linux-any
+Multi-Arch: same
+Pre-Depends:
+ ${misc:Pre-Depends},
+Depends:
+ libegl1,
+ libgl1,
+ libwayland-cursor0,
+ libwayland-egl1,
+ libxkbcommon0 (>= 0.5.0),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ libgles1,
+ libgles2,
+ libosmesa6,
+ libvulkan1,
+Conflicts:
+ libglfw3,
+Description: portable library for OpenGL, window and input (wayland libraries)
+ GLFW is an Open Source, multi-platform library for creating
+ windows with OpenGL contexts and managing input and events.
+ It is easy to integrate into existing applications and does
+ not lay claim to the main loop.
+ .
+ This package provides the shared library built with the Wayland backend.

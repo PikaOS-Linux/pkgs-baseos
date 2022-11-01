@@ -1,0 +1,69 @@
+From: =?utf-8?q?Florian_M=C3=BCllner?= <fmuellner@gnome.org>
+Date: Thu, 6 Oct 2022 14:30:20 +0200
+Subject: inhibitShortcutsDialog: Don't override resource
+
+PermissionStore's Set() method takes a complete permission
+table, so when setting an app's permission, we are implicitly
+removing all previously set entries for other apps.
+
+Switch to the SetPermission() method which sets the permission
+for a single app.
+
+https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/5937
+
+Part-of: <https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/2504>
+(cherry picked from commit 8590e3350145b3c652d3977d72fe0da7f1d8885c)
+---
+ .../org.freedesktop.impl.portal.PermissionStore.xml          |  7 +++++++
+ js/ui/inhibitShortcutsDialog.js                              | 12 ++++--------
+ 2 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/data/dbus-interfaces/org.freedesktop.impl.portal.PermissionStore.xml b/data/dbus-interfaces/org.freedesktop.impl.portal.PermissionStore.xml
+index 75fbc46..55d3fc3 100644
+--- a/data/dbus-interfaces/org.freedesktop.impl.portal.PermissionStore.xml
++++ b/data/dbus-interfaces/org.freedesktop.impl.portal.PermissionStore.xml
+@@ -13,6 +13,13 @@
+       <arg name="app_permissions" type="a{sas}" direction="in"/>
+       <arg name="data" type="v" direction="in"/>
+     </method>
++    <method name="SetPermission">
++      <arg name='table' type='s' direction='in'/>
++      <arg name='create' type='b' direction='in'/>
++      <arg name='id' type='s' direction='in'/>
++      <arg name='app' type='s' direction='in'/>
++      <arg name='permissions' type='as' direction='in'/>
++    </method>
+     <signal name="Changed">
+       <arg name="table" type="s" direction="out"/>
+       <arg name="id" type="s" direction="out"/>
+diff --git a/js/ui/inhibitShortcutsDialog.js b/js/ui/inhibitShortcutsDialog.js
+index f37c1f6..b6f1330 100644
+--- a/js/ui/inhibitShortcutsDialog.js
++++ b/js/ui/inhibitShortcutsDialog.js
+@@ -1,5 +1,5 @@
+ /* exported InhibitShortcutsDialog */
+-const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
++const {Clutter, Gio, GObject, Gtk, Meta, Pango, Shell, St} = imports.gi;
+ 
+ const Dialog = imports.ui.dialog;
+ const ModalDialog = imports.ui.modalDialog;
+@@ -57,16 +57,12 @@ var InhibitShortcutsDialog = GObject.registerClass({
+         if (!this._shouldUsePermStore() || this._permStore == null)
+             return;
+ 
+-        let permissions = {};
+-        permissions[this._app.get_id()] = [grant];
+-        let data = GLib.Variant.new('av', {});
+-
+         try {
+-            await this._permStore.SetAsync(APP_PERMISSIONS_TABLE,
++            await this._permStore.SetPermissionAsync(APP_PERMISSIONS_TABLE,
+                 true,
+                 APP_PERMISSIONS_ID,
+-                permissions,
+-                data);
++                this._app.get_id(),
++                [grant]);
+         } catch (error) {
+             log(error.message);
+         }

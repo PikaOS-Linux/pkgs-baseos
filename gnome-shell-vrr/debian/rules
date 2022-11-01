@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
+
+
+%:
+	dh $@  --with bash_completion
+	
+CONFFLAGS =
+
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+CONFFLAGS += \
+	-Dnetworkmanager=true \
+	-Dsoup2=false \
+	-Dsystemd=true
+endif
+
+CONFFLAGS += -Dtests=false
+
+override_dh_auto_configure:
+		GSETTINGS_SCHEMA_DIR=/opt/nobara/mutter-vrr/share/glib-2.0/schemas/:$(GSETTINGS_SCHEMA_DIR) PKG_CONFIG_PATH=/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/pkgconfig:$(PKG_CONFIG_PATH) LD_LIBRARY_PATH=/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11/plugins:$(LD_LIBRARY_PATH) PATH=/opt/nobara/mutter-vrr/bin:$(PATH) dh_auto_configure -- \
+		--prefix=/opt/nobara/mutter-vrr \
+		--libdir=lib \
+		-Dextensions-tool:bash_completion=enabled \
+		$(CONFFLAGS)
+		
+override_dh_install:
+	dh_install		
+	rm -r debian/tmp/etc/xdg/autostart/gnome-shell-overrides-migration.desktop
+
+override_dh_makeshlibs:
+	echo "dh_makeshlibs disabled!"
+
+override_dh_shlibdeps:
+	echo "dh_shlibdeps disabled!"
+
+override_dh_auto_test:
+	echo "dh_auto_test disabled!"

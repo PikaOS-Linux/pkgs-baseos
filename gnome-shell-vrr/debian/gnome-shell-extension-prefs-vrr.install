@@ -1,0 +1,4 @@
+opt/nobara/mutter-vrr/bin/gnome-extensions-app
+opt/nobara/mutter-vrr/bin/gnome-shell-extension-prefs
+opt/nobara/mutter-vrr/share/applications/org.gnome.Extensions.desktop
+opt/nobara/mutter-vrr/share/metainfo/org.gnome.Extensions.metainfo.xml

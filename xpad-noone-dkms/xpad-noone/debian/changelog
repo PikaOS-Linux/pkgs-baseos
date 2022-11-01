@@ -1,0 +1,11 @@
+xpad-noone-dkms (1.0-2) kinetic; urgency=medium
+
+  * Fix broken Patch.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300
+
+xpad-noone-dkms (1.0) kinetic; urgency=medium
+
+  * Initial release.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300

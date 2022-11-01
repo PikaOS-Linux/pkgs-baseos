@@ -1,0 +1,61 @@
+#! /bin/bash
+
+# Disables amdgpu-pro libraries to fallback to mesa
+# USE wrappers instead
+
+export PRO_DISABLED=0
+export AMD_DISABLED=0
+export BIN_AMD_DISABLED=0
+export BIN_INTEL_DISABLED=0
+export ENC_EXISTS=0
+export AMF_EXISTS=0
+
+# Add firmware
+
+rm -r /usr/src/amdgpu-official || echo
+
+ln -s  /usr/src/"$(ls /usr/src/ | grep amdgpu- | sort -nr | head -n1)" /usr/src/amdgpu-official
+
+rm -r /usr/lib/firmware/amdgpu || echo
+
+ln -s /usr/src/amdgpu-official/firmware/amdgpu /usr/lib/firmware/
+
+#
+
+cat /etc/ld.so.conf.d/10-amdgpu-pro.conf | grep "#" && export PRO_DISABLED=1
+
+cat /etc/ld.so.conf.d/20-amdgpu.conf | grep "#" && export AMD_DISABLED=1
+
+cat /etc/ld.so.conf.d/10-amdgpu-pro-x86_64.conf | grep "#" && export BIN_AMD_DISABLED=1
+
+cat /etc/ld.so.conf.d/10-amdgpu-pro-i386.conf | grep "#" && export BIN_INTEL_DISABLED=1
+
+ls /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdenc* && export ENC_EXISTS=1
+
+ls /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamf* && export AMF_EXISTS=1
+
+if [[ "${PRODISABLED}" != 1 ]]; then
+	sed -i.old -e 's/^/#/' /etc/ld.so.conf.d/10-amdgpu-pro.conf
+fi
+
+if [[ "${AMDDISABLED}" != 1 ]]; then
+	sed -i.old -e 's/^/#/' /etc/ld.so.conf.d/20-amdgpu.conf
+fi
+
+if [[ "${BIN_AMD_DISABLED}" != 1 ]]; then
+	sed -i.old -e 's/^/#/' /etc/ld.so.conf.d/10-amdgpu-pro-x86_64.conf
+fi
+
+if [[ "${BIN_INTEL_DISABLED}" != 1 ]]; then
+	sed -i.old -e 's/^/#/' /etc/ld.so.conf.d/10-amdgpu-pro-i386.conf
+fi
+
+if [[ "${ENC_EXISTS}" != 0 ]]; then
+	ln -s /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdenc* /usr/lib/x86_64-linux-gnu/
+fi
+
+if [[ "${AMF_EXISTS}" != 0 ]]; then
+	ln -s /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamf* /usr/lib/x86_64-linux-gnu/
+fi
+
+ldconfig

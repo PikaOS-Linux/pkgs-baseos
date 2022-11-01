@@ -1,0 +1,36 @@
+From: Fabian Vogt <fvogt@suse.com>
+Date: Wed, 20 Jan 2016 14:03:18 +0100
+Origin: vendor, https://build.opensuse.org/package/view_file/Base:System/plymouth/0002-Install-label-ft-plugin-into-initrd-if-available.patch
+Forwarded: https://gitlab.freedesktop.org/plymouth/plymouth/-/merge_requests/91
+Subject: [PATCH 2/7] Install label-ft plugin into initrd, if available
+
+It is small and useful enough to include it by default.
+
+Signed-off-by: Fabian Vogt <fvogt@suse.com>
+---
+ scripts/plymouth-populate-initrd.in | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/scripts/plymouth-populate-initrd.in b/scripts/plymouth-populate-initrd.in
+index 2703d48..7064e2e 100755
+--- a/scripts/plymouth-populate-initrd.in
++++ b/scripts/plymouth-populate-initrd.in
+@@ -509,6 +509,15 @@ if [ "${PLYMOUTH_IMAGE_DIR}" != "${PLYMOUTH_THEME_DIR}" -a -d "${PLYMOUTH_SYSROO
+      inst_recur "${PLYMOUTH_IMAGE_DIR}"
+ fi
+ 
++if [ -f "${PLYMOUTH_PLUGIN_PATH}/label-ft.so" ]; then
++     inst ${PLYMOUTH_PLUGIN_PATH}/label-ft.so $INITRDDIR
++     font=$(fc-match -f %{file})
++     inst "$font" $INITRDDIR
++     # The label-ft plugin expects it at this location
++     mkdir -p $INITRDDIR/usr/share/fonts
++     ln -s "$font" $INITRDDIR/usr/share/fonts/Plymouth.ttf
++fi
++
+ if [ -L ${PLYMOUTH_SYSROOT}${PLYMOUTH_DATADIR}/plymouth/themes/default.plymouth ]; then
+     cp -a ${PLYMOUTH_SYSROOT}${PLYMOUTH_DATADIR}/plymouth/themes/default.plymouth $INITRDDIR${PLYMOUTH_DATADIR}/plymouth/themes
+ fi
+-- 
+2.34.1
+

@@ -1,0 +1,1040 @@
+From: =?utf-8?b?Ik1hcmNvIFRyZXZpc2FuIChUcmV2acOxbyki?= <mail@3v1n0.net>
+Date: Mon, 27 Jun 2022 19:34:40 +0200
+Subject: background: Allow configuring the ubuntu accent color
+
+Move the ubuntu colors configuration to a single widget
+(CcUbuntuColorsRow) so that it can be easily included in other widgets
+with minimal changes.
+We keep resources and the widget itself compiled together with the ubuntu
+panel, so that there's no need to change multiple panels build scripts,
+given that these are per-process anyways.
+---
+ panels/background/cc-background-panel.c  |  12 +
+ panels/background/cc-background-panel.ui |   4 +
+ panels/ubuntu/cc-ubuntu-colors-row.c     | 538 +++++++++++++++++++++++++++++++
+ panels/ubuntu/cc-ubuntu-colors-row.css   |  24 ++
+ panels/ubuntu/cc-ubuntu-colors-row.h     |  34 ++
+ panels/ubuntu/cc-ubuntu-colors-row.ui    | 289 +++++++++++++++++
+ panels/ubuntu/meson.build                |   3 +
+ po/POTFILES.in                           |   2 +
+ 8 files changed, 906 insertions(+)
+ create mode 100644 panels/ubuntu/cc-ubuntu-colors-row.c
+ create mode 100644 panels/ubuntu/cc-ubuntu-colors-row.css
+ create mode 100644 panels/ubuntu/cc-ubuntu-colors-row.h
+ create mode 100644 panels/ubuntu/cc-ubuntu-colors-row.ui
+
+diff --git a/panels/background/cc-background-panel.c b/panels/background/cc-background-panel.c
+index f748e9a..db2dbd6 100644
+--- a/panels/background/cc-background-panel.c
++++ b/panels/background/cc-background-panel.c
+@@ -35,6 +35,8 @@
+ #include "cc-background-resources.h"
+ #include "cc-background-xml.h"
+ 
++#include "panels/ubuntu/cc-ubuntu-colors-row.h"
++
+ #define WP_PATH_ID "org.gnome.desktop.background"
+ #define WP_LOCK_PATH_ID "org.gnome.desktop.screensaver"
+ #define WP_URI_KEY "picture-uri"
+@@ -67,6 +69,8 @@ struct _CcBackgroundPanel
+   CcBackgroundPreview *dark_preview;
+   GtkToggleButton *default_toggle;
+   GtkToggleButton *dark_toggle;
++
++  CcUbuntuColorsRow *ubuntu_colors;
+ };
+ 
+ CC_PANEL_REGISTER (CcBackgroundPanel, cc_background_panel)
+@@ -103,6 +107,8 @@ reload_color_scheme_toggles (CcBackgroundPanel *self)
+       gtk_toggle_button_set_active (self->default_toggle, FALSE);
+       gtk_toggle_button_set_active (self->dark_toggle, FALSE);
+     }
++
++  cc_ubuntu_colors_row_set_color_scheme (self->ubuntu_colors, scheme);
+ }
+ 
+ static void
+@@ -380,6 +386,7 @@ cc_background_panel_class_init (CcBackgroundPanelClass *klass)
+ 
+   g_type_ensure (CC_TYPE_BACKGROUND_CHOOSER);
+   g_type_ensure (CC_TYPE_BACKGROUND_PREVIEW);
++  g_type_ensure (CC_TYPE_UBUNTU_COLORS_ROW);
+ 
+   panel_class->get_help_uri = cc_background_panel_get_help_uri;
+ 
+@@ -393,6 +400,7 @@ cc_background_panel_class_init (CcBackgroundPanelClass *klass)
+   gtk_widget_class_bind_template_child (widget_class, CcBackgroundPanel, dark_preview);
+   gtk_widget_class_bind_template_child (widget_class, CcBackgroundPanel, default_toggle);
+   gtk_widget_class_bind_template_child (widget_class, CcBackgroundPanel, dark_toggle);
++  gtk_widget_class_bind_template_child (widget_class, CcBackgroundPanel, ubuntu_colors);
+ 
+   gtk_widget_class_bind_template_callback (widget_class, on_color_scheme_toggle_active_cb);
+   gtk_widget_class_bind_template_callback (widget_class, on_chooser_background_chosen_cb);
+@@ -451,5 +459,9 @@ cc_background_panel_init (CcBackgroundPanel *panel)
+                             got_transition_proxy_cb,
+                             panel);
+ 
++  g_signal_connect_object (panel->ubuntu_colors, "changed",
++                           G_CALLBACK (transition_screen),
++                           panel, G_CONNECT_SWAPPED);
++
+   load_custom_css (panel);
+ }
+diff --git a/panels/background/cc-background-panel.ui b/panels/background/cc-background-panel.ui
+index 33a8638..89a5ef5 100644
+--- a/panels/background/cc-background-panel.ui
++++ b/panels/background/cc-background-panel.ui
+@@ -90,6 +90,10 @@
+               </object>
+             </child>
+ 
++            <child>
++              <object class="CcUbuntuColorsRow" id="ubuntu_colors" />
++            </child>
++
+           </object>
+         </child>
+ 
+diff --git a/panels/ubuntu/cc-ubuntu-colors-row.c b/panels/ubuntu/cc-ubuntu-colors-row.c
+new file mode 100644
+index 0000000..2d64912
+--- /dev/null
++++ b/panels/ubuntu/cc-ubuntu-colors-row.c
+@@ -0,0 +1,538 @@
++/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
++/*
++ * Copyright (C) 2022 Canonical Ltd
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General
++ * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Author: Marco Trevisan <marco.trevisan@canonical.com>
++ *
++ */
++
++#include "config.h"
++
++#include <glib/gi18n-lib.h>
++
++#include "cc-ubuntu-colors-row.h"
++#include "cc-ubuntu-resources.h"
++
++#include "gdesktop-enums.h"
++
++#define MIN_ICONSIZE 16.0
++#define MAX_ICONSIZE 64.0
++#define DEFAULT_ICONSIZE 48.0
++#define ICONSIZE_KEY "dash-max-icon-size"
++
++#define UBUNTU_DOCK_SCHEMA "org.gnome.shell.extensions.dash-to-dock"
++#define UBUNTU_DOCK_ALL_MONITORS_KEY "multi-monitor"
++#define UBUNTU_DOCK_PREFERRED_MONITOR_KEY "preferred-monitor"
++#define UBUNTU_DOCK_PREFERRED_CONNECTOR_KEY "preferred-monitor-by-connector"
++
++/*
++ * This allows to migrate settings from 'preferred-monitor' to
++ * 'preferred-monitor-by-connector', and can be removed after 22.04
++ * simplifying all the logic, by relying on connector names only.
++ */
++#define UBUNTU_DOCK_MONITOR_INDEX_USE_CONNECTOR -2
++
++#define INTERFACE_SCHEMA "org.gnome.desktop.interface"
++#define GTK_THEME_KEY "gtk-theme"
++#define CURSOR_THEME_KEY "cursor-theme"
++#define ICON_THEME_KEY "icon-theme"
++
++#define GEDIT_PREFRENCES_SCHEMA "org.gnome.gedit.preferences.editor"
++#define GEDIT_THEME_KEY "scheme"
++
++#define DEFAULT_ACCENT_COLOR "default"
++
++struct _CcUbuntuColorsRow {
++  AdwActionRow parent_instance;
++
++  gboolean startup;
++
++  GtkFlowBox      *color_box;
++  GtkFlowBoxChild *accent_bark;
++  GtkFlowBoxChild *accent_blue;
++  GtkFlowBoxChild *accent_olive;
++  GtkFlowBoxChild *accent_default;
++  GtkFlowBoxChild *accent_magenta;
++  GtkFlowBoxChild *accent_purple;
++  GtkFlowBoxChild *accent_prussiangreen;
++  GtkFlowBoxChild *accent_sage;
++  GtkFlowBoxChild *accent_red;
++  GtkFlowBoxChild *accent_viridian;
++
++  GSettings *interface_settings;
++  GSettings *gedit_settings;
++
++  GDesktopColorScheme color_scheme;
++};
++
++G_DEFINE_FINAL_TYPE (CcUbuntuColorsRow, cc_ubuntu_colors_row, ADW_TYPE_ACTION_ROW)
++
++enum
++{
++  CHANGED,
++  N_SIGNALS,
++};
++
++static guint signals[N_SIGNALS];
++
++static GQuark accent_quark (void);
++G_DEFINE_QUARK (accent-quark, accent);
++
++static void
++on_selected_color_changed (CcUbuntuColorsRow *self)
++{
++  GtkWidget *accent_color;
++  g_autoptr(GString) gtk_theme = NULL;
++  g_autoptr(GString) icon_theme = NULL;
++  g_autoptr(GString) gedit_theme = NULL;
++  g_autofree char *current_gtk_theme = NULL;
++  g_autofree char *current_icon_theme = NULL;
++
++  gtk_theme = g_string_new ("Yaru");
++  icon_theme = g_string_new ("Yaru");
++  gedit_theme = g_string_new ("Yaru");
++
++  for (accent_color = gtk_widget_get_first_child (GTK_WIDGET (self->color_box));
++       accent_color != NULL;
++       accent_color = gtk_widget_get_next_sibling (accent_color))
++    {
++      const char *color = g_object_get_qdata (G_OBJECT (accent_color), accent_quark ());
++
++      if (!gtk_widget_is_visible (accent_color))
++        continue;
++
++      if (color && gtk_flow_box_child_is_selected (GTK_FLOW_BOX_CHILD (accent_color)))
++        {
++          if (g_str_equal (color, DEFAULT_ACCENT_COLOR))
++            break;
++
++          g_string_append_printf (gtk_theme, "-%s", color);
++          g_string_append_printf (icon_theme, "-%s", color);
++          break;
++        }
++    }
++
++  if (accent_color == NULL)
++    {
++      /* No selection, do not change anything */
++      return;
++    }
++
++  if (self->color_scheme == G_DESKTOP_COLOR_SCHEME_PREFER_DARK)
++    {
++      g_string_append (gtk_theme, "-dark");
++      g_string_append (gedit_theme, "-dark");
++    }
++
++  current_gtk_theme = g_settings_get_string (self->interface_settings, GTK_THEME_KEY);
++
++  if (g_strcmp0 (current_gtk_theme, gtk_theme->str))
++    {
++      g_signal_emit (self, signals[CHANGED], 0);
++      g_settings_set_string (self->interface_settings, GTK_THEME_KEY, gtk_theme->str);
++    }
++
++  current_icon_theme = g_settings_get_string (self->interface_settings, ICON_THEME_KEY);
++
++  if (!current_icon_theme || !self->startup ||
++      g_str_has_prefix (current_icon_theme, "Yaru"))
++    g_settings_set_string (self->interface_settings, ICON_THEME_KEY, icon_theme->str);
++
++  if (self->gedit_settings)
++    {
++      g_autoptr(GVariant) gedit_user_value = NULL;
++      const char *gedit_theme_name = NULL;
++
++      gedit_user_value = g_settings_get_user_value (self->gedit_settings,
++                                                    GEDIT_THEME_KEY);
++
++      if (gedit_user_value)
++        gedit_theme_name = g_variant_get_string (gedit_user_value, NULL);
++
++      if (!gedit_theme_name || *gedit_theme_name == '\0' ||
++          g_str_has_prefix (gedit_theme_name, "Yaru"))
++        {
++          /* Only change the gedit setting if user is using a Yaru theme, or unset */
++          g_settings_set_string (self->gedit_settings, GEDIT_THEME_KEY,
++                                 gedit_theme->str);
++        }
++    }
++}
++
++static void
++on_interface_settings_changed (CcUbuntuColorsRow *self)
++{
++  GtkWidget *color_item;
++  g_autofree gchar *gtk_theme = NULL;
++  g_autofree gchar *cursor_theme = NULL;
++  g_autofree gchar *icon_theme = NULL;
++  g_auto(GStrv) parts = NULL;
++  const char *accent_color = DEFAULT_ACCENT_COLOR;
++  gboolean is_dark = FALSE;
++
++  gtk_theme = g_settings_get_string (self->interface_settings, GTK_THEME_KEY);
++  cursor_theme = g_settings_get_string (self->interface_settings, CURSOR_THEME_KEY);
++  icon_theme = g_settings_get_string (self->interface_settings, ICON_THEME_KEY);
++
++  if (!g_str_has_prefix (gtk_theme, "Yaru"))
++    {
++      g_warning ("No yaru theme selected!");
++
++      gtk_flow_box_unselect_all (self->color_box);
++      return;
++    }
++
++  is_dark = g_str_has_suffix (gtk_theme, "-dark");
++  parts = g_strsplit (gtk_theme, "-", 3);
++
++  switch (g_strv_length (parts))
++    {
++      case 3:
++        g_return_if_fail (is_dark);
++        accent_color = parts[1];
++        break;
++      case 2:
++        if (!is_dark)
++          accent_color = parts[1];
++        break;
++    }
++
++  if (!is_dark && self->color_scheme == G_DESKTOP_COLOR_SCHEME_PREFER_DARK)
++    is_dark = TRUE;
++  else if (is_dark && self->color_scheme != G_DESKTOP_COLOR_SCHEME_PREFER_DARK)
++    is_dark = FALSE;
++
++  for (color_item = gtk_widget_get_first_child (GTK_WIDGET (self->color_box));
++       color_item != NULL;
++       color_item = gtk_widget_get_next_sibling (color_item))
++    {
++      GtkFlowBoxChild *item = GTK_FLOW_BOX_CHILD (color_item);
++      const char *color = g_object_get_qdata (G_OBJECT (item), accent_quark ());
++
++      if (!gtk_widget_is_visible (color_item))
++        continue;
++
++      if (g_strcmp0 (color, accent_color) == 0)
++        {
++          gtk_flow_box_select_child (self->color_box, item);
++          break;
++        }
++    }
++}
++
++static gchar *
++get_theme_dir (void)
++{
++  const gchar *var;
++
++  var = g_getenv ("GTK_DATA_PREFIX");
++  if (var == NULL)
++    var = "/usr";
++
++  return g_build_filename (var, "share", "themes", NULL);
++}
++
++
++#if (GTK_MINOR_VERSION % 2)
++#define MINOR (GTK_MINOR_VERSION + 1)
++#else
++#define MINOR GTK_MINOR_VERSION
++#endif
++
++
++static gchar *
++find_theme_dir (const gchar *dir,
++                const gchar *subdir,
++                const gchar *name,
++                const gchar *variant)
++{
++  g_autofree gchar *file = NULL;
++  g_autofree gchar *base = NULL;
++  gchar *path;
++  gint i;
++
++  if (variant)
++    file = g_strconcat ("gtk-", variant, ".css", NULL);
++  else
++    file = g_strdup ("gtk.css");
++
++  if (subdir)
++    base = g_build_filename (dir, subdir, name, NULL);
++  else
++    base = g_build_filename (dir, name, NULL);
++
++  for (i = MINOR; i >= 0; i = i - 2) {
++    g_autofree gchar *subsubdir = NULL;
++
++    if (i < 14)
++      i = 0;
++
++    subsubdir = g_strdup_printf ("gtk-4.%d", i);
++    path = g_build_filename (base, subsubdir, file, NULL);
++
++    if (g_file_test (path, G_FILE_TEST_EXISTS))
++      break;
++
++    g_free (path);
++    path = NULL;
++  }
++
++  return path;
++}
++
++#undef MINOR
++
++static gchar *
++find_theme (const gchar *name,
++            const gchar *variant)
++{
++  g_autofree gchar *dir = NULL;
++  const gchar *const *dirs;
++  gchar *path;
++  gint i;
++
++  /* First look in the user's data directory */
++  path = find_theme_dir (g_get_user_data_dir (), "themes", name, variant);
++  if (path)
++    return path;
++
++  /* Next look in the user's home directory */
++  path = find_theme_dir (g_get_home_dir (), ".themes", name, variant);
++  if (path)
++    return path;
++
++  /* Look in system data directories */
++  dirs = g_get_system_data_dirs ();
++  for (i = 0; dirs[i]; i++) {
++    path = find_theme_dir (dirs[i], "themes", name, variant);
++    if (path)
++      return path;
++  }
++
++  /* Finally, try in the default theme directory */
++  dir = get_theme_dir ();
++  path = find_theme_dir (dir, NULL, name, variant);
++
++  return path;
++}
++
++/* Courtesy of libhandy... */
++static gboolean
++check_theme_exists (const gchar *name,
++                    const gchar *variant)
++{
++  g_autofree gchar *resource_path = NULL;
++  g_autofree gchar *path = NULL;
++
++  /* try loading the resource for the theme. This is mostly meant for built-in
++   * themes.
++   */
++  if (variant)
++    resource_path = g_strdup_printf ("/org/gtk/libgtk/theme/%s/gtk-%s.css", name, variant);
++  else
++    resource_path = g_strdup_printf ("/org/gtk/libgtk/theme/%s/gtk.css", name);
++
++  if (g_resources_get_info (resource_path, 0, NULL, NULL, NULL))
++    return TRUE;
++
++  g_clear_pointer (&resource_path, g_free);
++
++  if (variant)
++    resource_path = g_strdup_printf ("/com/ubuntu/themes/%s/4.0/gtk-%s.css", name, variant);
++  else
++    resource_path = g_strdup_printf ("/com/ubuntu/themes/%s/4.0/gtk.css", name);
++
++  if (g_resources_get_info (resource_path, 0, NULL, NULL, NULL))
++    return TRUE;
++
++  /* Next try looking for files in the various theme directories. */
++  path = find_theme (name, variant);
++
++  return path != NULL;
++}
++
++static void
++check_theme_accents_availability (CcUbuntuColorsRow *self)
++{
++  GtkWidget *accent_color;
++  g_autoptr (GList) colors = NULL;
++  gint available_accents = 0;
++
++  if (!check_theme_exists ("Yaru", NULL))
++    g_critical ("No Yaru theme found");
++
++  if (!check_theme_exists ("Yaru", "dark"))
++    g_critical ("No Yaru-dark theme found");
++
++  for (accent_color = gtk_widget_get_first_child (GTK_WIDGET (self->color_box));
++       accent_color != NULL;
++       accent_color = gtk_widget_get_next_sibling (accent_color))
++    {
++      GtkFlowBoxChild *item = GTK_FLOW_BOX_CHILD (accent_color);
++      const char *accent = g_object_get_qdata (G_OBJECT (item), accent_quark ());
++      g_autofree char *theme_name = NULL;
++
++      if (g_strcmp0 (accent, DEFAULT_ACCENT_COLOR) == 0)
++        continue;
++
++      theme_name = g_strdup_printf("Yaru-%s", accent);
++
++      if (check_theme_exists (theme_name, NULL) && check_theme_exists (theme_name, "dark"))
++        available_accents++;
++      else
++        gtk_widget_hide (GTK_WIDGET (item));
++    }
++
++  if (!available_accents)
++    gtk_widget_hide (GTK_WIDGET (self));
++}
++
++static void
++load_custom_css (CcUbuntuColorsRow *self)
++{
++  g_autoptr(GtkCssProvider) provider = NULL;
++
++  /* use custom CSS */
++  provider = gtk_css_provider_new ();
++  gtk_css_provider_load_from_resource (provider,
++    "/org/gnome/control-center/ubuntu/cc-ubuntu-colors-row.css");
++  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
++                                              GTK_STYLE_PROVIDER (provider),
++                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++}
++
++static void
++cc_ubuntu_colors_row_init (CcUbuntuColorsRow *self)
++{
++  GSettingsSchemaSource *schema_source = g_settings_schema_source_get_default ();
++  g_autoptr(GSettingsSchema) schema = NULL;
++  const gchar *desktop_list;
++  g_auto(GStrv) desktops = NULL;
++
++  desktop_list = g_getenv ("XDG_CURRENT_DESKTOP");
++  if (desktop_list != NULL)
++    desktops = g_strsplit (desktop_list, ":", -1);
++
++  if (desktops == NULL ||
++      !g_strv_contains ((const gchar * const *) desktops, "ubuntu"))
++    {
++      gtk_widget_hide (GTK_WIDGET (self));
++      return;
++    }
++
++  self->startup = TRUE;
++
++  g_resources_register (cc_ubuntu_get_resource ());
++
++  gtk_widget_init_template (GTK_WIDGET (self));
++
++  g_object_set_qdata (G_OBJECT (self->accent_bark), accent_quark (), "bark");
++  g_object_set_qdata (G_OBJECT (self->accent_blue), accent_quark (), "blue");
++  g_object_set_qdata (G_OBJECT (self->accent_magenta), accent_quark (), "magenta");
++  g_object_set_qdata (G_OBJECT (self->accent_olive), accent_quark (), "olive");
++  g_object_set_qdata (G_OBJECT (self->accent_default), accent_quark (), "default");
++  g_object_set_qdata (G_OBJECT (self->accent_purple), accent_quark (), "purple");
++  g_object_set_qdata (G_OBJECT (self->accent_prussiangreen), accent_quark (), "prussiangreen");
++  g_object_set_qdata (G_OBJECT (self->accent_red), accent_quark (), "red");
++  g_object_set_qdata (G_OBJECT (self->accent_sage), accent_quark (), "sage");
++  g_object_set_qdata (G_OBJECT (self->accent_viridian), accent_quark (), "viridian");
++  check_theme_accents_availability (self);
++
++  self->interface_settings = g_settings_new (INTERFACE_SCHEMA);
++  g_signal_connect_object (self->interface_settings, "changed::" GTK_THEME_KEY,
++                           G_CALLBACK (on_interface_settings_changed), self,
++                           G_CONNECT_SWAPPED);
++  g_signal_connect_object (self->interface_settings, "changed::" CURSOR_THEME_KEY,
++                           G_CALLBACK (on_interface_settings_changed), self,
++                           G_CONNECT_SWAPPED);
++  g_signal_connect_object (self->interface_settings, "changed::" ICON_THEME_KEY,
++                           G_CALLBACK (on_interface_settings_changed), self,
++                           G_CONNECT_SWAPPED);
++
++  schema = g_settings_schema_source_lookup (schema_source, GEDIT_PREFRENCES_SCHEMA, TRUE);
++  if (schema)
++    {
++      self->gedit_settings = g_settings_new (GEDIT_PREFRENCES_SCHEMA);
++      g_signal_connect_object (self->gedit_settings, "changed::" GEDIT_THEME_KEY,
++                               G_CALLBACK (on_interface_settings_changed), self, G_CONNECT_SWAPPED);
++    }
++  else
++    {
++      g_warning ("No gedit is installed here. Colors won't be updated. Please fix your installation.");
++    }
++
++  load_custom_css (self);
++  on_interface_settings_changed (self);
++
++  self->startup = FALSE;
++}
++
++static void
++cc_ubuntu_colors_row_dispose (GObject *object)
++{
++  CcUbuntuColorsRow *self = CC_UBUNTU_COLORS_ROW (object);
++
++  g_clear_object (&self->interface_settings);
++  g_clear_object (&self->gedit_settings);
++
++  G_OBJECT_CLASS (cc_ubuntu_colors_row_parent_class)->dispose (object);
++}
++
++static void
++cc_ubuntu_colors_row_class_init (CcUbuntuColorsRowClass *klass)
++{
++  GObjectClass *object_class = G_OBJECT_CLASS (klass);
++  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
++
++  object_class->dispose = cc_ubuntu_colors_row_dispose;
++
++  signals[CHANGED] = g_signal_new ("changed",
++                                   CC_TYPE_UBUNTU_COLORS_ROW,
++                                   G_SIGNAL_RUN_FIRST,
++                                   0, NULL, NULL, NULL,
++                                   G_TYPE_NONE,
++                                   0);
++
++  gtk_widget_class_set_template_from_resource (widget_class,
++    "/org/gnome/control-center/ubuntu/cc-ubuntu-colors-row.ui");
++
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, color_box);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_bark);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_blue);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_olive);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_default);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_magenta);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_purple);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_prussiangreen);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_red);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_sage);
++  gtk_widget_class_bind_template_child (widget_class, CcUbuntuColorsRow, accent_viridian);
++
++  gtk_widget_class_bind_template_callback (widget_class, on_selected_color_changed);
++}
++
++void
++cc_ubuntu_colors_row_set_color_scheme (CcUbuntuColorsRow *self,
++                                       GDesktopColorScheme color_scheme)
++{
++  if (self->color_scheme == color_scheme)
++    return;
++
++  self->color_scheme = color_scheme;
++
++  if (self->interface_settings)
++    on_interface_settings_changed (self);
++}
+diff --git a/panels/ubuntu/cc-ubuntu-colors-row.css b/panels/ubuntu/cc-ubuntu-colors-row.css
+new file mode 100644
+index 0000000..cd9f62b
+--- /dev/null
++++ b/panels/ubuntu/cc-ubuntu-colors-row.css
+@@ -0,0 +1,24 @@
++.ubuntu-colors flowboxchild.ubuntu-color {
++  border-radius: 9999px;
++  background-color: transparent;
++}
++
++.ubuntu-colors flowboxchild.ubuntu-color:selected {
++  background-color: alpha(@theme_selected_bg_color, 0.75);
++}
++
++.ubuntu-colors flowboxchild.ubuntu-color box {
++  background-color: transparent;
++}
++
++.ubuntu-colors flowboxchild.ubuntu-color:selected box {
++  background-color: mix(@view_bg_color, @card_bg_color, 0.25);
++}
++
++.ubuntu-colors box.ubuntu-color {
++  border-radius: 9999px;
++}
++
++.ubuntu-colors picture.thumbnail {
++  border-radius: 9999px;
++}
+diff --git a/panels/ubuntu/cc-ubuntu-colors-row.h b/panels/ubuntu/cc-ubuntu-colors-row.h
+new file mode 100644
+index 0000000..07cedee
+--- /dev/null
++++ b/panels/ubuntu/cc-ubuntu-colors-row.h
+@@ -0,0 +1,34 @@
++/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
++/*
++ * Copyright (C) 2022 Canonical Ltd
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General
++ * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#pragma once
++
++#include <glib.h>
++#include <adwaita.h>
++#include <gdesktop-enums.h>
++
++G_BEGIN_DECLS
++
++#define CC_TYPE_UBUNTU_COLORS_ROW (cc_ubuntu_colors_row_get_type ())
++G_DECLARE_FINAL_TYPE (CcUbuntuColorsRow, cc_ubuntu_colors_row, CC, UBUNTU_COLORS_ROW, AdwActionRow)
++
++void cc_ubuntu_colors_row_set_color_scheme (CcUbuntuColorsRow *colors_row,
++                                            GDesktopColorScheme color_scheme);
++
++G_END_DECLS
+diff --git a/panels/ubuntu/cc-ubuntu-colors-row.ui b/panels/ubuntu/cc-ubuntu-colors-row.ui
+new file mode 100644
+index 0000000..ddcfbd7
+--- /dev/null
++++ b/panels/ubuntu/cc-ubuntu-colors-row.ui
+@@ -0,0 +1,289 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<interface>
++  <template class="CcUbuntuColorsRow" parent="AdwActionRow">
++    <property name="title">Color</property>
++    <property name="title-lines">1</property>
++    <property name="activatable">False</property>
++    <property name="selectable">False</property>
++    <style>
++        <class name="ubuntu-colors" />
++    </style>
++    <child>
++        <object class="GtkFlowBox" id="color_box">
++            <property name="max-children-per-line">10</property>
++            <property name="min-children-per-line">10</property>
++            <property name="column-spacing">12</property>
++            <property name="row-spacing">12</property>
++            <property name="margin-top">6</property>
++            <property name="margin-bottom">6</property>
++            <property name="margin-start">6</property>
++            <property name="margin-end">6</property>
++            <property name="activate-on-single-click">False</property>
++            <signal name="selected-children-changed" handler="on_selected_color_changed" object="CcUbuntuColorsRow" swapped="yes"/>
++            <style>
++                <class name="ubuntu-color" />
++            </style>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_default">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Orange</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/default.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_bark">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Bark</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/bark.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_sage">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Sage</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/sage.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_olive">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Olive</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/olive.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_viridian">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Viridian</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/viridian.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_prussiangreen">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Prussian Green</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/prussiangreen.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_blue">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Blue</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/blue.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_purple">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Purple</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/purple.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_magenta">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Magenta</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/magenta.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++            <child>
++                <object class="GtkFlowBoxChild" id="accent_red">
++                    <property name="tooltip_text" translatable="yes" context="Yaru theme accent color">Red</property>
++                    <property name="valign">center</property>
++                    <style>
++                        <class name="ubuntu-color" />
++                    </style>
++                    <child>
++                        <object class="GtkBox">
++                            <property name="orientation">vertical</property>
++                            <style>
++                                <class name="ubuntu-color" />
++                                <class name="background" />
++                            </style>
++                            <child>
++                                <object class="GtkPicture">
++                                    <property name="file">resource:///org/gnome/control-center/ubuntu/assets/colors/red.svg</property>
++                                    <style>
++                                        <class name="thumbnail" />
++                                    </style>
++                                </object>
++                            </child>
++                        </object>
++                    </child>
++                </object>
++            </child>
++        </object>
++    </child>
++  </template>
++</interface>
+diff --git a/panels/ubuntu/meson.build b/panels/ubuntu/meson.build
+index 1fc83df..34d509f 100644
+--- a/panels/ubuntu/meson.build
++++ b/panels/ubuntu/meson.build
+@@ -19,6 +19,7 @@ i18n.merge_file(
+ )
+ 
+ sources = files(
++  'cc-ubuntu-colors-row.c',
+   'cc-ubuntu-panel.c',
+   'cc-ubuntu-dock-dialog.c',
+ )
+@@ -41,6 +42,8 @@ resource_generated_data = []
+ resource_data = files(
+   'assets/theme-dark.svg',
+   'assets/theme-light.svg',
++  'cc-ubuntu-colors-row.css',
++  'cc-ubuntu-colors-row.ui',
+   'cc-ubuntu-panel.ui',
+   'cc-ubuntu-dock-dialog.ui',
+ )
+diff --git a/po/POTFILES.in b/po/POTFILES.in
+index 92f5b7d..6968b2a 100644
+--- a/po/POTFILES.in
++++ b/po/POTFILES.in
+@@ -238,6 +238,8 @@ panels/ubuntu/cc-ubuntu-panel.c
+ panels/ubuntu/cc-ubuntu-panel.ui
+ panels/ubuntu/cc-ubuntu-dock-dialog.c
+ panels/ubuntu/cc-ubuntu-dock-dialog.ui
++panels/ubuntu/cc-ubuntu-colors-row.c
++panels/ubuntu/cc-ubuntu-colors-row.ui
+ panels/ubuntu/gnome-ubuntu-panel.desktop.in.in
+ panels/universal-access/cc-cursor-blinking-dialog.ui
+ panels/universal-access/cc-cursor-size-dialog.ui

@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+
+built_binaries := $(shell dh_listpackages)
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1
+export DPKG_GENSYMBOLS_CHECK_LEVEL = 4
+
+# Following upstream method to compute the API version
+MUTTER_MAJOR_VERSION = $(shell echo $(DEB_VERSION_UPSTREAM) | sed 's/[~.].*//')
+MUTTER_API_VERSION = $(shell echo $$(( $(MUTTER_MAJOR_VERSION) - 32 )) )
+MUTTER_SONAME = 0
+
+export MUTTER_API_VERSION
+export MUTTER_SONAME
+
+%:
+	dh $@
+
+CONFFLAGS = \
+	-Degl_device=true \
+	-Dremote_desktop=true \
+	-Dwayland_eglstream=true \
+	-Dtests=false \
+	--prefix=/opt/nobara/mutter-vrr
+	
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		$(CONFFLAGS)
+
+override_dh_install:
+	dh_install
+	cp -r  debian/mutter-vrr/usr/share/* debian/mutter-vrr/opt/nobara/mutter-vrr/share/ || echo
+	rm -rf debian/mutter-vrr/usr/share/ || echo
+	mv debian/mutter-vrr/lib/* debian/mutter-vrr/opt/nobara/mutter-vrr/lib/
+	cp -rv debian/extra_files/etc debian/mutter-vrr/
+	mkdir -p debian/mutter-vrr/etc/rc2.d
+	mkdir -p debian/mutter-vrr/etc/rc3.d
+	ln -sf /etc/init.d/mutter-dbus-override debian/mutter-vrr/etc/rc2.d/S01mutter-dbus-override
+	ln -sf /etc/init.d/mutter-dbus-override debian/mutter-vrr/etc/rc3.d/S01mutter-dbus-override
+	
+override_dh_shlibdeps:
+	echo "dh_shlibdeps disabled!"

@@ -1,0 +1,22 @@
+From: James Cowgill <james410@cowgill.org.uk>
+Date: Fri, 24 Jun 2016 19:13:09 +0100
+Subject: Remove the date from the documentation footer to make the build
+ reproducible.
+
+Forwarded: no
+---
+ docs/footer.html | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/footer.html b/docs/footer.html
+index b0434ca..f28b098 100644
+--- a/docs/footer.html
++++ b/docs/footer.html
+@@ -1,6 +1,6 @@
+ <address class="footer">
+ <p>
+-Last update on $date for $projectname $projectnumber
++$projectname $projectnumber
+ </p>
+ </address>
+ </body>

@@ -1,0 +1,352 @@
+From: =?utf-8?b?Ik1hcmNvIFRyZXZpc2FuIChUcmV2acOxbyki?= <mail@3v1n0.net>
+Date: Fri, 25 Feb 2022 01:07:12 +0100
+Subject: main: Support loading multiple Yaru theme variants
+
+Yaru can provide multiple variants, we can support using more theme
+variants in GNOME shell as it happens on Gtk apps.
+
+So, make StSettings to compute the main theme and the chosen variant,
+and we use those to pick the correct .css file.
+
+We don't make difference between dark/light themes here, as we assume
+that the shell theme will always be dark or light.
+
+Forwarded: not-needed
+---
+ data/meson.build                           |   8 +-
+ data/org.gnome.shell.ubuntu.gschema.xml.in |  17 +++++
+ js/ui/main.js                              |  42 +++++++++++
+ src/st/meson.build                         |   1 +
+ src/st/st-settings.c                       | 114 +++++++++++++++++++++++++++++
+ 5 files changed, 181 insertions(+), 1 deletion(-)
+ create mode 100644 data/org.gnome.shell.ubuntu.gschema.xml.in
+
+diff --git a/data/meson.build b/data/meson.build
+index 22d6665..e16d108 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -95,6 +95,12 @@ schema = configure_file(
+   configuration: schemaconf,
+   install_dir: schemadir
+ )
++schema_ubuntu = configure_file(
++  input: 'org.gnome.shell.ubuntu.gschema.xml.in',
++  output: 'org.gnome.shell.ubuntu.gschema.xml',
++  configuration: schemaconf,
++  install_dir: schemadir
++)
+ schema_ubuntu_login = configure_file(
+   input: 'com.ubuntu.login-screen.gschema.xml.in',
+   output: 'com.ubuntu.login-screen.gschema.xml',
+@@ -138,7 +144,7 @@ endif
+ 
+ # for unit tests - gnome.compile_schemas() only looks in srcdir
+ custom_target('compile-schemas',
+-  input: [schema, chema_ubuntu_login],
++  input: [schema, schema_ubuntu, schema_ubuntu_login],
+   output: 'gschemas.compiled',
+   command: [find_program('glib-compile-schemas'), meson.current_build_dir()],
+   build_by_default: true)
+diff --git a/data/org.gnome.shell.ubuntu.gschema.xml.in b/data/org.gnome.shell.ubuntu.gschema.xml.in
+new file mode 100644
+index 0000000..6f9cc62
+--- /dev/null
++++ b/data/org.gnome.shell.ubuntu.gschema.xml.in
+@@ -0,0 +1,17 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<schemalist gettext-domain="@GETTEXT_PACKAGE@">
++  <enum id="org.gnome.shell.ubuntu.GDesktopColorScheme">
++    <value value="1" nick="default"/>
++    <value value="2" nick="prefer-dark"/>
++    <value value="3" nick="prefer-light"/>
++  </enum>
++  <schema id="org.gnome.shell.ubuntu" path="/org/gnome/shell/ubuntu/">
++    <key name="color-scheme" enum="org.gnome.shell.ubuntu.GDesktopColorScheme">
++      <default>'default'</default>
++      <summary>Color scheme</summary>
++      <description>
++        The preferred color scheme for the shell user interface. Valid values are “default”, “prefer-dark”, “prefer-light”.
++      </description>
++    </key>
++  </schema>
++</schemalist>
+diff --git a/js/ui/main.js b/js/ui/main.js
+index 33f62be..60969fd 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -186,6 +186,9 @@ function start() {
+     sessionMode.connect('updated', _sessionUpdated);
+ 
+     St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
++    St.Settings.get().connect('notify::gtk-theme', _loadDefaultStylesheet);
++    St.Settings.get().connect('notify::gtk-theme-variant', _loadDefaultStylesheet);
++    St.Settings.get().connect('notify::shell-color-scheme', _loadDefaultStylesheet);
+ 
+     // Initialize ParentalControlsManager before the UI
+     ParentalControlsManager.getDefault();
+@@ -423,6 +426,38 @@ function _getStylesheet(name) {
+     return null;
+ }
+ 
++function _getYaruStyleSheet(themeVariant) {
++    const { shellColorScheme: colorScheme } = St.Settings.get();
++    const baseThemeName = sessionMode.stylesheetName.split(".css").at(0);
++    const isDark = themeVariant === 'dark' || themeVariant?.endsWith('-dark');
++    let colorSchemeVariant;
++
++    if (isDark && colorScheme == 'prefer-light') {
++        colorSchemeVariant = themeVariant.split('-').slice(0, -1).join('-');
++    } else if (!isDark && colorScheme == 'prefer-dark' ) {
++        colorSchemeVariant = themeVariant ? `${themeVariant}-dark` : 'dark';
++    }
++
++    if (colorSchemeVariant !== undefined) {
++        if (colorSchemeVariant.length)
++            colorSchemeVariant = `-${colorSchemeVariant}`;
++        const stylesheet = _getStylesheet(`${baseThemeName}${colorSchemeVariant}.css`);
++        if (stylesheet)
++            return stylesheet;
++    }
++
++    if (!themeVariant)
++        return null;
++
++    const stylesheet = _getStylesheet(`${baseThemeName}-${themeVariant}.css`);
++
++    // Try to use the dark theme if a dark variant is selected
++    if (!stylesheet && isDark)
++        return _getStylesheet(`${baseThemeName}-dark.css`);
++
++    return stylesheet;
++}
++
+ function _getDefaultStylesheet() {
+     let stylesheet = null;
+     let name = sessionMode.stylesheetName;
+@@ -431,6 +466,13 @@ function _getDefaultStylesheet() {
+     if (St.Settings.get().high_contrast)
+         stylesheet = _getStylesheet(name.replace('.css', '-high-contrast.css'));
+ 
++    if (stylesheet == null) {
++        const settings = St.Settings.get();
++
++        if (settings.gtkTheme === 'Yaru')
++            stylesheet = _getYaruStyleSheet(settings.gtkThemeVariant?.toLowerCase());
++    }
++
+     if (stylesheet == null)
+         stylesheet = _getStylesheet(sessionMode.stylesheetName);
+ 
+diff --git a/src/st/meson.build b/src/st/meson.build
+index 717aa05..03a5978 100644
+--- a/src/st/meson.build
++++ b/src/st/meson.build
+@@ -202,6 +202,7 @@ if get_option('tests')
+   )
+ 
+   test('CSS styling support', test_theme,
++    env: ['GSETTINGS_SCHEMA_DIR=' + meson.project_build_root() / 'data' ],
+     workdir: meson.current_source_dir()
+   )
+ endif
+diff --git a/src/st/st-settings.c b/src/st/st-settings.c
+index 04bf68f..a5f584d 100644
+--- a/src/st/st-settings.c
++++ b/src/st/st-settings.c
+@@ -33,6 +33,7 @@
+ #define KEY_FONT_NAME             "font-name"
+ #define KEY_HIGH_CONTRAST         "high-contrast"
+ #define KEY_GTK_ICON_THEME        "icon-theme"
++#define KEY_GTK_THEME             "gtk-theme"
+ #define KEY_MAGNIFIER_ACTIVE      "screen-magnifier-enabled"
+ #define KEY_DISABLE_SHOW_PASSWORD "disable-show-password"
+ 
+@@ -43,7 +44,10 @@ enum {
+   PROP_DRAG_THRESHOLD,
+   PROP_FONT_NAME,
+   PROP_HIGH_CONTRAST,
++  PROP_GTK_THEME,
++  PROP_GTK_THEME_VARIANT,
+   PROP_GTK_ICON_THEME,
++  PROP_SHELL_COLOR_SCHEME,
+   PROP_MAGNIFIER_ACTIVE,
+   PROP_SLOW_DOWN_FACTOR,
+   PROP_DISABLE_SHOW_PASSWORD,
+@@ -60,10 +64,13 @@ struct _StSettings
+   GSettings *a11y_applications_settings;
+   GSettings *a11y_interface_settings;
+   GSettings *lockdown_settings;
++  GSettings *ubuntu_settings;
+ 
+   gchar *font_name;
+   gboolean high_contrast;
+   gchar *gtk_icon_theme;
++  gchar *gtk_theme;
++  gchar *gtk_theme_variant;
+   int inhibit_animations_count;
+   gboolean enable_animations;
+   gboolean primary_paste;
+@@ -133,7 +140,10 @@ st_settings_finalize (GObject *object)
+   g_object_unref (settings->a11y_applications_settings);
+   g_object_unref (settings->a11y_interface_settings);
+   g_object_unref (settings->lockdown_settings);
++  g_object_unref (settings->ubuntu_settings);
+   g_free (settings->font_name);
++  g_free (settings->gtk_theme);
++  g_free (settings->gtk_theme_variant);
+   g_free (settings->gtk_icon_theme);
+ 
+   G_OBJECT_CLASS (st_settings_parent_class)->finalize (object);
+@@ -185,6 +195,16 @@ st_settings_get_property (GObject    *object,
+     case PROP_GTK_ICON_THEME:
+       g_value_set_string (value, settings->gtk_icon_theme);
+       break;
++    case PROP_GTK_THEME:
++      g_value_set_string (value, settings->gtk_theme);
++      break;
++    case PROP_GTK_THEME_VARIANT:
++      g_value_set_string (value, settings->gtk_theme_variant);
++      break;
++    case PROP_SHELL_COLOR_SCHEME:
++      g_value_take_string (value,
++        g_settings_get_string (settings->ubuntu_settings, "color-scheme"));
++      break;
+     case PROP_MAGNIFIER_ACTIVE:
+       g_value_set_boolean (value, settings->magnifier_active);
+       break;
+@@ -275,6 +295,39 @@ st_settings_class_init (StSettingsClass *klass)
+                                                     "",
+                                                     ST_PARAM_READABLE);
+ 
++  /**
++   * StSettings:gtk-theme:
++   *
++   * The current GTK theme
++   */
++  props[PROP_GTK_THEME] = g_param_spec_string ("gtk-theme",
++                                               "GTK Theme",
++                                               "GTK Theme",
++                                               "",
++                                               ST_PARAM_READABLE);
++
++  /**
++   * StSettings:gtk-theme-variant:
++   *
++   * The current GTK theme
++   */
++  props[PROP_GTK_THEME_VARIANT] = g_param_spec_string ("gtk-theme-variant",
++                                                       "GTK Theme Variant",
++                                                       "GTK Theme Variant",
++                                                       "",
++                                                       ST_PARAM_READABLE);
++
++  /**
++   * StSettings:shell-color-scheme:
++   *
++   * The current GTK theme
++   */
++  props[PROP_SHELL_COLOR_SCHEME] = g_param_spec_string ("shell-color-scheme",
++                                                        "Shell Color Scheme",
++                                                        "Shell Color Scheme",
++                                                        "default",
++                                                        ST_PARAM_READABLE);
++
+   /**
+    * StSettings:magnifier-active:
+    *
+@@ -311,6 +364,45 @@ st_settings_class_init (StSettingsClass *klass)
+   g_object_class_install_properties (object_class, N_PROPS, props);
+ }
+ 
++static void
++update_theme_settings (StSettings *settings)
++{
++  g_auto(GStrv) parts = NULL;
++  g_autofree char *theme = NULL;
++  g_autofree char *variant = NULL;
++
++  theme = g_settings_get_string (settings->interface_settings, KEY_GTK_THEME);
++  parts = g_strsplit (theme, "-", 2);
++
++  switch (g_strv_length (parts))
++    {
++    case 2:
++      variant = g_strdup (parts[1]);
++      /* fallthrough */
++    case 1:
++      theme = g_strdup (parts[0]);
++      break;
++    }
++
++  if (g_strcmp0 (settings->gtk_theme, theme) != 0)
++    {
++      g_free (settings->gtk_theme);
++      settings->gtk_theme = g_steal_pointer (&theme);
++
++      g_object_notify_by_pspec (G_OBJECT (settings),
++                                props[PROP_GTK_THEME]);
++    }
++
++  if (g_strcmp0 (settings->gtk_theme_variant, variant) != 0)
++    {
++      g_free (settings->gtk_theme_variant);
++      settings->gtk_theme_variant = g_steal_pointer (&variant);
++
++      g_object_notify_by_pspec (G_OBJECT (settings),
++                                props[PROP_GTK_THEME_VARIANT]);
++    }
++}
++
+ static void
+ on_interface_settings_changed (GSettings   *g_settings,
+                                const gchar *key,
+@@ -332,6 +424,10 @@ on_interface_settings_changed (GSettings   *g_settings,
+       settings->font_name = g_settings_get_string (g_settings, key);
+       g_object_notify_by_pspec (G_OBJECT (settings), props[PROP_FONT_NAME]);
+     }
++  else if (g_str_equal (key, KEY_GTK_THEME))
++    {
++      update_theme_settings (settings);
++    }
+   else if (g_str_equal (key, KEY_GTK_ICON_THEME))
+     {
+       g_free (settings->gtk_icon_theme);
+@@ -341,6 +437,18 @@ on_interface_settings_changed (GSettings   *g_settings,
+     }
+ }
+ 
++static void
++on_ubuntu_settings_changed (GSettings   *g_settings,
++                            const gchar *key,
++                            StSettings  *settings)
++{
++  if (g_str_equal (key, "color-scheme"))
++    {
++      g_object_notify_by_pspec (G_OBJECT (settings),
++                                props[PROP_SHELL_COLOR_SCHEME]);
++    }
++}
++
+ static void
+ on_mouse_settings_changed (GSettings   *g_settings,
+                            const gchar *key,
+@@ -398,6 +506,10 @@ st_settings_init (StSettings *settings)
+   g_signal_connect (settings->interface_settings, "changed",
+                     G_CALLBACK (on_interface_settings_changed), settings);
+ 
++  settings->ubuntu_settings = g_settings_new ("org.gnome.shell.ubuntu");
++  g_signal_connect (settings->ubuntu_settings, "changed",
++                    G_CALLBACK (on_ubuntu_settings_changed), settings);
++
+   settings->mouse_settings = g_settings_new ("org.gnome.desktop.peripherals.mouse");
+   g_signal_connect (settings->mouse_settings, "changed",
+                     G_CALLBACK (on_mouse_settings_changed), settings);
+@@ -414,6 +526,8 @@ st_settings_init (StSettings *settings)
+   g_signal_connect (settings->lockdown_settings, "changed",
+                     G_CALLBACK (on_lockdown_settings_changed), settings);
+ 
++  update_theme_settings (settings);
++
+   settings->enable_animations = g_settings_get_boolean (settings->interface_settings,
+                                                         KEY_ENABLE_ANIMATIONS);
+   settings->primary_paste = g_settings_get_boolean (settings->interface_settings,

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+cp -fv /lib/udev/rules.d/61-mutter.rules.old /lib/udev/rules.d/61-mutter.rules

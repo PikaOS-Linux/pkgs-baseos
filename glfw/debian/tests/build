@@ -1,0 +1,35 @@
+#!/bin/sh
+# autopkgtest check: Build and run a simple program against GLFW 3
+
+set -e
+
+# Require $AUTOPKGTEST_TMP for temporary build files
+if [ -z "$AUTOPKGTEST_TMP" ]
+then
+	echo "Required envvar \"$AUTOPKGTEST_TMP\"is not set" >&2
+	exit 1
+fi
+
+# Copy test program to AUTOPKGTEST_TMP and cd there
+cp debian/tests/glfw3_test.c "$AUTOPKGTEST_TMP"
+cd "$AUTOPKGTEST_TMP"
+
+# Build programs - once with raw libraries and once with pkg-config
+gcc -Wall -Werror -o glfw3_test1 glfw3_test.c -lglfw
+echo "build1: OK"
+gcc -Wall -Werror -o glfw3_test2 glfw3_test.c $(pkg-config --cflags --libs glfw3)
+echo "build2: OK"
+
+# Run them - ensure the correct version is reported
+GLFW_VERSION=$(dpkg-query -f '${Version}\n' -W libglfw3-dev | \
+	sed 's/[^.0-9].*//' | sed 's/^[0-9]*\.[0-9]*$/&.0/')
+
+TEST1_RESULT=$(./glfw3_test1)
+echo $TEST1_RESULT
+[ $(echo $TEST1_RESULT | cut -f 1 -d' ') = $GLFW_VERSION ]
+echo "run1: OK"
+
+TEST2_RESULT=$(./glfw3_test2)
+echo $TEST2_RESULT
+[ $(echo $TEST2_RESULT | cut -f 1 -d' ') = $GLFW_VERSION ]
+echo "run2: OK"

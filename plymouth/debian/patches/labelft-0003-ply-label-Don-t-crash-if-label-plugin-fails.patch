@@ -1,0 +1,38 @@
+From: Fabian Vogt <fvogt@suse.com>
+Date: Thu, 21 Jan 2016 10:39:21 +0100
+Origin: vendor, https://build.opensuse.org/package/view_file/Base:System/plymouth/0003-fix_null_deref.patch
+Forwarded: https://gitlab.freedesktop.org/plymouth/plymouth/-/merge_requests/91
+Subject: [PATCH 4/7] ply-label: Don't crash if label plugin fails
+
+The label plugin's create_control function can return NULL if allocation
+failed, for example, but ply-label.c ignores that and uses the NULL control,
+causing various SEGVs.
+
+Signed-off-by: Fabian Vogt <fvogt@suse.com>
+---
+ src/libply-splash-graphics/ply-label.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/libply-splash-graphics/ply-label.c b/src/libply-splash-graphics/ply-label.c
+index 703060a..2430ceb 100644
+--- a/src/libply-splash-graphics/ply-label.c
++++ b/src/libply-splash-graphics/ply-label.c
+@@ -130,6 +130,15 @@ ply_label_load_plugin (ply_label_t *label)
+ 
+         label->control = label->plugin_interface->create_control ();
+ 
++        if (label->control == NULL) {
++                ply_save_errno ();
++                label->plugin_interface = NULL;
++                ply_close_module (label->module_handle);
++                label->module_handle = NULL;
++                ply_restore_errno ();
++                return false;
++        }
++
+         if (label->text != NULL)
+                 label->plugin_interface->set_text_for_control (label->control,
+                                                                label->text);
+-- 
+2.34.1
+

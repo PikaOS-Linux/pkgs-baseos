@@ -1,0 +1,9 @@
+# Base OS PPA
+
+deb [signed-by=/etc/apt/trusted.gpg.d/nobara-keyring.gpg] https://ppa.launchpadcontent.net/cosmohq/baseos-test/ubuntu/ kinetic main
+# deb-src [signed-by=/etc/apt/trusted.gpg.d/nobara-keyring.gpg] https://ppa.launchpadcontent.net/cosmohq/baseos-test/ubuntu/ kinetic main
+
+# Multimedia PPA
+
+deb [signed-by=/etc/apt/trusted.gpg.d/nobara-keyring.gpg] https://ppa.launchpadcontent.net/cosmohq/multimedia-test/ubuntu/ kinetic main
+# deb-src [signed-by=/etc/apt/trusted.gpg.d/nobara-keyring.gpg] https://ppa.launchpadcontent.net/cosmohq/multimedia-test/ubuntu/ kinetic main

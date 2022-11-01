@@ -1,0 +1,25 @@
+Source: network-manager-wireguard
+Section: net
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13),
+               dh-autoreconf,
+               quilt,
+               wireguard,
+               git,
+               dh-autoreconf,
+               libglib2.0-dev,
+               intltool,
+               build-essential,
+               libgtk-3-dev,
+               libnma-dev,
+               libsecret-1-dev,
+               network-manager-dev 
+Standards-Version: 4.6.1
+Homepage: https://github.com/max-moser/network-manager-wireguard
+Rules-Requires-Root: no
+
+Package: network-manager-wireguard-plugin
+Architecture: all
+Depends: ${misc:Depends}, ${shlibs:Depends}, wireguard, network-manager, systemd-resolved
+Description: a VPN Plugin for NetworkManager that handles client-side WireGuard connections

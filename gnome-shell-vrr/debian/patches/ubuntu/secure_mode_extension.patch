@@ -1,0 +1,89 @@
+From: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Date: Wed, 20 Jun 2018 19:22:06 +0200
+Subject: Don't allow ubuntu mode extension to update
+
+Ensure that no update is proposed or loaded if sideloaded (always
+prefer system version) on the ubuntu session.
+We want to ensure that the default code running is going through
+our QA and security team process than being loaded from a 3rd
+party website.
+Also, that will enable us to upload newer versions on GNOME
+extension website while still letting older ubuntu release versions
+running expected extension version.
+Origin: ubuntu
+Forwarded: https://bugzilla.gnome.org/show_bug.cgi?id=789852
+---
+ js/ui/extensionDownloader.js | 11 +++++++++++
+ js/ui/extensionSystem.js     |  9 +++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/js/ui/extensionDownloader.js b/js/ui/extensionDownloader.js
+index 94ba8fa..54b1105 100644
+--- a/js/ui/extensionDownloader.js
++++ b/js/ui/extensionDownloader.js
+@@ -4,6 +4,7 @@
+ const { Clutter, Gio, GLib, GObject, Soup } = imports.gi;
+ 
+ const Config = imports.misc.config;
++const Desktop = imports.misc.desktop;
+ const Dialog = imports.ui.dialog;
+ const ExtensionUtils = imports.misc.extensionUtils;
+ const FileUtils = imports.misc.fileUtils;
+@@ -32,6 +33,13 @@ async function installExtension(uuid, invocation) {
+         shell_version: Config.PACKAGE_VERSION,
+     };
+ 
++    if (Desktop.is('ubuntu') && Main.extensionManager.isModeExtension(uuid)) {
++        const msg = _("This is an extension enabled by your current mode, you can't install manually any update in that session.");
++        Main.notifyError(_("Can't install “%s”:").format(uuid), msg);
++        invocation.return_dbus_error('org.gnome.Shell.ExtensionError', msg);
++        return;
++    }
++
+     const message = Soup.Message.new_from_encoded_form('GET',
+         REPOSITORY_URL_INFO,
+         Soup.form_encode_hash(params));
+@@ -161,6 +169,9 @@ async function checkForUpdates() {
+             return;
+         if (extension.hasUpdate)
+             return;
++        // don't updates out of repository mode extension
++        if (Desktop.is("ubuntu") && Main.extensionManager.isModeExtension(uuid))
++            return;
+         metadatas[uuid] = {
+             version: extension.metadata.version,
+         };
+diff --git a/js/ui/extensionSystem.js b/js/ui/extensionSystem.js
+index c21cc7c..db47088 100644
+--- a/js/ui/extensionSystem.js
++++ b/js/ui/extensionSystem.js
+@@ -4,6 +4,7 @@
+ const { GLib, Gio, GObject, Shell, St } = imports.gi;
+ const Signals = imports.misc.signals;
+ 
++const Desktop = imports.misc.desktop;
+ const ExtensionDownloader = imports.ui.extensionDownloader;
+ const ExtensionUtils = imports.misc.extensionUtils;
+ const FileUtils = imports.misc.fileUtils;
+@@ -434,6 +435,10 @@ var ExtensionManager = class extends Signals.EventEmitter {
+         this.loadExtension(newExtension);
+     }
+ 
++    isModeExtension(uuid) {
++        return this._getModeExtensions().indexOf(uuid) !== -1;
++    }
++
+     _callExtensionInit(uuid) {
+         if (!this._extensionSupportsSessionMode(uuid))
+             return false;
+@@ -624,6 +629,10 @@ var ExtensionManager = class extends Signals.EventEmitter {
+             let type = dir.has_prefix(perUserDir)
+                 ? ExtensionType.PER_USER
+                 : ExtensionType.SYSTEM;
++            if (Desktop.is("ubuntu") && this.isModeExtension(uuid) && type === ExtensionType.PER_USER) {
++                log(`Found user extension ${uuid}, but not loading from ${dir.get_path()} directory as part of session mode.`);
++                return;
++            }
+             try {
+                 extension = this.createExtensionObject(uuid, dir, type);
+             } catch (e) {

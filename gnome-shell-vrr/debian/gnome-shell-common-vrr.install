@@ -1,0 +1,7 @@
+opt/nobara/mutter-vrr/lib/systemd/user
+opt/nobara/mutter-vrr/share/dbus-1/interfaces
+opt/nobara/mutter-vrr/share/glib-2.0
+opt/nobara/mutter-vrr/share/gnome-control-center
+opt/nobara/mutter-vrr/share/gnome-shell
+opt/nobara/mutter-vrr/share/icons/hicolor/*/apps/*
+opt/nobara/mutter-vrr/share/locale

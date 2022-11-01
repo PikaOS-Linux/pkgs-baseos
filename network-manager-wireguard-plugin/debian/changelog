@@ -1,0 +1,5 @@
+network-manager-wireguard (0.8) kinetic; urgency=medium
+
+  * Initial release.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300

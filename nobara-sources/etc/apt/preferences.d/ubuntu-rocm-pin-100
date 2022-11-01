@@ -1,0 +1,7 @@
+Package: libhsa-runtime64*
+Pin: release o=Ubuntu
+Pin-Priority: 100
+
+Package: rocm*
+Pin: release o=Ubuntu
+Pin-Priority: 100

@@ -1,0 +1,19 @@
+Description: Fix for glext.h colllision due to moved header
+Author: Alastair McKinstry <mckinstry@debian.org>
+Bug-Origin: https://github.com/nigels-com/glew/pull/198/commits/d6c2c3b9ca52af697088f280c30fe5b27f7a694f
+Last-Updated: 2018-12-04
+Forwarded: not-needed
+
+Index: glew-2.2.0/include/GL/glew.h
+===================================================================
+--- glew-2.2.0.orig/include/GL/glew.h
++++ glew-2.2.0/include/GL/glew.h
+@@ -78,7 +78,7 @@
+ */
+ 
+ #ifndef __glew_h__
+-#define __glew_h__
++#define __oglew_h__
+ #define __GLEW_H__
+ 
+ #if defined(__gl_h_) || defined(__GL_H__) || defined(_GL_H) || defined(__X_GL_H)

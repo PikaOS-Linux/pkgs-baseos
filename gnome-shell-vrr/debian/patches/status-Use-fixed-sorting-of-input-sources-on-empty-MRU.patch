@@ -1,0 +1,34 @@
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Wed, 14 Sep 2022 20:20:14 +0200
+Subject: status: Use fixed sorting of input sources on empty MRU
+
+When updating the MRU sources if there was no prior MRU, we want
+to go with the unmodified list of sources in visibility order.
+
+However iterating over object properties happens in an undetermined
+order, so the initial MRU list ends up picking a value at random.
+
+In order to prefer the sources list in the same order than they
+appear in the menu if there was no prior MRU, order the keys
+when accessing it and building the initial list of sources.
+
+Closes: https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/5873
+Part-of: <https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/2487>
+(cherry picked from commit 13c9fd2a668e137b9e2569dcdedb0a25b95ae9aa)
+---
+ js/ui/status/keyboard.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/ui/status/keyboard.js b/js/ui/status/keyboard.js
+index 76a42f6..65b3962 100644
+--- a/js/ui/status/keyboard.js
++++ b/js/ui/status/keyboard.js
+@@ -492,7 +492,7 @@ var InputSourceManager = class extends Signals.EventEmitter {
+ 
+     _updateMruSources() {
+         let sourcesList = [];
+-        for (let i in this._inputSources)
++        for (let i of Object.keys(this._inputSources).sort((a, b) => a - b))
+             sourcesList.push(this._inputSources[i]);
+ 
+         this._keyboardManager.setUserLayouts(sourcesList.map(x => x.xkbId));

@@ -1,0 +1,9 @@
+Document: glfw3
+Title: Documentation for version 3.0 of GLFW library.
+Abstract: Comprehesive library reference and set
+ of various guides related to the library usage.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/libglfw3-dev/html/index.html
+Files: /usr/share/doc/libglfw3-dev/html/*

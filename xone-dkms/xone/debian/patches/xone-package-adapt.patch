@@ -1,0 +1,35 @@
+diff -uraN a/Makefile b/Makefile
+--- a/Makefile	1970-01-01 02:00:00.000000000 +0200
++++ b/Makefile	2022-10-04 19:12:45.651268524 +0300
+@@ -0,0 +1,20 @@
++VERSION=0.3
++
++.PHONY: install
++all:
++	true
++
++install:
++		cp dkms.conf dkms.conf.in
++		sed 's/"#VERSION#"/"'"${VERSION}"'"/g' <dkms.conf.in >dkms.conf
++		echo 'ccflags-y += -DDEBUG' >> "Kbuild"
++		echo "* Copying module into /usr/src..."
++		install -dm755 $(DESTDIR)/usr/src/xone
++		rsync -av --progress ./* $(DESTDIR)/usr/src/xone/ --exclude debian
++		install -dm755 $(DESTDIR)/usr/bin
++		cp install/firmware.sh $(DESTDIR)/usr/bin/xone-firmware
++		ln -sf /usr/src/xone $(DESTDIR)/usr/src/xone-"${VERSION}"
++		install -d $(DESTDIR)/etc/modules-load.d
++		cp -r modules-load-d-xone.conf  $(DESTDIR)/etc/modules-load.d/xone.conf
++		echo "* Blacklisting xpad module..."
++		install -D -m 644 install/modprobe.conf $(DESTDIR)/etc/modprobe.d/xone-blacklist.conf
+diff -uraN a/modules-load-d-xpadneo.conf b/modules-load-d-xpadneo.conf
+--- a/modules-load-d-xone.conf	1970-01-01 02:00:00.000000000 +0200
++++ b/modules-load-d-xone.conf	2022-09-25 20:44:46.000000000 +0300
+@@ -0,0 +1,6 @@
++xone-wired
++xone-dongle
++xone-gip
++xone-gip-gamepad
++xone-gip-headset
++xone-gip-chatpad
++xone-gip-guitar

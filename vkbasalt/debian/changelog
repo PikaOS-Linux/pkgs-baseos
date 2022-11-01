@@ -1,0 +1,37 @@
+vkbasalt (1:0.3.2.6-1) kinetic; urgency=medium
+
+ * Initial Push to PPA
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
+
+vkbasalt (0.3.2.6-1) unstable; urgency=medium
+
+  * New upstream version 0.3.2.6
+  * Update standards version to 4.6.1, no changes needed
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Fri, 05 Aug 2022 10:35:34 +0200
+
+vkbasalt (0.3.2.5-1) unstable; urgency=medium
+
+  * New upstream version 0.3.2.5
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Sat, 12 Feb 2022 20:31:33 +0100
+
+vkbasalt (0.3.2.4-1) unstable; urgency=medium
+
+  * New upstream version 0.3.2.4
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Sat, 23 Jan 2021 21:46:28 +0100
+
+vkbasalt (0.3.2.3-2) unstable; urgency=medium
+
+  * set Multi-Arch: same
+  * bump Standards-Version to 4.5.1
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Sat, 09 Jan 2021 11:35:00 +0100
+
+vkbasalt (0.3.2.3-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #961010)
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Wed, 04 Nov 2020 19:00:03 +0100

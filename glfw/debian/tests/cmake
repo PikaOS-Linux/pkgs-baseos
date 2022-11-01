@@ -1,0 +1,29 @@
+#!/bin/sh
+# autopkgtest check: Configure, build and run a CMake project against GLFW 3
+
+set -e
+
+# Require $AUTOPKGTEST_TMP for temporary build files
+if [ -z "$AUTOPKGTEST_TMP" ]
+then
+	echo "Required envvar \"$AUTOPKGTEST_TMP\"is not set" >&2
+	exit 1
+fi
+
+# Copy test program to AUTOPKGTEST_TMP and cd there
+cp debian/tests/CMakeLists.txt debian/tests/glfw3_test.c "$AUTOPKGTEST_TMP"
+cd "$AUTOPKGTEST_TMP"
+
+# Run CMake and build program
+CFLAGS='-Wall -Werror' cmake .
+make VERBOSE=1
+echo "build: OK"
+
+# Run it - ensure the correct version is reported
+GLFW_VERSION=$(dpkg-query -f '${Version}\n' -W libglfw3-dev | \
+	sed 's/[^.0-9].*//' | sed 's/^[0-9]*\.[0-9]*$/&.0/')
+
+TEST_RESULT=$(./glfw3_test)
+echo $TEST_RESULT
+[ $(echo $TEST_RESULT | cut -f 1 -d' ') = $GLFW_VERSION ]
+echo "run: OK"

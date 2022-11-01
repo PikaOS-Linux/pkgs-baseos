@@ -1,0 +1,6 @@
+#! /bin/bash
+
+# Disables amdgpu-pro libraries to fallback to mesa
+# USE wrappers instead
+
+cp -rfv /opt/nobara/mutter-vrr/lib/udev/rules.d/* /lib/udev/rules.d/

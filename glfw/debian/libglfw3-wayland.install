@@ -1,0 +1,2 @@
+#!/usr/bin/dh-exec
+wayland/usr/lib/*/lib*.so.* usr/lib/${DEB_HOST_MULTIARCH}

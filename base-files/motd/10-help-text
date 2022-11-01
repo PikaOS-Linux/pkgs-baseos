@@ -1,0 +1,7 @@
+#!/bin/sh
+
+printf "\n"
+printf " * Website:		https://nobaraproject.org\n"
+printf " * Documentation:     	https://nobaraproject.org/docs\n"
+printf " * Troubleshooting:     https://nobaraproject.org/docs/upgrade-troubleshooting\n"
+printf " * Discord:        	https://discord.gg/6y3BdzC\n"

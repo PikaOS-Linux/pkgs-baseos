@@ -1,0 +1,13 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: xpadneo
+Upstream-Contact: Florian Dollinger <dollinger.florian@gmx.de>
+Source: https://github.com/atar-axis/xpadneo
+
+Files: *
+Copyright: 2022 Florian Dollinger <dollinger.florian@gmx.de>
+License: GPL-3
+
+Files: debian/*
+Copyright: 2022 Ward Nakchbandi <hotrod.master@hotmail.com>
+License: GPL-3
+

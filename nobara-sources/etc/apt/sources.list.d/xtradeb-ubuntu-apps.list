@@ -1,0 +1,6 @@
+# not updated for kinetic yet
+# deb [signed-by=/etc/apt/trusted.gpg.d/xtradeb-ubuntu-apps.gpg] https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu/ kinetic main
+# # deb-src [signed-by=/etc/apt/trusted.gpg.d/xtradeb-ubuntu-apps.gpg] https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu/ kinetic main
+
+deb  [signed-by=/etc/apt/trusted.gpg.d/xtradeb-ubuntu-apps.gpg]  https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu/ jammy main
+deb-src [signed-by=/etc/apt/trusted.gpg.d/xtradeb-ubuntu-apps.gpg]  https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu/ jammy main

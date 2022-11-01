@@ -1,0 +1,4 @@
+deb https://repo.radeon.com/amdgpu/22.20.3/ubuntu jammy main proprietary
+#deb-src https://repo.radeon.com/amdgpu/22.20.3/ubuntu jammy main
+deb [signed-by=/etc/apt/trusted.gpg.d/amdvlk.gpg.key] http://repo.radeon.com/amdvlk/apt/debian bionic main
+#deb-src [signed-by=/etc/apt/trusted.gpg.d/amdvlk.gpg.key] http://repo.radeon.com/amdvlk/apt/debian bionic main

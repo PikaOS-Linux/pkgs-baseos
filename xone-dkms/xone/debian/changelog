@@ -1,0 +1,18 @@
+xone-dkms (0.3-6) kinetic; urgency=medium
+
+  * Fix bad deps.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300
+
+xone-dkms (0.3-4) kinetic; urgency=medium
+
+  * Revert Stupid Patch and use firmware install properly, and fix section.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300
+
+
+xone-dkms (0.3) kinetic; urgency=medium
+
+  * Initial release.
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 04 Oct 2022 17:50:00 +0300

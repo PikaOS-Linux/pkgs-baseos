@@ -1,0 +1,19 @@
+Source: xpad-noone-dkms
+Section: games
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13),
+               dh-autoreconf,
+               quilt,
+               dh-dkms,
+               rsync,
+               dkms
+Standards-Version: 4.6.1
+Homepage: https://github.com/medusalix/xpad-noone
+Rules-Requires-Root: no
+
+Package: xpad-noone-dkms
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}, ${shlibs:Depends}, dkms, xone-dkms
+Description: Xpad kernel driver without Xbox One controller support

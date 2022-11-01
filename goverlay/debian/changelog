@@ -1,0 +1,91 @@
+goverlay (1:0.9-1) unstable; urgency=medium
+
+  * Initial Push to PPA
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
+
+goverlay (0.9-1) unstable; urgency=medium
+
+  * New upstream version 0.9
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Thu, 21 Jul 2022 13:23:27 +0200
+
+goverlay (0.8.1-1) unstable; urgency=medium
+
+  * New upstream version 0.8.1
+  * Update standards version to 4.6.1, no changes needed
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Tue, 05 Jul 2022 13:13:36 +0200
+
+goverlay (0.7.1-2) unstable; urgency=medium
+
+  * Build with Lazarus 2.2.0
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Tue, 25 Jan 2022 20:41:39 +0100
+
+goverlay (0.7.1-1) unstable; urgency=medium
+
+  * New upstream version 0.7.1
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Thu, 16 Dec 2021 11:39:34 +0100
+
+goverlay (0.7-1) unstable; urgency=medium
+
+  * New upstream version 0.7
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Mon, 29 Nov 2021 21:26:07 +0100
+
+goverlay (0.6.4-1) unstable; urgency=medium
+
+  * New upstream version 0.6.4
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Thu, 28 Oct 2021 09:07:46 +0200
+
+goverlay (0.6.3-2) unstable; urgency=medium
+
+  * Fix missing build dependencies
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Sun, 10 Oct 2021 16:56:41 +0200
+
+goverlay (0.6.3-1) unstable; urgency=medium
+
+  * New upstream version 0.6.3
+  * Upload to unstable
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Sun, 10 Oct 2021 15:33:58 +0200
+
+goverlay (0.6.1-1) experimental; urgency=medium
+
+  * New upstream version 0.6.1
+
+ -- Stephan Lachnit <stephanlachnit@debian.org>  Wed, 28 Jul 2021 19:11:29 +0200
+
+goverlay (0.5.1-1) experimental; urgency=medium
+
+  * New upstream version 0.5.1
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Sat, 05 Jun 2021 11:24:21 +0200
+
+goverlay (0.5-1) experimental; urgency=medium
+
+  * New upstream version 0.5
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Wed, 24 Mar 2021 13:49:53 +0100
+
+goverlay (0.4.4-1) unstable; urgency=medium
+
+  * New upstream version 0.4.4
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Thu, 04 Feb 2021 19:44:40 +0100
+
+goverlay (0.4.3-1) unstable; urgency=medium
+
+  * New upstream version 0.4.3
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Sun, 20 Dec 2020 14:28:17 +0100
+
+goverlay (0.4.2-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #958862)
+
+ -- Stephan Lachnit <stephanlachnit@protonmail.com>  Fri, 20 Nov 2020 16:02:28 +0100
