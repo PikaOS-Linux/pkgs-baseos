@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# We should quit any existing repoman processes before we open a new one. 
+# See https://github.com/pop-os/repoman/pull/30#issuecomment-558732562
+killall repoman 2>/dev/null || true
+
+# Open a new one.
+"/usr/bin/repoman"

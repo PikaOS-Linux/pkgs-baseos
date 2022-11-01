@@ -1,0 +1,16 @@
+Source: supergfxctl
+Section: misc
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13), rustc, libdbus-1-dev, cargo, quilt
+Standards-Version: 4.6.1
+Homepage: https://gitlab.com/asus-linux/supergfxctl
+
+Package: supergfxctl
+Section: misc
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: supergfxctl is a super graphics mode controller for systems with hybrid gpus.
+
+
+

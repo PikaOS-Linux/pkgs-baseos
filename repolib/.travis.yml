@@ -1,0 +1,13 @@
+dist: bionic
+addons:
+    apt:
+        packages:
+            - libdbus-1-dev
+
+language: python
+python: "3.8"
+
+install:
+    - pip install -r requirements.txt
+scripts:
+    - pytest --pylint

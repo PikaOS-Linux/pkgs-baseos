@@ -1,0 +1,20 @@
+diff -burN a/data/repoman.desktop b/data/repoman.desktop
+--- a/data/repoman.desktop	2022-10-07 02:57:12.000000000 +0300
++++ b/data/repoman.desktop	2022-10-29 15:47:27.107699555 +0300
+@@ -1,12 +1,11 @@
+ [Desktop Entry]
+-Name=Repoman
+-GenericName=Repoman
+-Comment=Easily manage PPA
++Name=Nobara Repository Settings
++GenericName=Repository Settings
++Comment=Easily manage PPA and Flatpaks
+ Categories=System;
+ Exec=/usr/lib/repoman/repoman.pkexec
+-Icon=repoman
++Icon=software-properties
+ Terminal=false
+ Type=Application
+ X-GNOME-Gettext-Domain=repoman
+ Keywords=Python;
+-NoDisplay=true

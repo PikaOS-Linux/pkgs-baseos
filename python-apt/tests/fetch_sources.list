@@ -1,0 +1,1 @@
+deb [allow-insecure=yes] file:/home/cosmo/test/builds/baseos/kinetic/python-apt/python-apt-2.3.0ubuntu2/tests/data/fake-packages/ /

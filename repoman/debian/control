@@ -1,0 +1,27 @@
+Source: repoman
+Section: x11
+Priority: extra
+Maintainer: Ian Santopietro <ian@system76.com>
+Build-Depends: debhelper (>= 10),
+               dh-python,
+               python3-all,
+               gir1.2-gtk-3.0,
+               libflatpak-dev,
+               quilt
+Standards-Version: 3.9.3
+X-Python3-Version: >= 3.4
+
+Package: repoman
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends},
+         gir1.2-gtk-3.0,
+         python3-repolib (>= 2.0),
+         flatpak,
+         gir1.2-appstream-1.0,
+         gir1.2-flatpak-1.0
+Provides: software-properties-gtk
+Replaces: software-properties-gtk
+Conflicts: software-properties-gtk
+Description: Repoman
+ Apt/PPA Repositories & Flatpak manager 
+

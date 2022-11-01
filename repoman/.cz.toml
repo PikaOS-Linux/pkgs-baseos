@@ -1,0 +1,8 @@
+# This defines our version tracking
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "2.2.0"
+tag_format = "v$version"
+version_files = [
+    'setup.py:version'
+]

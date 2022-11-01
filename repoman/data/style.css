@@ -1,0 +1,85 @@
+.inline-toolbar button.flat {
+	border-radius: 9999px;
+	border: none;
+	background-color: transparent;
+	background-image: none;
+	box-shadow: none;
+	-gtk-outline-radius: 9999px;
+}
+
+.inline-toolbar button.flat:hover {
+	background-color: alpha(@theme_fg_color, 0.2);
+}
+
+#Title {
+	padding-top: 50px;
+	font-size: 18px;
+	padding-bottom: 5px;
+}
+
+#Description {
+	font-size: 10px;	
+	padding-bottom: 15px;
+}
+
+#Validate {
+	color: #0066cc;
+	padding-top: 10px;
+	font-weight: bold;
+}
+
+#Validate.success {
+	color: #009933;
+}
+
+#Validate.error {
+	color: #ff3300;
+}
+
+separator {
+  color: transparent;
+  background-color: transparent;
+}
+
+.dialog-vbox {
+	padding: 12px;
+}
+
+.description {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.list_window {
+  margin-top: 10px;
+}
+
+/* This is required because of some bug with GTK that makes the buttons
+in a message dialog wonky. It doesn't happen in other python projects, but I 
+can't figure out what's causing the problem. */
+
+messagedialog > decoration {
+  margin: 0px;
+}
+
+messagedialog .dialog-vbox {
+  padding: 0px;
+  margin: 0px;
+}
+
+messagedialog > .dialog-vbox > box:not(.dialog-action-box) {
+  padding: 0 12px;
+}
+
+messagedialog expander {
+  margin: 0 24px;
+}
+
+messagedialog box.titlebar {
+  padding: 0px;
+}
+
+.dialog-action-area {
+  margin: 0;
+  margin-top: 0;
+}

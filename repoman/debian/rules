@@ -1,0 +1,11 @@
+#! /usr/bin/make -f
+
+%:
+	dh $@ --with quilt --with python3 --buildsystem=pybuild
+	
+override_dh_install:
+	dh_install
+	mkdir -p debian/repoman/usr/share || echo
+	cp -r debian/icons debian/repoman/usr/share/ 
+	ln -sf /usr/bin/repoman debian/repoman/usr/bin/software-properties-gtk
+

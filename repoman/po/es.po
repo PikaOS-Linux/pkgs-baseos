@@ -1,0 +1,292 @@
+# REPOMAN POT TRANSLATION TEMPLATE.
+# Copyright (C) 2020 Ian Santopietro
+# This file is distributed under the same license as the REPOMAN package.
+# Ian Santopietro <isantop@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-17 12:35-0700\n"
+"PO-Revision-Date: 2020-11-09 13:37-0700\n"
+"Last-Translator: Ian Santopiero <ian@system76.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: repoman/dialog.py:80
+msgid "Add Source"
+msgstr "Agregar repositorio"
+
+#: repoman/dialog.py:109
+msgid "Enter Source Details"
+msgstr "Ingrese las detalles de repositorio"
+
+#: repoman/dialog.py:113
+msgid "e.g. ppa:mirkobrombin/ppa"
+msgstr "p.e. ppa:mirkobrombin/ppa"
+
+#: repoman/dialog.py:124
+msgid "Source Line"
+msgstr "Línea de repositorio"
+
+#: repoman/dialog.py:179
+#, python-format
+msgid "Could not add source: %s"
+msgstr "No se puedo agregar repositorio: %s"
+
+#: repoman/dialog.py:182
+msgid "Could not add source"
+msgstr "No se puedo agregar repositorio"
+
+# {} is the repo entered which couldn't be added
+#: repoman/dialog.py:184
+msgid "{} could not be added"
+msgstr "{} no se puedo agregar"
+
+# {} is the name of the source/repository
+#: repoman/dialog.py:194
+msgid "Remove {}"
+msgstr "Eliminar {}"
+
+#: repoman/dialog.py:223
+msgid "Are you sure you want to remove this source?"
+msgstr "¿Estás seguro de que quieres eliminar este repositorio?"
+
+#: repoman/dialog.py:230
+msgid ""
+"If you remove this source, you will need to add it again to continue using "
+"it. Any software you've installed from this source will remain installed."
+msgstr ""
+"Si elimina este repositorio, deberá agregarlo nuevamente para continuar "
+"usándolo. Todo el software que haya instalado desde este repositorio "
+"permanecerá instalado."
+
+#: repoman/dialog.py:239
+msgid ""
+"If you remove this source, you will need to add it again to continue using "
+"it."
+msgstr ""
+"Si elimina este repositorio, deberá agregarlo nuevamente para continuar "
+"usándolo."
+
+#: repoman/dialog.py:258
+msgid " All flatpaks you've installed from this source will be removed."
+msgstr "Se eliminará todo el flatpaks que haya instalado de este repositorio."
+
+#: repoman/dialog.py:263
+msgid "Removed Flatpaks"
+msgstr "Flatpaks elimina"
+
+#: repoman/dialog.py:278
+msgid "The following Flatpaks will be removed with this source:"
+msgstr "El siguiente flatpaks se eliminará con este repositorio"
+
+#: repoman/dialog.py:322
+msgid "Modify Source"
+msgstr "Modificar repositorio"
+
+#: repoman/dialog.py:345 repoman/dialog.py:365
+msgid "Name"
+msgstr "Nombre"
+
+#: repoman/dialog.py:347
+msgid "Source Code"
+msgstr "Código fuente"
+
+#: repoman/dialog.py:349
+msgid "URIs"
+msgstr "URI:"
+
+#: repoman/dialog.py:351
+msgid "Version"
+msgstr "Versión:"
+
+#: repoman/dialog.py:353
+msgid "Components"
+msgstr "Componente:"
+
+#: repoman/dialog.py:355
+msgid "Enabled"
+msgstr "Habilitar:"
+
+#: repoman/dialog.py:537
+msgid "Homepage"
+msgstr "Página principal"
+
+#: repoman/dialog.py:545
+msgid "Installed Flatpaks"
+msgstr "Flatpaks installado"
+
+# {} is the name of the source/repo
+#: repoman/dialog.py:561
+msgid "The following Flatpaks are currently installed from {}"
+msgstr "El siguiente flatpaks está instalado actualmente desde {}"
+
+#: repoman/dialog.py:576
+msgid "Applications:"
+msgstr "Aplicaciones:"
+
+#: repoman/flatpak.py:65
+msgid "Flatpak Sources"
+msgstr "Repositorios Flatpak"
+
+#: repoman/flatpak.py:70
+msgid ""
+"These sources are for software provided via Flatpak. They may present a "
+"security risk. Only add sources that you trust."
+msgstr ""
+"Estos repositorios son para el software proporcionado a través de Flatpak. "
+"Pueden presentar un riesgo de seguridad. Solo agregue repositorios de "
+"confianza."
+
+#: repoman/flatpak.py:92 repoman/list.py:76
+msgid "Source"
+msgstr "Repositorio"
+
+#: repoman/flatpak.py:96
+msgid "URL"
+msgstr "URL"
+
+#: repoman/flatpak.py:101
+msgid "Type"
+msgstr "Tipo"
+
+#: repoman/flatpak.py:117 repoman/list.py:92
+msgid "Add New Source"
+msgstr "Agregar repositorio"
+
+#: repoman/flatpak.py:126
+msgid "Remote Info"
+msgstr "Información del repositorio"
+
+#: repoman/flatpak.py:135
+msgid "Remove Selected Source"
+msgstr "Eliminar repositorio"
+
+#: repoman/list.py:55 repoman/stack.py:60
+msgid "Extra Sources"
+msgstr "Repositorios adicionales"
+
+#: repoman/list.py:60
+msgid ""
+"These sources are for software provided by a third party. They may present a "
+"security risk or cause system instability. Only add sources that you trust."
+msgstr ""
+"Estas fuentes son para software proporcionado por un tercero. Pueden "
+"presentar un riesgo de seguridad o pueden causar inestabilidad del sistema. "
+"Solo agregue fuentes en las que confíe."
+
+#: repoman/list.py:78
+msgid "URI"
+msgstr "URI"
+
+#: repoman/list.py:101
+msgid "Modify Selected Source"
+msgstr "Modificar el repositorio"
+
+#: repoman/list.py:110
+msgid "Delete Selected Source"
+msgstr "Eliminar el repositorio"
+
+#: repoman/settings.py:34
+msgid "Community-maintained software"
+msgstr "Software mantenido por la comunidad"
+
+#: repoman/settings.py:35
+msgid "Proprietary drivers for devices"
+msgstr "Controladores de hardware propietarios"
+
+#: repoman/settings.py:36
+msgid "Software with Copyright or Legal Restrictions"
+msgstr "Software con derechos de autor o restricciones legales"
+
+#: repoman/settings.py:54 repoman/settings.py:71
+msgid "Include source code"
+msgstr "Incluir código fuente"
+
+#: repoman/settings.py:62
+msgid "Prerelease updates"
+msgstr "Actualizaciones aún no publicadas"
+
+#: repoman/settings.py:87
+msgid "Official Sources"
+msgstr "Repositorios oficiales"
+
+# {} is the name of the OS, or "your OS"
+#: repoman/settings.py:94
+msgid ""
+"Official sources are provided by {} and its developers. It's recommended to "
+"leave these sources enabled."
+msgstr ""
+"Las fuentes oficiales son las proporcionadas por {} y sus desarrolladores. "
+"Se recomienda dejar estas fuentes habilitadas."
+
+#: repoman/settings.py:114
+msgid "Reset Mirrors to Defaults"
+msgstr "Restablecen a los predeterminados"
+
+#: repoman/settings.py:136
+msgid "Developer Options (Advanced)"
+msgstr "Opciones avanzadas de desarrollador."
+
+#: repoman/settings.py:148
+msgid "These options are primarily of interest to developers."
+msgstr ""
+"Estas opciones son aquellas que interesan principalmente a los "
+"desarrolladores."
+
+#: repoman/settings.py:213
+msgid "Remove Mirror"
+msgstr "Eliminar servidor"
+
+#: repoman/settings.py:243
+msgid "Add a new mirror"
+msgstr "Agregar nuevo servidor"
+
+#: repoman/settings.py:245
+msgid "Add mirror"
+msgstr "Agregar servidor"
+
+#: repoman/stack.py:54
+msgid "Settings"
+msgstr "Configuraciones"
+
+#: repoman/stack.py:57
+msgid "Updates"
+msgstr "Actualizaciones"
+
+#: repoman/stack.py:66
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: repoman/updates.py:35
+msgid "Important security updates"
+msgstr "Actualizaciones importantes de seguridad"
+
+#: repoman/updates.py:36
+msgid "Recommended updates"
+msgstr "Actualizaciones recomendadas"
+
+#: repoman/updates.py:37
+msgid "Unsupported updates"
+msgstr "Actualizacions sin servicio técnico"
+
+#: repoman/updates.py:59
+msgid "Update Sources"
+msgstr "Fuentes de actualizaciones"
+
+#: repoman/updates.py:64
+#, python-format
+msgid ""
+"These sources control how %s checks for updates. It is recommended to leave "
+"these sources enabled."
+msgstr ""
+"Estas fuentes controlan cómo %s busca actualizaciones. Se recomienda dejar "
+"estas fuentes habilitadas."
+
+#~ msgid "{title}"
+#~ msgstr "{title}"

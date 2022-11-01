@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Repoman
+GenericName=Repoman
+Comment=Easily manage PPA
+Categories=System;
+Exec=/usr/lib/repoman/repoman.pkexec
+Icon=repoman
+Terminal=false
+Type=Application
+X-GNOME-Gettext-Domain=repoman
+Keywords=Python;
+NoDisplay=true
