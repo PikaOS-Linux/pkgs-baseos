@@ -1,1 +1,2 @@
 xpadneo-dkms_0.9.5.orig.tar.gz
+#https://github.com/atar-axis/xpadneo
