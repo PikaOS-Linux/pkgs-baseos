@@ -1,0 +1,1 @@
+https://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git
