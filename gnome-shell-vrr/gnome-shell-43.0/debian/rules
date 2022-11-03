@@ -26,10 +26,11 @@ override_dh_auto_configure:
 		$(CONFFLAGS)
 		
 override_dh_install:
-	dh_install		
-	rm -r debian/tmp/etc/xdg/autostart/gnome-shell-overrides-migration.desktop
+	mkdir -p debian/extras/gnome-shell-vrr/usr/bin
 	cp debian/extras/gnome-shell-vrr debian/extras/gnome-shell-vrr/usr/bin/gnome-shell-vrr
 	chmod +x debian/extras/gnome-shell-vrr/usr/bin/gnome-shell-vrr
+	dh_install		
+	rm -r debian/tmp/etc/xdg/autostart/gnome-shell-overrides-migration.desktop
 
 override_dh_makeshlibs:
 	echo "dh_makeshlibs disabled!"
