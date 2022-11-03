@@ -7,10 +7,12 @@ DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' '
 
 override_dh_install:
 	dh_install
-	mv debian/nobara-mintupdate/usr/bin/mintupdate debian/nobara-mintupdate/usr/bin/mintupdate-user
-	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate-user
-	mv debian/mintupdate debian/nobara-mintupdate/usr/bin/
+	mv debian/nobara-mintupdate/usr/bin/mintupdate debian/nobara-mintupdate/usr/lib/mintbin/mintupdate
+	chmod +x debian/nobara-mintupdate/usr/lib/mintbin/mintupdate
+	mv debian/extras/mintupdate debian/nobara-mintupdate/usr/bin/
 	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate
+	mv debian/extras/mintupdate-launcher debian/nobara-mintupdate/usr/bin/
+	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate-launcher
 # Inject version number in the code
 override_dh_installdeb:
 	dh_installdeb

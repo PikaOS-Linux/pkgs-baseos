@@ -40,3 +40,15 @@ diff -ru a/usr/share/linuxmint/mintupdate/main.ui b/usr/share/linuxmint/mintupda
                          <property name="wrap">True</property>
                        </object>
                        <packing>
+diff -ru a/etc/xdg/autostart/mintupdate.desktop b/etc/xdg/autostart/mintupdate.desktop
+--- a/etc/xdg/autostart/mintupdate.desktop	2022-10-30 17:03:41.000000000 +0300
++++ b/etc/xdg/autostart/mintupdate.desktop	2022-11-03 21:19:20.027251849 +0300
+@@ -148,7 +148,7 @@
+ Name[zh_CN]=更新管理器
+ Name[zh_HK]=更新管理員
+ Name[zh_TW]=更新管理員
+-Comment=Linux Mint Update Manager
++Comment=Nobara Update Manager
+ Icon=mintupdate
+ Exec=mintupdate-launcher
+ Terminal=false

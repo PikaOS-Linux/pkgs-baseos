@@ -1,0 +1,3 @@
+#! /bin/bash
+target="/usr/lib/mintbin/mintupdate-launcher"
+GDK_BACKEND=x11 "${target}" $@
