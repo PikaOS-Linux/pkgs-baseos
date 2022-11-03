@@ -8,11 +8,17 @@ DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' '
 override_dh_install:
 	dh_install
 	mkdir -p debian/nobara-mintupdate/usr/lib/mintbin/
-	mv debian/nobara-mintupdate/usr/bin/mintupdate debian/nobara-mintupdate/usr/lib/mintbin/mintupdate
+	# Move main mintupdate
+	mv debian/nobara-mintupdate/usr/bin/mintupdate debian/nobara-mintupdate/usr/lib/mintbin/
 	chmod +x debian/nobara-mintupdate/usr/lib/mintbin/mintupdate
-	mv debian/extras/mintupdate debian/nobara-mintupdate/usr/bin/
+	# Move main mintupdate-launcher
+	mv debian/nobara-mintupdate/usr/bin/mintupdate-launcher debian/nobara-mintupdate/usr/lib/mintbin/
+	chmod +x debian/nobara-mintupdate/usr/lib/mintbin/mintupdate-launcher
+	# Add xwayland mintupdate
+	cp debian/extras/mintupdate debian/nobara-mintupdate/usr/bin/
 	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate
-	mv debian/extras/mintupdate-launcher debian/nobara-mintupdate/usr/bin/
+	# Add xwayland mintupdate-launcher
+	cp debian/extras/mintupdate-launcher debian/nobara-mintupdate/usr/bin/
 	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate-launcher
 # Inject version number in the code
 override_dh_installdeb:
