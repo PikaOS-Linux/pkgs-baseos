@@ -26,9 +26,9 @@ override_dh_auto_configure:
 		$(CONFFLAGS)
 
 override_dh_auto_install:
-	mkdir -p debian/extras/gnome-shell-vrr/usr/bin
-	cp debian/extras/gnome-shell-vrr debian/extras/gnome-shell-vrr/usr/bin/gnome-shell-vrr
-	chmod +x debian/extras/gnome-shell-vrr/usr/bin/gnome-shell-vrr
+	mkdir -p debian/gnome-shell-vrr/usr/bin
+	cp debian/extras/gnome-shell-vrr debian/gnome-shell-vrr/usr/bin/gnome-shell-vrr
+	chmod +x debian/gnome-shell-vrr/usr/bin/gnome-shell-vrr
 	dh_auto_install
 
 override_dh_install:
