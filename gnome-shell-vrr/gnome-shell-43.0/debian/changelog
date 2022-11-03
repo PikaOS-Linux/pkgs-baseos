@@ -1,4 +1,4 @@
-gnome-shell-vrr (43.0-0nobara16) kinetic; urgency=medium
+gnome-shell-vrr (43.0-0nobara17) kinetic; urgency=medium
 
   * Last action didn't work, let's retry.
 

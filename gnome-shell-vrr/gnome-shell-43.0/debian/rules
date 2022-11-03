@@ -25,12 +25,6 @@ override_dh_auto_configure:
 		-Dextensions-tool:bash_completion=enabled \
 		$(CONFFLAGS)
 
-override_dh_auto_install:
-	mkdir -p debian/gnome-shell-vrr/usr/bin
-	cp debian/extras/gnome-shell-vrr debian/gnome-shell-vrr/usr/bin/gnome-shell-vrr
-	chmod +x debian/gnome-shell-vrr/usr/bin/gnome-shell-vrr
-	dh_auto_install
-
 override_dh_install:
 	dh_install		
 	rm -r debian/tmp/etc/xdg/autostart/gnome-shell-overrides-migration.desktop
