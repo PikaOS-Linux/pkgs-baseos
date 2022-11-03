@@ -1,2 +1,0 @@
-nobara-mintupdate_5.8.9_99nobara4.orig.tar.xz
-#https://github.com/linuxmint/mintupdate
