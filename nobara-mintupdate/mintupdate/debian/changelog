@@ -1,4 +1,4 @@
-nobara-mintupdate (5.8.9~99nobara5) kinetic; urgency=medium
+nobara-mintupdate (5.8.9~99nobara6) kinetic; urgency=medium
 
   * Make it work in user mode by fixing wayland weirdness
 
