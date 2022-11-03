@@ -10,4 +10,4 @@ opt/nobara/mutter-vrr/share/bash-completion/completions/gnome-extensions
 opt/nobara/mutter-vrr/share/dbus-1/services
 opt/nobara/mutter-vrr/share/man
 opt/nobara/mutter-vrr/share/xdg-desktop-portal
-debian/extras/gnome-shell-vrr /usr/bin
+usr/bin/gnome-shell-vrr

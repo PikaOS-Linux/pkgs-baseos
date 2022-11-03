@@ -1,3 +1,9 @@
+gnome-shell-vrr (43.0-0nobara13) kinetic; urgency=medium
+
+  * Last action didn't work, let's retry.
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 07 Oct 2022 23:26:00 +0300
+
 gnome-shell-vrr (43.0-0nobara12) kinetic; urgency=medium
 
   * Get gnome-shell-vrr command.
