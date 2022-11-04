@@ -1,0 +1,8 @@
+X-Repolib-Name: Official WineHQ Sources
+Enabled: yes
+Types: deb deb-src
+URIs: https://dl.winehq.org/wine-builds/ubuntu
+Suites: kinetic
+Components: main
+Architectures: amd64 i386
+Signed-By: /etc/apt/trusted.gpg.d/winehq-archive.key
