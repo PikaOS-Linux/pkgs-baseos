@@ -1,0 +1,14 @@
+interest-noawait /etc/lsb-release
+interest-noawait /etc/issue
+interest-noawait /etc/issue.net
+interest-noawait /usr/lib/firefox-addons/searchplugins/google.xml
+interest-noawait /usr/bin/firefox
+interest-noawait /usr/share/sounds/startup.wav
+interest-noawait /usr/share/system-config-printer
+interest-noawait /usr/share/linuxmint/adjustments
+interest-noawait /opt/firefox/firefox
+interest-noawait /usr/lib/firefox
+interest-noawait /usr/share/mdm/defaults.conf
+interest-noawait /usr/share/applications/vino-preferences.desktop
+interest-noawait /etc/xdg/autostart/user-dirs-update-gtk.desktop
+interest-noawait /etc/xdg/autostart/vino-server.desktop
