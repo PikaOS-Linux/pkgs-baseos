@@ -8,5 +8,5 @@ Rules-Requires-Root: no
 
 Package: nobara-package-manager
 Architecture: any
-Depends: ${misc:Depends}, nobara-mintinstall, nobara-mintupdate, python-apt-common, repoman, repolib
+Depends: ${misc:Depends}, nobara-mintdrivers, nobara-mintinstall, nobara-mintupdate, python-apt-common, repoman, repolib
 Description: A Meta package to install nobara's collection of package management software

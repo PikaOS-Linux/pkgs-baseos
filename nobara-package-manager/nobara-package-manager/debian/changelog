@@ -1,3 +1,9 @@
+nobara-package-manager (1.0-99nobara5) kinetic; urgency=medium
+
+  * Add nobara-mintdrivers
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
 nobara-package-manager (1.0-99nobara4) kinetic; urgency=medium
 
   * Replace ubuntu update-manager with nobara-mintupdate
