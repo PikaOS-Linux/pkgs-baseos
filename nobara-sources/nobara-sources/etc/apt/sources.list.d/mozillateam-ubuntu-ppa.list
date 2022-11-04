@@ -1,2 +1,0 @@
-deb [signed-by=/etc/apt/trusted.gpg.d/mozillateam-ubuntu-ppa.gpg] https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ kinetic main
-# deb-src [signed-by=/etc/apt/trusted.gpg.d/mozillateam-ubuntu-ppa.gpg] https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ kinetic main

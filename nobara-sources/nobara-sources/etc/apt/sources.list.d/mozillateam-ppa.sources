@@ -1,0 +1,6 @@
+X-Repolib-Name: Official Mozilla Sources
+Enabled: yes
+Types: deb deb-src
+URIs: https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu
+Suites: kinetic
+Components: main

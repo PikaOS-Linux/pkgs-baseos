@@ -1,3 +1,9 @@
+nobara-sources (1.10-99nobara1) kinetic; urgency=urgent
+
+  * Switch to DEB822 Sources
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 20:50:00 +0300
+
 nobara-sources (1.9-nobara) kinetic; urgency=urgent
 
   * Add Cosmo OBS repo until i get in contact with the ubuntu team to discuss i386

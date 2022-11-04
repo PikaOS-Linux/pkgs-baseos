@@ -1,0 +1,7 @@
+X-Repolib-Name: XtraDeb Repo Sources
+Enabled: yes
+Types: deb
+URIs: https://packages.xtradeb.net/ubuntu
+Suites: kinetic
+Components: apps play
+Architectures: amd64
