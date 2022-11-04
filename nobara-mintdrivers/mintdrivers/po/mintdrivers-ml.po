@@ -1,0 +1,145 @@
+# Malayalam translation for linuxmint
+# Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
+# This file is distributed under the same license as the linuxmint package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: linuxmint\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2020-09-23 10:34+0100\n"
+"PO-Revision-Date: 2014-03-26 14:03+0000\n"
+"Last-Translator: Rajesh R <rajeshr.r61@gmail.com>\n"
+"Language-Team: Malayalam <ml@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2022-07-24 09:37+0000\n"
+"X-Generator: Launchpad (build 025a39fd866a641b6ae33074cda0d02a2c712d38)\n"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:60 generate_desktop_files:26
+#: generate_desktop_files:41 generate_desktop_files:69
+msgid "Driver Manager"
+msgstr "ഡ്രൈവർ നിയന്ത്രിതാവ്"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:67
+msgid "Re_vert"
+msgstr "തിരിച്ചു_പോവുക"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:69
+msgid "_Apply Changes"
+msgstr "_വ്യതാസങ്ങൾ വരുത്തുന്നു"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:71
+msgid "_Cancel"
+msgstr "_റദ്ദാക്കുക"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:73
+msgid "_Restart..."
+msgstr "_പുനരാവര്തിക്കുക.."
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:101
+msgid ""
+"Drivers cannot be installed.\n"
+"Please connect to the Internet or insert the Linux Mint installation DVD (or "
+"USB stick)."
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:221
+msgid "Applying changes..."
+msgstr "വ്യതാസങ്ങൾ വരുത്തുന്നു..."
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:399
+msgid "This device is using the recommended driver."
+msgstr "ഈ ഉപകരണം നിര്ധിഷ്ട ഡ്രൈവർ ഉപയോഗിക്കുന്നു."
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:400
+msgid "This device is using an alternative driver."
+msgstr "ഈ ഉപകരണം മറ്റൊരു ലഭ്യമായ ഡ്രൈവർ ഉപയോഗിക്കുന്നു"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:401
+msgid "This device is using a manually-installed driver."
+msgstr "ഈ ഉപകരണം മനുഷ്യ-സ്ഥാപിതമായ ഡ്രൈവർ ഉപയോഗിക്കുന്നു"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:402
+msgid "This device is not working."
+msgstr "ഈ ഉപകരണം പ്രവര്ത്തനരഹിതമാന്ന്"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:411
+msgid "Continue using a manually installed driver"
+msgstr "മനുഷ്യ- സ്ഥാപിതമായ ഡ്രൈവർ ഉപയോഗിച്ച് തുടരുക"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:438
+msgid "Version"
+msgstr "പതിപ്പ്"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:441
+msgid "recommended"
+msgstr "നിര്ധിഷ്ട"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:443
+msgid "open-source"
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:446
+msgid "requires a connection to the Internet"
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:470
+msgid "Do not use the device"
+msgstr "ഉപകരണം ഉപയോഗിക്കരുത്"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:488
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:489
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:557
+msgid "Unknown"
+msgstr "അജ്ഞാതം"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:512
+msgid "Processor"
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:539
+msgid "Processor microcode"
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:600
+msgid "Do not update the CPU microcode"
+msgstr ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:641
+msgid "You need to restart the computer to complete the driver changes."
+msgstr ""
+"ഡ്രൈവർ  വ്യത്യാസങ്ങൾ പൂര്നമാകാൻ  കമ്പ്യൂട്ടർ വീണ്ടും പ്രവര്തിപികെണ്ടാതാണ്"
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:655
+#, python-format
+msgid "%(count)d proprietary driver in use."
+msgid_plural "%(count)d proprietary drivers in use."
+msgstr[0] ""
+msgstr[1] ""
+
+#: usr/lib/linuxmint/mintdrivers/mintdrivers.py:660
+msgid "No proprietary drivers are in use."
+msgstr ""
+
+#: generate_desktop_files:26 generate_desktop_files:41
+msgid "Manage the drivers for your devices"
+msgstr "നിങ്ങളുടെ ഉപകരണത്തിനായി ഡ്രൈവറുകൾ നിയന്ത്രിക്കുക"
+
+#: usr/share/linuxmint/mintdrivers/main.ui.h:1
+msgid "Looking for hardware drivers..."
+msgstr ""
+
+#: usr/share/linuxmint/mintdrivers/main.ui.h:2
+msgid "Your computer does not need any additional drivers."
+msgstr ""
+
+#: usr/share/linuxmint/mintdrivers/main.ui.h:3
+msgid "An error occurred"
+msgstr ""
+
+#: usr/share/linuxmint/mintdrivers/main.ui.h:4
+msgid "OK"
+msgstr ""

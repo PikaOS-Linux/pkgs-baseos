@@ -1,0 +1,7 @@
+#!/bin/bash
+
+sudo rm -rf /usr/lib/linuxmint/mintDrivers
+sudo cp -R usr /
+
+/usr/lib/linuxmint/mintdrivers/mintdrivers.py test
+

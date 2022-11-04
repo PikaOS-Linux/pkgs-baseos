@@ -1,0 +1,11 @@
+--- usr/share/linuxmint/mintdrivers/main.ui	2022-11-04 13:25:34.467305673 +0300
++++ usr/share/linuxmint/mintdrivers/main.ui	2022-11-04 13:29:57.923041794 +0300
+@@ -413,7 +413,7 @@
+               <object class="GtkLabel">
+                 <property name="visible">True</property>
+                 <property name="can-focus">False</property>
+-                <property name="label" translatable="yes">Connect to the Internet or insert the Linux Mint installation disc (or USB stick).</property>
++                <property name="label" translatable="yes">Connect to the Internet.</property>
+                 <property name="wrap">True</property>
+               </object>
+               <packing>

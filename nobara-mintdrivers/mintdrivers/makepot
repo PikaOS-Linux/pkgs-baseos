@@ -1,0 +1,5 @@
+#!/bin/bash
+
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintdrivers/main.ui
+xgettext --language=Python --keyword=_ --keyword=N_ --output=mintdrivers.pot usr/lib/linuxmint/mintdrivers/mintdrivers.py generate_desktop_files usr/share/linuxmint/mintdrivers/main.ui.h
+rm -f usr/share/linuxmint/mintdrivers/main.ui.h
