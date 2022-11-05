@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright 2019 Juan Palacios <jpalaciosdev@gmail.com>
+
+#pragma once
+
+#define PROJECT_NAME "${PROJECT_NAME}"
+#define PROJECT_VERSION "${PROJECT_VERSION}"
+#define PCI_IDS_PATH "${WITH_PCI_IDS_PATH}"
