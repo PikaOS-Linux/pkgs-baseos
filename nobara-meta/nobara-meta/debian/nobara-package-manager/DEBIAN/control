@@ -1,0 +1,10 @@
+Package: nobara-package-manager
+Source: nobara-meta
+Version: 10:1.0-99nobara5
+Architecture: all
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Installed-Size: 7
+Depends: nobara-mintdrivers, nobara-mintinstall, nobara-mintupdate, python-apt-common, repoman
+Section: metapackages
+Priority: optional
+Description: A Meta package to install nobara's collection of package management software.

@@ -1,0 +1,11 @@
+Package: nobara-codecs-meta
+Source: nobara-meta
+Version: 10:1.0-99nobara5
+Architecture: all
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Installed-Size: 7
+Depends: ffmpeg, vlc, gstreamer1.0-libav, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good
+Section: metapackages
+Priority: optional
+Multi-Arch: foreign
+Description: A Meta package to install nobara's collection of codec software.

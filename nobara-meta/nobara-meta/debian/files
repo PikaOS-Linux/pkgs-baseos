@@ -1,0 +1,5 @@
+nobara-codecs-meta_1.0-99nobara5_all.deb metapackages optional
+nobara-gameutils-meta_1.0-99nobara5_all.deb metapackages optional
+nobara-meta_1.0-99nobara5_amd64.buildinfo metapackages optional
+nobara-package-manager_1.0-99nobara5_all.deb metapackages optional
+nobara-rocm-meta_1.0-99nobara5_all.deb metapackages optional
