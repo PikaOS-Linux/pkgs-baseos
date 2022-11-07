@@ -1,0 +1,5 @@
+X-Repolib-Name: Nobara OBS Sources
+Enabled: yes
+Types: deb deb-src
+URIs: https://download.opensuse.org/repositories/home:/CosmoHQ/xUbuntu_22.10/
+Suites: ./

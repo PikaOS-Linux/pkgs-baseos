@@ -10,9 +10,9 @@ Pin-Priority: 2000
 
 # Temp OBS Priority Over
 Package: mangohud
-Pin: release o=obs://build.opensuse.org/home:CosmoHQ/xUbuntu_22.04
+Pin: release o=obs://build.opensuse.org/home:CosmoHQ/xUbuntu_22.10
 Pin-Priority: 2000
 
 Package: vkbasalt
-Pin: release o=obs://build.opensuse.org/home:CosmoHQ/xUbuntu_22.04
+Pin: release o=obs://build.opensuse.org/home:CosmoHQ/xUbuntu_22.10
 Pin-Priority: 2000
