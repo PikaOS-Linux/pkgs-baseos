@@ -1,6 +1,6 @@
 nobara-sources (1.11-99nobara3) kinetic; urgency=urgent
 
-  * Add FFMPEG4 Repo
+  * Add FFMPEG4 Repo and enable backports repo (feature updates!)
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 20:50:00 +0300
 
