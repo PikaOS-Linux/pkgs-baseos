@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+export PKG_ROOT = debian/auto-cpufreq
+
+%:
+	dh $@ --with quilt,python2,python3 --buildsystem=pybuild
+	
+override_dh_auto_configure:
+	dh_auto_configure
+	sed -i 's|usr/local|usr|g' "scripts/auto-cpufreq.service" auto_cpufreq/core.py
+	
+override_dh_install:
+	dh_install
+	install -Dm755 scripts/cpufreqctl.sh -t $(PKG_ROOT)/usr/share/auto-cpufreg/scripts
+	install -Dm644 debian/auto-cpufreq.conf -t $(PKG_ROOT)/etc
+	install -Dm644 scripts/auto-cpufreq.service -t $(PKG_ROOT)%/usr/lib/systemd/system/
+

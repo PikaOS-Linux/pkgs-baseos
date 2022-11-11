@@ -1,0 +1,27 @@
+From a8adf8d8f81c34ea794b9bfb9159138b72e7949c Mon Sep 17 00:00:00 2001
+From: GloriousEggroll <gloriouseggroll@gmail.com>
+Date: Thu, 29 Sep 2022 12:29:04 -0600
+Subject: [PATCH] remove /opt usage
+
+---
+ scripts/auto-cpufreq.service | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/scripts/auto-cpufreq.service b/scripts/auto-cpufreq.service
+index 3362723..1bf1bf9 100644
+--- a/scripts/auto-cpufreq.service
++++ b/scripts/auto-cpufreq.service
+@@ -5,9 +5,7 @@ After=network.target network-online.target
+ [Service]
+ Type=simple
+ User=root
+-WorkingDirectory=/opt/auto-cpufreq/venv
+-Environment=PYTHONPATH=/opt/auto-cpufreq
+-ExecStart=/opt/auto-cpufreq/venv/bin/python /opt/auto-cpufreq/venv/bin/auto-cpufreq --daemon
++ExecStart=/usr/bin/python /usr/bin/auto-cpufreq --daemon
+ Restart=on-failure
+ 
+ [Install]
+-- 
+2.37.3
+
