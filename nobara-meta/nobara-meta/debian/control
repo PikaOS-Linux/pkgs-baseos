@@ -12,7 +12,8 @@ Depends: ${misc:Depends},
 	nobara-mintdrivers, 
 	nobara-mintinstall, 
 	nobara-mintupdate, 
-	python-apt-common, 
+	python-apt-common,
+	gdebi,
 	repoman
 Description: A Meta package to install nobara's collection of package management software.
 
@@ -246,7 +247,12 @@ Depends: ${misc:Depends},
 	va-driver-all,
 	steam-launcher,
 	winetricks,
-	lutris
+	lutris,
+	steamtinkerlaunch,
+	mangohud,
+	vkbasalt,
+	mangohud,
+	goverlay
 Description: A Meta package to install nobara's collection of gaming software.
 
 Package: nobara-codecs-meta

@@ -1,0 +1,29 @@
+diff -ru a/Makefile b/Makefile
+--- a/Makefile	2022-09-22 17:40:36.000000000 +0300
++++ b/Makefile	2022-11-11 13:12:21.380442327 +0300
+@@ -1,19 +1,14 @@
+-ifeq ($(PREFIX),)
+-    PREFIX := /usr
+-endif
+-
+ .PHONY: build install
+ 
+ build:
+ 
+ install:
+-	sed "s:^PREFIX=\"/usr\":PREFIX=\"$(PREFIX)\":" -i steamtinkerlaunch
+-	install -Dm755 steamtinkerlaunch -t "$(PREFIX)/bin"
++	install -Dm755 steamtinkerlaunch -t "$(DESTDIR)/bin"
+ 
+-	install -d "$(PREFIX)/share/steamtinkerlaunch"
+-	cp -r collections eval guicfgs lang misc "$(PREFIX)/share/steamtinkerlaunch"
++	install -d "$(DESTDIR)/share/steamtinkerlaunch"
++	cp -r collections eval guicfgs lang misc "$(DESTDIR)/share/steamtinkerlaunch"
+ 
+-	install -Dm644 README.md -t "$(PREFIX)/share/doc/steamtinkerlaunch"
+-	install -Dm644 "misc/steamtinkerlaunch.desktop" -t "$(PREFIX)/share/applications"
+-	install -Dm644 "misc/steamtinkerlaunch.svg" -t "$(PREFIX)/share/icons/hicolor/scalable/apps"
++	install -Dm644 README.md -t "$(DESTDIR)/share/doc/steamtinkerlaunch"
++	install -Dm644 "misc/steamtinkerlaunch.desktop" -t "$(DESTDIR)/share/applications"
++	install -Dm644 "misc/steamtinkerlaunch.svg" -t "$(DESTDIR)/share/icons/hicolor/scalable/apps"
+ 

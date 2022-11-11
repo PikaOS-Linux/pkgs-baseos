@@ -1,0 +1,17 @@
+Source: steamtinkerlaunch
+Section: games
+Priority: optional
+Maintainer: Scarlett Moore <sgmoore@kde.org>
+Build-Depends: make,
+               debhelper (>= 12),
+               dh-autoreconf,
+               quilt,
+               dh-make
+Standards-Version: 4.3.0
+Homepage: https://github.com/frostworx/steamtinkerlaunch
+
+Package: steamtinkerlaunch
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, yad, bash, gawk, procps, libprocps8, unzip, wget, xdotool, x11-utils, x11-xserver-utils, libxrandr2, vim-common
+Recommends: strace, gamemode, mangohud, winetricks, vkbasalt, scummvm, gameconqueror, gamescope, innoextract, usbutils, jq, imagemagick, rsync, p7zip
+Description: Wrapper tool for use with the Steam client for custom launch options
