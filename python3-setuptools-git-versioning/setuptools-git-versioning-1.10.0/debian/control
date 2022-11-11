@@ -10,7 +10,9 @@ Build-Depends: debhelper (>= 12),
                python3-setuptools,
                python3-pip,
                python3-setuptools-git,
-               python3-wheel
+               python3-wheel,
+               python3-toml,
+               python3-packaging
 Standards-Version: 4.3.0
 Homepage: https://setuptools-git-versioning.readthedocs.io
 
