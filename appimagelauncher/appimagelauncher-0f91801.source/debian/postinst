@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+/usr/share/appimagelauncher/maintainer-scripts/post-install
+#DEBHELPER#

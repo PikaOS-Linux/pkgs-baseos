@@ -1,0 +1,3 @@
+# git-build-recipe format 0.4 deb-version 202211022349-stable-0f91801
+lp:appimagelauncher git-commit:0f918015fa418affec32435d1c61c6ae473f2af5
+merge packaging lp:~appimagelauncher-team/appimagelauncher/+git/packaging git-commit:03dc2cfc8bc9dea4f4621efd123d75652ea1fdc1
