@@ -1,0 +1,25 @@
+Source: calamares-settings-nobara
+Section: devel
+Priority: optional
+Maintainer: Lubuntu Developers <lubuntu-devel@lists.ubuntu.com>
+Uploaders: Simon Quigley <tsimonq2@ubuntu.com>
+Build-Depends: debhelper-compat (= 13), intltool, qttools5-dev-tools
+Standards-Version: 4.6.0
+
+Package: calamares-settings-nobara
+Architecture: all
+Depends: calamares-settings-nobara (>= ${binary:Version}),
+         ${misc:Depends}
+Description: Nobara Calamares Settings and Branding
+
+Package: calamares-settings-nobara-common
+Architecture: any
+Depends: calamares (>= 3.2.14~),
+         cryptsetup,
+         keyutils,
+         python3,
+         qml-module-qtquick-window2,
+         qml-module-qtquick2,
+         squashfs-tools,
+         ${misc:Depends}
+Description: Common Calamares Settings

@@ -1,0 +1,29 @@
+---
+componentName: nobara
+
+windowExpanding:    fullscreen
+
+strings:
+    productName:         Nobara
+    shortProductName:    Nobara
+    version:             22.10
+    shortVersion:        kinetic
+    versionedName:       Nobara
+    shortVersionedName:  Nobara 22.10
+    bootloaderEntryName: Ubuntu
+    productUrl:          https://nobaraproject.org/
+    supportUrl:          https://nobaraproject.org/
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "icon.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+
+slideshowAPI:            1
+
+style:
+   sidebarBackground:    "#808080"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#0068C8"

@@ -11,7 +11,7 @@ override_dh_auto_configure:
 	
 override_dh_install:
 	dh_install
-	install -Dm755 scripts/cpufreqctl.sh -t $(PKG_ROOT)/usr/share/auto-cpufreg/scripts
+	install -Dm755 scripts/cpufreqctl.sh -t $(PKG_ROOT)/usr/share/auto-cpufreq/scripts
 	install -Dm644 debian/auto-cpufreq.conf -t $(PKG_ROOT)/etc
-	install -Dm644 scripts/auto-cpufreq.service -t $(PKG_ROOT)%/usr/lib/systemd/system/
+	install -Dm644 scripts/auto-cpufreq.service -t $(PKG_ROOT)/usr/lib/systemd/system/
 

@@ -1,4 +1,0 @@
-click
-distro
-psutil
-setuptools

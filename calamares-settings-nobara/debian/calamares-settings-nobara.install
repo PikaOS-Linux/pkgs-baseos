@@ -1,0 +1,5 @@
+nobara/branding/ etc/calamares/
+nobara/calamares-logs-helper usr/bin/
+nobara/nobara-calamares.desktop usr/share/applications/
+nobara/modules/ etc/calamares/
+nobara/settings.conf etc/calamares/
