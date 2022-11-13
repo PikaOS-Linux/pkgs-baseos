@@ -1,0 +1,12 @@
+Source: adw-gtk3
+Section: gnome
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Standards-Version: 4.6.1
+Build-Depends: debhelper-compat (= 13), libdebhelper-perl, meson, sassc
+Rules-Requires-Root: no
+
+Package: adw-gtk3-theme
+Architecture: all
+Depends: ${misc:Depends}
+Description: The theme from libadwaita ported to GTK-3
