@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+export PKG_ROOT = debian/nobara-settings
+
+%:
+	dh $@
+	
+override_dh_install:
+	mkdir -p $(PKG_ROOT)
+	cp -r debian/data/usr $(PKG_ROOT)/

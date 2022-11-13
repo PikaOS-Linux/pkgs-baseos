@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=TeXInfo
+Comment=The viewer for TexInfo documents
+Exec=info
+Icon=dialog-information
+NoDisplay=true
+Type=Application
+Categories=Utility;Documentation;ConsoleOnly;
+Terminal=true
+X-Desktop-File-Install-Version=0.24
+X-Ubuntu-Gettext-Domain=ubuntu-default-launchers

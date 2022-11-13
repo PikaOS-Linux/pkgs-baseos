@@ -1,0 +1,93 @@
+###################
+# global settings #
+###################
+
+[org.gnome.evolution-data-server.calendar]
+notify-with-tray=false
+
+[org.gnome.desktop.session]
+session-name = "ubuntu"
+
+[org.onboard]
+layout = 'Compact'
+theme = 'Nightshade'
+key-label-font = 'Ubuntu'
+key-label-overrides = ['RWIN::super-group', 'LWIN::super-group']
+xembed-onboard = true
+
+[org.onboard.window]
+docking-enabled = true
+force-to-top = true
+
+[org.gnome.login-screen]
+logo='/usr/share/plymouth/ubuntu-logo.png'
+
+##################################
+# ubuntu common session settings #
+##################################
+
+[org.gnome.shell:ubuntu]
+always-show-log-out = true
+
+[org.gnome.shell.extensions.ding:ubuntu]
+show-trash = false
+show-volumes = false
+start-corner = 'bottom-right'
+arrangeorder = 'DESCENDINGNAME'
+
+[org.gnome.desktop.background:ubuntu]
+show-desktop-icons = true
+
+[org.gtk.Settings.FileChooser:ubuntu]
+sort-directories-first = true
+startup-mode = 'cwd'
+
+# Mirror G-S default experience (in overrides) compared to mutter default
+# as we are using a G-S mode, the default overrides aren't used.
+[org.gnome.mutter:ubuntu]
+attach-modal-dialogs = true
+edge-tiling = true
+dynamic-workspaces = true
+workspaces-only-on-primary = true
+focus-change-on-pointer-rest = true
+
+[org.gnome.desktop.peripherals.touchpad:ubuntu]
+tap-to-click = true
+click-method = 'default'
+
+[org.gnome.desktop.wm.keybindings:ubuntu]
+show-desktop = ['<Primary><Super>d','<Primary><Alt>d','<Super>d']
+switch-applications = ['<Super>Tab']
+switch-windows = ['<Alt>Tab']
+switch-applications-backward = ['<Shift><Super>Tab']
+switch-windows-backward = ['<Shift><Alt>Tab']
+
+[org.gnome.nautilus.desktop:ubuntu]
+home-icon-visible = false
+
+[org.gnome.nautilus.icon-view:ubuntu]
+default-zoom-level = 'small'
+
+[org.gnome.shell.extensions.desktop-icons:ubuntu]
+icon-size = 'small'
+
+[org.gnome.nautilus.preferences:ubuntu]
+open-folder-on-dnd-hover = false
+
+[org.gnome.rhythmbox.rhythmdb:ubuntu]
+monitor-library = true
+
+[org.gnome.rhythmbox.plugins.alternative_toolbar:ubuntu]
+display-type=1
+
+[org.gnome.settings-daemon.plugins.print-notifications:ubuntu]
+active = false
+
+[org.gnome.settings-daemon.plugins.background:ubuntu]
+active = false
+
+[org.gnome.software:ubuntu]
+first-run = false
+
+[org.gnome.Terminal.Legacy.Settings:ubuntu]
+theme-variant = 'dark'

@@ -1,0 +1,28 @@
+[org.gnome.desktop.background]
+picture-uri = 'file:///usr/share/backgrounds/ubuntu-gnome/1_by_the5heepdev.jpg'
+show-desktop-icons = false
+
+[org.gnome.desktop.screensaver]
+picture-uri = 'file:///usr/share/backgrounds/ubuntu-gnome/1_by_the5heepdev.jpg'
+
+[org.gnome.desktop.wm.preferences]
+button-layout = 'appmenu:close'
+titlebar-font = 'Cantarell Bold 11'
+theme = 'adw-gtk3'
+
+[org.gnome.desktop.sound]
+theme-name = 'freedesktop'
+
+[org.gnome.desktop.interface]
+document-font-name = 'Roboto Regular 10'
+font-name = 'Roboto Regular 10'
+gtk-theme = 'adw-gtk3'
+icon-theme = 'Adwaita'
+cursor-theme = 'Adwaita'
+monospace-font-name = 'Monospace 11'
+document-font-name = 'Sans 11'
+font-name = 'Cantarell 11'
+
+[org.gnome.shell]
+favorite-apps = ['nobara-calamares.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
+
