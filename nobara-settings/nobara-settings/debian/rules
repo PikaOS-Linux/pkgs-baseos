@@ -6,5 +6,9 @@ export PKG_ROOT = debian/nobara-settings
 	dh $@
 	
 override_dh_install:
+	dh_install
 	mkdir -p $(PKG_ROOT)
 	cp -r debian/data/usr $(PKG_ROOT)/
+	cp -r debian/data/etc $(PKG_ROOT)/
+	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc2.d/S01calamares-sources-undo
+	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc3.d/S01calamares-sources-undo

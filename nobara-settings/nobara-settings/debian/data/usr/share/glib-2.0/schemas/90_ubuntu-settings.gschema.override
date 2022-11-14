@@ -14,14 +14,13 @@ theme = 'adw-gtk3'
 theme-name = 'freedesktop'
 
 [org.gnome.desktop.interface]
-document-font-name = 'Roboto Regular 10'
-font-name = 'Roboto Regular 10'
 gtk-theme = 'adw-gtk3'
 icon-theme = 'Adwaita'
 cursor-theme = 'Adwaita'
 monospace-font-name = 'Monospace 11'
 document-font-name = 'Sans 11'
 font-name = 'Cantarell 11'
+enable-animations = true
 
 [org.gnome.shell]
 favorite-apps = ['nobara-calamares.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
