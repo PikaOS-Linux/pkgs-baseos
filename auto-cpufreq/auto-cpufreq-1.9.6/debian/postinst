@@ -2,5 +2,5 @@
 
 set -e
 
-systemctl enable --now auto-cpufreq.service
+systemctl enable --now auto-cpufreq.service || echo "auto-cpufreq service could not be enabled"
 

@@ -2,5 +2,5 @@
 
 set -e
 
-systemctl disable --now auto-cpufreq.service
+systemctl disable --now auto-cpufreq.service || echo "auto-cpufreq service could not be disabled"
 
