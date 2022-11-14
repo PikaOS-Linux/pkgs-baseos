@@ -1,3 +1,9 @@
+nobara-settings (1.2-99nobara1) kinetic; urgency=low
+
+  * Fix borked symlinks
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 nobara-settings (1.1-99nobara1) kinetic; urgency=low
 
   * Add enable animations

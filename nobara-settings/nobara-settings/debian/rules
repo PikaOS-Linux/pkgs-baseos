@@ -12,3 +12,5 @@ override_dh_install:
 	cp -r debian/data/etc $(PKG_ROOT)/
 	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc2.d/S01calamares-sources-undo
 	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc3.d/S01calamares-sources-undo
+	ln -sf /usr/share/ubuntu $(PKG_ROOT)/usr/share/nobara
+	ln -sf /usr/share/ubuntu-wayland $(PKG_ROOT)/usr/share/nobara-wayland
