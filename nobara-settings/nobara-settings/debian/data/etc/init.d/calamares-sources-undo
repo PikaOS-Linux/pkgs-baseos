@@ -2,4 +2,4 @@
 
 # Undo the calamares sources modifactions
 
-printf "## This file is deprecated in Nobara.\n## See /etc/apt/sources.list.d/system.sources." | tee example.txt > /dev/null
+printf "## This file is deprecated in Nobara.\n## See /etc/apt/sources.list.d/system.sources." | tee /etc/apt/sources.list > /dev/null
