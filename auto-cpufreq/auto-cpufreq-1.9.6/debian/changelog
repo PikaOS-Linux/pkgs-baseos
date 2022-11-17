@@ -1,3 +1,9 @@
+auto-cpufreq (1.9.6-99pika1) kinetic; urgency=medium
+
+  * Rebrand to PikaOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 auto-cpufreq (1.9.6-99nobara3) kinetic; urgency=medium
 
  * Make post scripts safe on chroots

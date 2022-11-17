@@ -1,3 +1,9 @@
+goverlay (1:0.9-99pika1) kinetic; urgency=medium
+
+  * Rebrand to PikaOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 goverlay (1:0.9-1) unstable; urgency=medium
 
   * Initial Push to PPA

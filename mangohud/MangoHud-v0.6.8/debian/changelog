@@ -1,3 +1,9 @@
+mangohud (1:0.6.8-99pika1) kinetic; urgency=medium
+
+  * Rebrand to PikaOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 mangohud (1:0.6.8-1nobara1) kinetic; urgency=medium
 
   * Initial Push to PPA

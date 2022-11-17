@@ -1,3 +1,0 @@
-# The .desktop file uses bash to run firefox as the local
-# user. bash is included in the system.
-calamares-settings-nobara: desktop-command-not-in-package usr/share/applications/nobara-calamares.desktop bash

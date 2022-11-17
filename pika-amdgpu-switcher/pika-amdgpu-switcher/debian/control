@@ -1,0 +1,17 @@
+Source: pika-amdgpu-switcher
+Section: misc
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+Homepage: https://nobaraproject.org/
+
+Package: pika-amdgpu-switcher
+Section: misc
+Architecture: all
+Provides:  amdgpu-vulkan-switcher, amdgpu-opengl-switcher, amdgpu-opencl-switcher
+Depends: ${misc:Depends}
+Description: Prefix Scripts to choose the driver for OpenGL, OpenCL, and Vulkan on amdgpus.
+
+
+

@@ -1,3 +1,9 @@
+base-files (12.99pika1) kinetic; urgency=medium
+
+  * Rebrand to PikaOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 base-files (12.99nobara5) kinetic; urgency=medium
 
   * It's Nobara not NobaraOS dumbass
