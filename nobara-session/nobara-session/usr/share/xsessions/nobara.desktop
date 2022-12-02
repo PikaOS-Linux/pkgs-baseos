@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Nobara Gnome on Xorg
-Comment=This session logs you into Nobara
-Exec=env GNOME_SHELL_SESSION_MODE=nobara /usr/bin/gnome-session --session=nobara
-TryExec=/usr/bin/gnome-shell
-Type=Application
-DesktopNames=ubuntu:nobara:GNOME
-X-GDM-SessionRegisters=true
-X-Ubuntu-Gettext-Domain=gnome-session-3.0

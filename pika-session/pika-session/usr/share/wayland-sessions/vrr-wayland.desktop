@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Pika Gnome on Wayland with VRR
+Comment=This session logs you into Pika with VRR Support
+Exec=env GNOME_SHELL_SESSION_MODE=vrr /usr/bin/gnome-session --session=vrr
+TryExec=/usr/bin/gnome-shell-vrr
+Type=Application
+DesktopNames=vrr:GNOME
+X-GDM-SessionRegisters=true
+X-Ubuntu-Gettext-Domain=gnome-session-3.0
