@@ -34,10 +34,10 @@ override_dh_auto_install:
 	rmdir debian/python3-*/usr/share
 	mkdir -p debian/python-apt-common/usr/share || echo
 	mkdir -p debian/python-apt-common/usr/share/distro-info/
-	ln -sf /usr/share/distro-info/ubuntu.csv  debian/python-apt-common/usr/share/distro-info/nobara.csv
+	ln -sf /usr/share/distro-info/ubuntu.csv  debian/python-apt-common/usr/share/distro-info/pika.csv
 	mkdir -p debian/python-apt-common/usr/share/python-apt/templates/ || echo
-	ln -sf /usr/share/python-apt/templates/Ubuntu.info  debian/python-apt-common/usr/share/python-apt/templates/Nobara.info
-	ln -sf /usr/share/python-apt/templates/Ubuntu.mirrors  debian/python-apt-common/usr/share/python-apt/templates/Nobara.mirrors
+	ln -sf /usr/share/python-apt/templates/Ubuntu.info  debian/python-apt-common/usr/share/python-apt/templates/Pika.info
+	ln -sf /usr/share/python-apt/templates/Ubuntu.mirrors  debian/python-apt-common/usr/share/python-apt/templates/Pika.mirrors
 
 
 override_dh_installdocs:
