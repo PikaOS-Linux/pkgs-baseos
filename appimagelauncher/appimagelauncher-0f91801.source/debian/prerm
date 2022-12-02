@@ -1,4 +1,0 @@
-#!/bin/bash
-set -e
-/usr/share/appimagelauncher/maintainer-scripts/post-uninstall
-#DEBHELPER#

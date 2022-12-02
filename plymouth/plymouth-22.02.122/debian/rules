@@ -35,7 +35,7 @@ override_dh_auto_configure:
 		--with-background-color=0x2c001e \
 		--with-background-start-color-stop=0x2c001e \
 		--with-background-end-color-stop=0x2c001e \
-		--with-logo=/usr/share/plymouth/pika-logo.png \
+		--with-logo=/usr/share/plymouth/nobara-logo.png \
 		--with-release-file=/etc/os-release \
 		--without-system-root-install \
 		--without-rhgb-compat-link
@@ -68,9 +68,9 @@ override_dh_install:
 	# Adding other debian specific files
 	install -D -m 0755 debian/local/plymouth-update-initrd debian/plymouth/usr/libexec/plymouth/plymouth-update-initrd
 	install -D -m 0644 debian/local/plymouth.lsb debian/plymouth/lib/lsb/init-functions.d/99-plymouth
-	install -D -m 0644 debian/local/pika-logo.png debian/plymouth/usr/share/plymouth/pika-logo.png
+	install -D -m 0644 debian/local/nobara-logo.png debian/plymouth/usr/share/plymouth/nobara-logo.png
 	install -D -m 0644 debian/local/ubuntu-logo.png debian/plymouth/usr/share/plymouth/ubuntu-logo.png
-	install -D -m 0644 debian/local/pika-logo.png debian/plymouth/usr/share/plymouth/themes/spinner/watermark.png
+	install -D -m 0644 debian/local/nobara-logo.png debian/plymouth/usr/share/plymouth/themes/spinner/watermark.png
 
 	# Adding apport file (from Ubuntu)
 	mkdir -p debian/plymouth/usr/share/apport/package-hooks

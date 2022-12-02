@@ -1,3 +1,0 @@
-# libglfw3-wayland provides an alternative implementation of libglfw3 whose
-# package name is clearly already taken.
-libglfw3-wayland: package-name-doesnt-match-sonames libglfw3

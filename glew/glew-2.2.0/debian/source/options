@@ -1,1 +1,0 @@
-extend-diff-ignore = "(^|/)(config\.guess|config\.status|Makefile)$"

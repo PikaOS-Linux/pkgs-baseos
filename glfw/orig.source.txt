@@ -1,2 +1,0 @@
-glfw3_3.3.8.orig.tar.gz
-#https://github.com/glfw/glfw

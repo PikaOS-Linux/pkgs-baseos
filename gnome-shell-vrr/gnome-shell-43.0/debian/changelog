@@ -1,9 +1,3 @@
-gnome-shell-vrr (43.0-99pika1) kinetic; urgency=medium
-
-  * Rebrand to PikaOS
-
- -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
-
 gnome-shell-vrr (43.0-0nobara19) kinetic; urgency=medium
 
   * Last action didn't work, let's retry.

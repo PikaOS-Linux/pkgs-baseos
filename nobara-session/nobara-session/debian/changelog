@@ -1,0 +1,54 @@
+nobara-session (1.10-99nobara1) kinetic; urgency=low
+
+  * Replace profile.d safety mechnasim with init.d
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.9-99nobara1) kinetic; urgency=low
+
+  * Fix libunity in a more proper fashion
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+
+nobara-session (1.8-99nobara1) kinetic; urgency=low
+
+  * Move gnome-shell-vrr wrapper to gnome-shell-vrr package
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.7-99nobara1) kinetic; urgency=low
+
+  * Go with our own source and add libunity-vars fix and session requirement
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.4-99nobara1) kinetic; urgency=low
+
+  * Add the first actually working VRR session
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.3-99nobara1) kinetic; urgency=low
+
+  * Switch to PopOS Source
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.2-99nobara1) kinetic; urgency=low
+
+  * Undo Name change to keep libunity working
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.1-99nobara1) kinetic; urgency=low
+
+  * Fix VRR Session
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+nobara-session (1.0-99nobara1) kinetic; urgency=low
+
+  * Initial Creation
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200

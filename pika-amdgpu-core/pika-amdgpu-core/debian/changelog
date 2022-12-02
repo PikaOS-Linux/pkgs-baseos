@@ -1,5 +1,5 @@
-pika-amdgpu-core (100:22.20-1462318~22.04-99pika1) kinetic; urgency=medium
+pika-amdgpu-core (100:22.20.50205-1511376~22.04) kinetic; urgency=low
 
-  * Rebrand to PikaOS
+  * Initial Creation
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200

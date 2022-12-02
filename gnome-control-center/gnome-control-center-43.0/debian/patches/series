@@ -28,7 +28,7 @@ ubuntu/sound-Add-a-button-to-select-the-default-theme.patch
 ubuntu/display-Allow-fractional-scaling-to-be-enabled.patch
 build-Look-for-snapd-glib-2.patch
 
-### Nobara Changes
+### PikaOS Changes
 
-nobara/Allow-tweaking-some-settings-for-Ubuntu-Dock.patch
-nobara/vrr.patch
+pika/Allow-tweaking-some-settings-for-Ubuntu-Dock.patch
+pika/vrr.patch

@@ -216,3 +216,5 @@ usbdux
 # Remove AMD SEV firmware which is now provided by amd64-microcode
 LICENSE.amd-sev
 amd
+# Remove AMDGPU firmware which is now provides by amdgpu-dkms-firmware
+amdgpu
