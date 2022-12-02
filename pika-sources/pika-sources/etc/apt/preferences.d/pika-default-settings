@@ -1,0 +1,23 @@
+# Base OS Priority Override
+Package: *
+Pin: release o=LP-PPA-cosmohq-baseos-test
+Pin-Priority: 1000
+
+# Multimedia Priority Override
+Package: *
+Pin: release o=LP-PPA-cosmohq-multimedia-test
+Pin-Priority: 1000
+
+# Firefox Priority Override
+Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 2001
+
+# Enable Feature Updates
+Package: *
+Pin: release a=$(lsb_release -cs)-backports
+Pin-Priority: 500
+
+Package: *
+Pin: release a=$(lsb_release -cs)-proposed
+Pin-Priority: 500

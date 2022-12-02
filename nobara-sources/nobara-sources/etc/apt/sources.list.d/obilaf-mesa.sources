@@ -1,7 +1,0 @@
-X-Repolib-Name: Obilaf Graphics Drivers (Mesa) Sources
-Enabled: yes
-Types: deb deb-src
-URIs: http://ppa.launchpad.net/oibaf/graphics-drivers/ubuntu
-Suites: kinetic
-Components: main
-Signed-By: /etc/apt/trusted.gpg.d/oibaf-mesa.gpg

@@ -1,6 +1,0 @@
-X-Repolib-Name: Nobara Multimedia Sources
-Enabled: yes
-Types: deb deb-src
-URIs: https://ppa.launchpadcontent.net/cosmohq/multimedia-test/ubuntu
-Suites: kinetic
-Components: main

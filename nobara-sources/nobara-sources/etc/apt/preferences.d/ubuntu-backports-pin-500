@@ -1,7 +1,0 @@
-Package: *
-Pin: release a=$(lsb_release -cs)-backports
-Pin-Priority: 500
-
-Package: *
-Pin: release a=$(lsb_release -cs)-proposed
-Pin-Priority: 500

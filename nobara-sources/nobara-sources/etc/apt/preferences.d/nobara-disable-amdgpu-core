@@ -1,3 +1,0 @@
-Package: amdgpu-core amdgpu-pro-core
-Pin: release a=*
-Pin-Priority: -10

@@ -1,0 +1,6 @@
+X-Repolib-Name: PikaOS BaseOS Sources
+Enabled: yes
+Types: deb deb-src
+URIs: https://ppa.launchpadcontent.net/pikaos/baseos/ubuntu
+Suites: kinetic
+Components: main
