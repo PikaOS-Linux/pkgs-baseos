@@ -11,8 +11,6 @@ MALCONTENT := -Dmalcontent=true
 else
 MALCONTENT := -Dmalcontent=false
 endif
-endif
-
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 SNAP := -Dsnap=true
 else
