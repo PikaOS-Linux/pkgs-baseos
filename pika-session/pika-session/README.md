@@ -1,3 +1,3 @@
-# Nobara Session
+# PikaOS Session
 
-Nobara session default settings.
+Pika session default settings.

@@ -6,7 +6,7 @@ diff -burN a/data/repoman.desktop b/data/repoman.desktop
 -Name=Repoman
 -GenericName=Repoman
 -Comment=Easily manage PPA
-+Name=Nobara Repository Settings
++Name=PikaOS Repository Settings
 +GenericName=Repository Settings
 +Comment=Easily manage PPA and Flatpaks
  Categories=System;

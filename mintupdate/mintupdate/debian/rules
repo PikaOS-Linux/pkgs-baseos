@@ -7,19 +7,19 @@ DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' '
 
 override_dh_install:
 	dh_install
-	mkdir -p debian/nobara-mintupdate/usr/lib/mintbin/
+	mkdir -p debian/mintupdate/usr/lib/mintbin/
 	# Move main mintupdate
-	mv debian/nobara-mintupdate/usr/bin/mintupdate debian/nobara-mintupdate/usr/lib/mintbin/
-	chmod +x debian/nobara-mintupdate/usr/lib/mintbin/mintupdate
+	mv debian/mintupdate/usr/bin/mintupdate debian/mintupdate/usr/lib/mintbin/
+	chmod +x debian/mintupdate/usr/lib/mintbin/mintupdate
 	# Move main mintupdate-launcher
-	mv debian/nobara-mintupdate/usr/bin/mintupdate-launcher debian/nobara-mintupdate/usr/lib/mintbin/
-	chmod +x debian/nobara-mintupdate/usr/lib/mintbin/mintupdate-launcher
+	mv debian/mintupdate/usr/bin/mintupdate-launcher debian/mintupdate/usr/lib/mintbin/
+	chmod +x debian/mintupdate/usr/lib/mintbin/mintupdate-launcher
 	# Add xwayland mintupdate
-	cp debian/extras/mintupdate debian/nobara-mintupdate/usr/bin/
-	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate
+	cp debian/extras/mintupdate debian/mintupdate/usr/bin/
+	chmod +x debian/mintupdate/usr/bin/mintupdate
 	# Add xwayland mintupdate-launcher
-	cp debian/extras/mintupdate-launcher debian/nobara-mintupdate/usr/bin/
-	chmod +x debian/nobara-mintupdate/usr/bin/mintupdate-launcher
+	cp debian/extras/mintupdate-launcher debian/mintupdate/usr/bin/
+	chmod +x debian/mintupdate/usr/bin/mintupdate-launcher
 # Inject version number in the code
 override_dh_installdeb:
 	dh_installdeb
