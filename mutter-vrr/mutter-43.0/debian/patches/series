@@ -11,10 +11,10 @@
 #debian/tests-Tag-unstable-tests-as-flaky.patch
 #debian/wayland-data-device-Allow-any-drag-timestamp-as-drag-star.patch
 ubuntu/x11-Add-support-for-fractional-scaling-using-Randr.patch
-nobara/0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
-nobara/0001-window-actor-Special-case-shaped-Java-windows.patch
-nobara/2623.patch
-nobara/2624.patch
-nobara/mutter-42.alpha-disable-tegra.patch
-nobara/vrr.patch
+pika/0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
+pika/0001-window-actor-Special-case-shaped-Java-windows.patch
+pika/2623.patch
+pika/2624.patch
+pika/mutter-42.alpha-disable-tegra.patch
+pika/vrr.patch
 

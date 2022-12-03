@@ -24,7 +24,7 @@ CONFFLAGS = \
 	-Dremote_desktop=true \
 	-Dwayland_eglstream=true \
 	-Dtests=false \
-	--prefix=/opt/nobara/mutter-vrr
+	--prefix=/opt/mutter-vrr
 	
 
 override_dh_auto_configure:
@@ -33,9 +33,9 @@ override_dh_auto_configure:
 
 override_dh_install:
 	dh_install
-	cp -r  debian/mutter-vrr/usr/share/* debian/mutter-vrr/opt/nobara/mutter-vrr/share/ || echo
+	cp -r  debian/mutter-vrr/usr/share/* debian/mutter-vrr/opt/mutter-vrr/share/ || echo
 	rm -rf debian/mutter-vrr/usr/share/ || echo
-	mv debian/mutter-vrr/lib/* debian/mutter-vrr/opt/nobara/mutter-vrr/lib/
+	mv debian/mutter-vrr/lib/* debian/mutter-vrr/opt/mutter-vrr/lib/
 	cp -rv debian/extra_files/etc debian/mutter-vrr/
 	mkdir -p debian/mutter-vrr/etc/rc2.d
 	mkdir -p debian/mutter-vrr/etc/rc3.d

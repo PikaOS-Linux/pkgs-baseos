@@ -4,5 +4,5 @@ set -e
 
 cp -fv /lib/udev/rules.d/61-mutter.rules /lib/udev/rules.d/61-mutter.rules.old
 
-cp -rfv /opt/nobara/mutter-vrr/lib/udev/rules.d/* /lib/udev/rules.d/
+cp -rfv /opt/mutter-vrr/lib/udev/rules.d/* /lib/udev/rules.d/
 

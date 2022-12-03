@@ -1,6 +1,5 @@
 #! /bin/bash
 
-# Disables amdgpu-pro libraries to fallback to mesa
-# USE wrappers instead
+# Add VRR UDEV Rules to system
 
-cp -rfv /opt/nobara/mutter-vrr/lib/udev/rules.d/* /lib/udev/rules.d/
+cp -rfv /opt/mutter-vrr/lib/udev/rules.d/* /lib/udev/rules.d/
