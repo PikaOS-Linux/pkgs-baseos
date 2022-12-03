@@ -1,1 +1,1 @@
-LD_LIBRARY_PATH="/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11/plugins:$LD_LIBRARY_PATH" PATH="/opt/nobara/mutter-vrr/bin:$PATH" /opt/nobara/mutter-vrr/bin/gnome-shell $@
+LD_LIBRARY_PATH="/opt/mutter-vrr/lib/x86_64-linux-gnu:/opt/mutter-vrr/lib/x86_64-linux-gnu/mutter-11:/opt/mutter-vrr/lib/x86_64-linux-gnu/mutter-11/plugins:$LD_LIBRARY_PATH" PATH="/opt/mutter-vrr/bin:$PATH" /opt/mutter-vrr/bin/gnome-shell $@

@@ -19,8 +19,8 @@ endif
 CONFFLAGS += -Dtests=false
 
 override_dh_auto_configure:
-		GSETTINGS_SCHEMA_DIR=/opt/nobara/mutter-vrr/share/glib-2.0/schemas/:$(GSETTINGS_SCHEMA_DIR) PKG_CONFIG_PATH=/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/pkgconfig:$(PKG_CONFIG_PATH) LD_LIBRARY_PATH=/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11:/opt/nobara/mutter-vrr/lib/x86_64-linux-gnu/mutter-11/plugins:$(LD_LIBRARY_PATH) PATH=/opt/nobara/mutter-vrr/bin:$(PATH) dh_auto_configure -- \
-		--prefix=/opt/nobara/mutter-vrr \
+		GSETTINGS_SCHEMA_DIR=/opt/mutter-vrr/share/glib-2.0/schemas/:$(GSETTINGS_SCHEMA_DIR) PKG_CONFIG_PATH=/opt/mutter-vrr/lib/x86_64-linux-gnu/pkgconfig:$(PKG_CONFIG_PATH) LD_LIBRARY_PATH=/opt/mutter-vrr/lib/x86_64-linux-gnu:/opt/mutter-vrr/lib/x86_64-linux-gnu/mutter-11:/opt/mutter-vrr/lib/x86_64-linux-gnu/mutter-11/plugins:$(LD_LIBRARY_PATH) PATH=/opt/mutter-vrr/bin:$(PATH) dh_auto_configure -- \
+		--prefix=/opt/mutter-vrr \
 		--libdir=lib \
 		-Dextensions-tool:bash_completion=enabled \
 		$(CONFFLAGS)

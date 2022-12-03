@@ -1,14 +1,14 @@
-opt/nobara/mutter-vrr/bin/gnome-extensions
-opt/nobara/mutter-vrr/bin/gnome-shell
-opt/nobara/mutter-vrr/bin/gnome-shell-extension-tool
-opt/nobara/mutter-vrr/bin/gnome-shell-perf-tool
-opt/nobara/mutter-vrr/lib/gnome-shell
-opt/nobara/mutter-vrr/libexec
-opt/nobara/mutter-vrr/share/applications/evolution-calendar.desktop
-opt/nobara/mutter-vrr/share/applications/org.gnome.Shell*.desktop
-opt/nobara/mutter-vrr/share/bash-completion/completions/gnome-extensions
-opt/nobara/mutter-vrr/share/dbus-1/services
-opt/nobara/mutter-vrr/share/man
-opt/nobara/mutter-vrr/share/xdg-desktop-portal
+opt/mutter-vrr/bin/gnome-extensions
+opt/mutter-vrr/bin/gnome-shell
+opt/mutter-vrr/bin/gnome-shell-extension-tool
+opt/mutter-vrr/bin/gnome-shell-perf-tool
+opt/mutter-vrr/lib/gnome-shell
+opt/mutter-vrr/libexec
+opt/mutter-vrr/share/applications/evolution-calendar.desktop
+opt/mutter-vrr/share/applications/org.gnome.Shell*.desktop
+opt/mutter-vrr/share/bash-completion/completions/gnome-extensions
+opt/mutter-vrr/share/dbus-1/services
+opt/mutter-vrr/share/man
+opt/mutter-vrr/share/xdg-desktop-portal
 debian/extras/gnome-shell-vrr usr/bin/
 debian/extras/gnome-vrr.Shell.desktop usr/share/applications
