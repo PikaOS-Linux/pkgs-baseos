@@ -1,0 +1,47 @@
+ dpkg-buildpackage -us -uc -ui -S -sa -d
+dpkg-buildpackage: info: source package plymouth
+dpkg-buildpackage: info: source version 22.02.122-99pika2
+dpkg-buildpackage: info: source distribution kinetic
+dpkg-buildpackage: info: source changed by Ward Nakchbandi <hotrod.master@hotmail.com>
+ dpkg-source --before-build .
+ debian/rules clean
+dh clean
+   dh_clean
+ dpkg-source -b .
+dpkg-source: info: using source format '3.0 (quilt)'
+dpkg-source: info: building plymouth using existing ./plymouth_22.02.122.orig.tar.xz
+dpkg-source: info: using patch list from debian/patches/series
+dpkg-source: info: building plymouth in plymouth_22.02.122-99pika2.debian.tar.xz
+dpkg-source: info: building plymouth in plymouth_22.02.122-99pika2.dsc
+ dpkg-genbuildinfo --build=source -O../plymouth_22.02.122-99pika2_source.buildinfo
+ dpkg-genchanges -sa --build=source -O../plymouth_22.02.122-99pika2_source.changes
+dpkg-genchanges: info: including full source code in upload
+ dpkg-source --after-build .
+dpkg-source: info: unapplying labelft-0004-label-ft-fix-alignment.patch
+dpkg-source: info: unapplying labelft-0003-ply-label-Don-t-crash-if-label-plugin-fails.patch
+dpkg-source: info: unapplying labelft-0002-Install-label-ft-plugin-into-initrd-if-available.patch
+dpkg-source: info: unapplying labelft-0001-Add-label-ft-plugin.patch
+dpkg-source: info: unapplying plymouth-switch-root-initramfs-Preload-text-renderin.patch
+dpkg-source: info: unapplying ubuntu-default-devicetimeout.patch
+dpkg-source: info: unapplying ubuntu-add-splash-option.patch
+dpkg-source: info: unapplying initramfsless-boot.patch
+dpkg-source: info: unapplying details-update-status.patch
+dpkg-source: info: unapplying details-remove-separator.patch
+dpkg-source: info: unapplying misc-changes.patch
+dpkg-source: info: unapplying fallback-etc-default-keyboard.patch
+dpkg-source: info: unapplying drop-systemd-vconsole-setup-service.patch
+dpkg-source: info: unapplying 0005-cmdline.patch
+dpkg-buildpackage: info: source-only upload (original source is included)
+Now running lintian plymouth_22.02.122-99pika2_source.changes ...
+Finished running lintian.
+Now signing changes and any dsc files...
+ signfile dsc plymouth_22.02.122-99pika2.dsc Ward Nakchbandi <hotrod.master@hotmail.com>
+
+ fixup_buildinfo plymouth_22.02.122-99pika2.dsc plymouth_22.02.122-99pika2_source.buildinfo
+ signfile buildinfo plymouth_22.02.122-99pika2_source.buildinfo Ward Nakchbandi <hotrod.master@hotmail.com>
+
+ fixup_changes dsc plymouth_22.02.122-99pika2.dsc plymouth_22.02.122-99pika2_source.changes
+ fixup_changes buildinfo plymouth_22.02.122-99pika2_source.buildinfo plymouth_22.02.122-99pika2_source.changes
+ signfile changes plymouth_22.02.122-99pika2_source.changes Ward Nakchbandi <hotrod.master@hotmail.com>
+
+Successfully signed dsc, buildinfo, changes files

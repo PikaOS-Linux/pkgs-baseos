@@ -1,0 +1,48 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Sat, 15 Oct 2022 20:50:00 +0300
+Source: plymouth
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 22.02.122-99pika2
+Distribution: kinetic
+Urgency: medium
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Ward Nakchbandi <hotrod.master@hotmail.com>
+Changes:
+ plymouth (22.02.122-99pika2) kinetic; urgency=medium
+ .
+   * PikaOS Branding
+Checksums-Sha1:
+ 6ab8b8b191ddd6785748f7017700c2e6e47ac302 2479 plymouth_22.02.122-99pika2.dsc
+ 2a68a69b674b643cd50c48685669bb0523aeb68b 1183608 plymouth_22.02.122.orig.tar.xz
+ 3d0c8bfa2ef1ae5762a8fabcfa26b576ebc964c0 83768 plymouth_22.02.122-99pika2.debian.tar.xz
+ e7f54cccecb800c9526528f4995f68da466052ea 20635 plymouth_22.02.122-99pika2_source.buildinfo
+Checksums-Sha256:
+ 10093092f8ed3a33f8ed082831416a48a1031ec0754ef31b91c857a0ddd23f87 2479 plymouth_22.02.122-99pika2.dsc
+ 100551442221033ce868c447ad6c74d831d209c18ae232b98ae0207e34eadaeb 1183608 plymouth_22.02.122.orig.tar.xz
+ bcbaff966b574de457b6fcb280d7d600a80b122403ba5ea344f44e4a895cca52 83768 plymouth_22.02.122-99pika2.debian.tar.xz
+ 05e49324c0366bc9e3add8afa3294a9d3dac4f4d4c61fe594c5df531cd40c310 20635 plymouth_22.02.122-99pika2_source.buildinfo
+Files:
+ 0f45e159da8421dcb0f52604d6871e51 2479 misc optional plymouth_22.02.122-99pika2.dsc
+ 07281db83aa3132f7941f4d0b277a68e 1183608 misc optional plymouth_22.02.122.orig.tar.xz
+ 363d44e9fa5c2361c3f52e6ded004fb0 83768 misc optional plymouth_22.02.122-99pika2.debian.tar.xz
+ fb5f974afce0769c11f0925818ce633f 20635 misc optional plymouth_22.02.122-99pika2_source.buildinfo
+Original-Maintainer: Laurent Bigonville <bigon@debian.org>
+
+-----BEGIN PGP SIGNATURE-----
+
+iQHOBAEBCgA4FiEEv6C0gA7qFRY0VJTBTA58yuGqBgwFAmOMwPMaHGhvdHJvZC5t
+YXN0ZXJAaG90bWFpbC5jb20ACgkQTA58yuGqBgxlngwAtmme9RRgLqLJGPmnbGea
+ncGr2Ej/vF1UsYhHszMBezA5YbTKIQMKO+L6MuXz9Bahl0MmaZb6ydBQvw1gNlFs
+mLV4j3L3qMRB2Qgw52YeAOTayxHT96pDEuDeFsSUJSkxEt/REB1IVuYoz+xDt5YQ
+kiNSooutjzFwKf7grwx6yiRQ6SiEaf53WIAKpGFCVnQlUYwihZVh1NqKlMMAsYXE
+5xAq+XO9ZDCUTRNcogx0QYOtJdsDQX/fUvfEVpzR1bAEkbi4jCX4Km2OZevJyXKn
+3DBEAF90//M2lLHCU8lGWn8ITsd4NjeBU+1OeGNDiUghiHF3Tm/3z2p2xgWD2sXF
+9JQmRXZNbOph+rbks4JKecOqBQta4HIu6079jBAEjjxIsyibpSB4qwHz7qAldDK+
+OUWKbVPFlmu5UpXmHYEy1c1nE8GAscjlCgd7m/UcYAkIAojPcYDq4KR1HvnT+4Mx
+Hlj6TsoJKh//yrQSTGuPVaQ4Om0U5aUG2T0z/64bo55+
+=BZBR
+-----END PGP SIGNATURE-----

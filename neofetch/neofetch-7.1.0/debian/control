@@ -1,0 +1,21 @@
+Source: neofetch
+Maintainer: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Section: utils
+Priority: optional
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0.1
+Rules-Requires-Root: no
+Vcs-Browser: https://salsa.debian.org/debian/neofetch
+Vcs-Git: https://salsa.debian.org/debian/neofetch.git
+Homepage: https://github.com/dylanaraps/neofetch
+
+Package: neofetch
+Architecture: all
+Depends: ${misc:Depends}
+Multi-Arch: foreign
+Recommends: chafa, caca-utils, imagemagick, jp2a, libsixel-bin, w3m-img, pciutils
+Description: Shows Linux System Information with Distribution Logo
+ Neofetch is a cross-platform and easy-to-use system information
+ command line script that collects your Linux system information
+ and display it on the terminal next to an image, it could be your
+ distributions logo or any ascii art of your choice.

@@ -1,0 +1,26 @@
+From 7c7050dd6c7eed29db2c3fd813b4d84fe9be606d Mon Sep 17 00:00:00 2001
+From: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Date: Thu, 9 Sep 2021 11:53:21 +0900
+Subject: [PATCH] Change shebang to '#!/bin/bash' (Closes: #984433)
+
+On Debian, Bash is always installed at /bin/bash. so change to
+/bin/bash.
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Forwarded: not-needed
+Bug-Debian: http://bugs.debian.org/984433
+
+---
+ neofetch | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: neofetch-7.1.0/neofetch
+===================================================================
+--- neofetch-7.1.0.orig/neofetch
++++ neofetch-7.1.0/neofetch
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/bin/bash
+ # vim: noai:ts=4:sw=4:expandtab
+ # shellcheck source=/dev/null
+ # shellcheck disable=2009
