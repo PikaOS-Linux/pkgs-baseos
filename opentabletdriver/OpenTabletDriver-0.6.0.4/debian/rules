@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+DOTNET_CLI_TELEMETRY_OPTOUT=1
+DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build
+	./build.sh linux-x64
+	./generate-rules.sh -v OpenTabletDriver.Configurations/Configurations ./99-opentabletdriver.rules
+override_dh_auto_install:
+	dh_auto_install
+	mkdir -p "debian/opentabletdriver/usr/share/OpenTabletDriver/"
+	cp -r bin/* "debian/opentabletdriver/usr/share/OpenTabletDriver/"
+	install -D "debian/local/apps~64x64/otd.png" -t  "debian/opentabletdriver/usr/share/icons/hicolor/64x64/apps/"
+	install -D "debian/local/bin/opentabletdriver" -t  "debian/opentabletdriver/usr/bin/"
+	install -D "debian/local/bin/otd" -t  "debian/opentabletdriver/usr/bin/"    	
+	install -D "debian/local/modprobe.d/99-opentabletdriver.conf" -t  "debian/opentabletdriver/usr/lib/modprobe.d/"
+	install -D "debian/local/systemd~user/opentabletdriver.service" -t  "debian/opentabletdriver/usr/lib/systemd/user/"
+	install -D "99-opentabletdriver.rules" -t  "debian/opentabletdriver/usr/lib/udev/rules.d/"
+	ln -sf "/usr/bin/otd" "debian/opentabletdriver/usr/bin/otd-cli"
+	ln -sf "/usr/bin/otd" "debian/opentabletdriver/usr/bin/opentabletdriver-cli"
+	ln -sf "/usr/bin/opentabletdriver" "debian/opentabletdriver/usr/bin/otd-gui"
+	ln -sf "/usr/bin/opentabletdriver" "debian/opentabletdriver/usr/bin/opentabletdriver-gui"

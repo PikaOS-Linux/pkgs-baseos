@@ -1,0 +1,16 @@
+Source: opentabletdriver
+Section: misc
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13), dotnet-sdk-6.0
+Standards-Version: 4.6.1
+Homepage: https://opentabletdriver.net/
+
+Package: opentabletdriver
+Section: metapackages
+Architecture: amd64
+Depends: ${misc:Depends}, dotnet-runtime-6.0, libevdev2, libgtk-3-0
+Recommends: libx11-dev, libxrandr-dev
+Description: OpenTabletDriver
+ A cross-platform open source tablet driver.
+

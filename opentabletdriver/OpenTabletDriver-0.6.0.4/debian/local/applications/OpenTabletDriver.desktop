@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=OpenTabletDriver
+Exec=opentabletdriver
+Icon=otd
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Settings;
