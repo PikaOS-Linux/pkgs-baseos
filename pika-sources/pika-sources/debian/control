@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
 Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.1
-Homepage: https://nobaraproject.org/
+Homepage: https://github.com/PikaOS-Linux/
 
 Package: pika-sources
 Section: misc

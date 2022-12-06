@@ -1,35 +1,35 @@
-repoman (2.2.0~99nobara7) kinetic; urgency=medium
+repoman (2.2.0~99pika7) kinetic; urgency=medium
 
   * Fixed borked build
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
 
 
-repoman (2.2.0~99nobara6) kinetic; urgency=medium
+repoman (2.2.0~99pika6) kinetic; urgency=medium
 
   * Remove Distro Templates
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
 
-repoman (2.2.0~99nobara5) kinetic; urgency=medium
+repoman (2.2.0~99pika5) kinetic; urgency=medium
 
   * Bring back icons and link distro templates
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
 
-repoman (2.2.0~99nobara4) kinetic; urgency=medium
+repoman (2.2.0~99pika4) kinetic; urgency=medium
 
   * Remove conflicting icons
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
 
-repoman (2.2.0~99nobara3) kinetic; urgency=medium
+repoman (2.2.0~99pika3) kinetic; urgency=medium
 
   * Add desktop entry
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
 
-repoman (2.2.0~99nobara1) kinetic; urgency=medium
+repoman (2.2.0~99pika1) kinetic; urgency=medium
 
   * Initial Creation
 
