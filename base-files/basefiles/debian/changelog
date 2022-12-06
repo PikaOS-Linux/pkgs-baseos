@@ -1,3 +1,9 @@
+base-files (12.99pika2) kinetic; urgency=medium
+
+  * Fix Icons sizes
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 20:50:00 +0300
+
 base-files (12.99pika1) kinetic; urgency=medium
 
   * PikaOS rebranding
