@@ -1,3 +1,9 @@
+gnome-control-center (1:43.0-99pika2) kinetic; urgency=medium
+
+  * Fix icons sizes
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 07 Oct 2022 23:26:00 +0300
+
 gnome-control-center (1:43.0-99pika1) kinetic; urgency=medium
 
   * Add PikaOS Branding

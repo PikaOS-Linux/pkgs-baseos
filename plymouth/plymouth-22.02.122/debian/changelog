@@ -1,3 +1,9 @@
+plymouth (22.02.122-99pika3) kinetic; urgency=medium
+
+  * Fix icon sizes
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 20:50:00 +0300
+
 plymouth (22.02.122-99pika2) kinetic; urgency=medium
 
   * PikaOS Branding
