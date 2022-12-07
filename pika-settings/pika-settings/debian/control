@@ -9,9 +9,9 @@ Homepage: https://github.com/PikaOS-Linux/
 
 Package: pika-settings
 Architecture: all
-Depends: dconf-gsettings-backend | gsettings-backend, gnome-control-center-data, gsettings-desktop-schemas (>= 40), libglib2.0-bin (>= 2.53.4-3ubuntu1~)
-Conflicts: ubuntu-settings
-Replaces: ubuntu-settings
-Provides: ubuntu-settings
+Depends: gnome-backgrounds, dconf-gsettings-backend | gsettings-backend, gnome-control-center-data, gsettings-desktop-schemas (>= 40), libglib2.0-bin (>= 2.53.4-3ubuntu1~)
+Conflicts: ubuntu-settings, ubuntu-wallpapers, ubuntu-wallpapers-kinetic
+Replaces: ubuntu-settings, ubuntu-wallpapers, ubuntu-wallpapers-kinetic
+Provides: ubuntu-settings, ubuntu-wallpapers, ubuntu-wallpapers-kinetic
 Priority: optional
 Description: default settings for the PikaOS Gnome desktop
