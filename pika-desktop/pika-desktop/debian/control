@@ -129,9 +129,6 @@ Recommends:
     gucharmap,
     ibus-table-emoji,
     libavcodec59,
-    libreoffice-calc,
-    libreoffice-impress,
-    libreoffice-writer,
     pika-welcome,
     seahorse,
     simple-scan,
@@ -144,8 +141,7 @@ Recommends:
     fonts-noto-color-emoji,
     gnome-remote-desktop,
     gnome-shell-extension-manager,
-    libreoffice-gnome,
-    libreoffice-ogltrans,
+    gnome-tweaks,
     sessioninstaller,
     appmenu-gtk3-module,
 # Desktop
@@ -185,4 +181,5 @@ Recommends:
     vdpau-driver-all,
     vlc,
     pika-codecs-meta,
+    pika-office-meta,
 Description: PikaOS Gnome Desktop Metapackage

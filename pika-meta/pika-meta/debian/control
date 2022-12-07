@@ -276,3 +276,14 @@ Depends: ${misc:Depends},
 	rocm-hip-runtime,
 	rocm-hip-runtime-dev
 Description: A Meta package to install pika's collection of ROCm software.
+
+Package: pika-office-meta
+Architecture: all
+Depends: ${misc:Depends}, 
+	libreoffice-calc,
+	libreoffice-impress,
+	libreoffice-writer,
+	libreoffice-gnome,
+	libreoffice-ogltrans,
+Description: A Meta package to install pika's collection of Office software.
+
