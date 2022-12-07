@@ -11,6 +11,8 @@ then
 else 
         rm /tmp/desktop-session 
 fi
+# Workaround X11 Desktop detection issue
+echo "$DESKTOP_SESSION" > /tmp/desktop-session
 # Apply libunity env vars to vrr session
 if cat /tmp/desktop-session | grep vrr > /dev/null 2>&1
 then

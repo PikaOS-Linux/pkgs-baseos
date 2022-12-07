@@ -1,3 +1,9 @@
+pika-session (1.0-99pika2) kinetic; urgency=low
+
+  * Fix libunity for VRR session
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-session (1.0-99pika1) kinetic; urgency=low
 
   * Initial Creation
