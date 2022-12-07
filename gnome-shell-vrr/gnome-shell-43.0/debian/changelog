@@ -1,3 +1,9 @@
+gnome-shell-vrr (43.0-99pika5) kinetic; urgency=medium
+
+   * Fix gschema.
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 07 Oct 2022 23:26:00 +0300
+
 gnome-shell-vrr (43.0-99pika4) kinetic; urgency=medium
 
    * Initial Release.
