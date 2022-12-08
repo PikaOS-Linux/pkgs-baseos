@@ -1,0 +1,18 @@
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."https://github.com/flukejones/egui"]
+git = "https://github.com/flukejones/egui"
+branch = "wayland_dark_theme"
+replace-with = "vendored-sources"
+
+[source."https://github.com/flukejones/notify-rust.git"]
+git = "https://github.com/flukejones/notify-rust.git"
+replace-with = "vendored-sources"
+
+[source."https://gitlab.com/asus-linux/supergfxctl.git"]
+git = "https://gitlab.com/asus-linux/supergfxctl.git"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
