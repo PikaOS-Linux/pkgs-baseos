@@ -1,12 +1,9 @@
 usr/bin/asusd
 usr/bin/asusd-user
 usr/bin/asusctl
-usr/bin/asus-notify
 usr/lib/systemd/*
 usr/lib/udev/rules.d/*
-etc/dbus-1/system.d/asusd.conf
 etc/asusd/*
-usr/share/icons/hicolor/512x512/apps/asus_notif_yellow.png
-usr/share/icons/hicolor/512x512/apps/asus_notif_green.png
-usr/share/icons/hicolor/512x512/apps/asus_notif_red.png
+usr/share/icons/hicolor/512x512/apps/asus_noti*
+usr/share/icons/hicolor/scalable/status/*
 usr/share/dbus-1/*
