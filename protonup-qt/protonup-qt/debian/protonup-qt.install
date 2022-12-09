@@ -1,0 +1,9 @@
+usr/bin/asusd
+usr/bin/asusd-user
+usr/bin/asusctl
+usr/lib/systemd/*
+usr/lib/udev/rules.d/*
+etc/asusd/*
+usr/share/icons/hicolor/512x512/apps/asus_noti*
+usr/share/icons/hicolor/scalable/status/*
+usr/share/dbus-1/*
