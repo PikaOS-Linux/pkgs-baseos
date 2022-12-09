@@ -1,0 +1,12 @@
+Source:linux-cosmo-config
+Section: misc
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+
+Package: linux-cosmo-config
+Section: Kernel
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: settings for the kernel
