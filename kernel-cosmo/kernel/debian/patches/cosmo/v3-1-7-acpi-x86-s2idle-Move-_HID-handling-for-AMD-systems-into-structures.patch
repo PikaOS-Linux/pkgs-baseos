@@ -1,0 +1,308 @@
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index e10394b847af..c9ee30627b6c 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -369,6 +369,39 @@ static int validate_dsm(acpi_handle handle, const char *uuid, int rev, guid_t *d
+ 	return ret;
+ }
+ 
++struct amd_lps0_hid_device_data {
++	const unsigned int rev_id;
++	const bool check_off_by_one;
++	const bool prefer_amd_guid;
++};
++
++static const struct amd_lps0_hid_device_data amd_picasso = {
++	.rev_id = 0,
++	.check_off_by_one = true,
++	.prefer_amd_guid = false,
++};
++
++static const struct amd_lps0_hid_device_data amd_cezanne = {
++	.rev_id = 0,
++	.check_off_by_one = false,
++	.prefer_amd_guid = false,
++};
++
++static const struct amd_lps0_hid_device_data amd_rembrandt = {
++	.rev_id = 2,
++	.check_off_by_one = false,
++	.prefer_amd_guid = true,
++};
++
++static const struct acpi_device_id amd_hid_ids[] = {
++	{"AMD0004",	(kernel_ulong_t)&amd_picasso,	},
++	{"AMD0005",	(kernel_ulong_t)&amd_picasso,	},
++	{"AMDI0005",	(kernel_ulong_t)&amd_picasso,	},
++	{"AMDI0006",	(kernel_ulong_t)&amd_cezanne,	},
++	{"AMDI0007",	(kernel_ulong_t)&amd_rembrandt,	},
++	{}
++};
++
+ static int lps0_device_attach(struct acpi_device *adev,
+ 			      const struct acpi_device_id *not_used)
+ {
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index c9ee30627b6c..2d1ff7796c34 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -472,31 +472,27 @@ static int lps0_device_attach(struct acpi_device *adev,
+ 		return 0;
+ 
+ 	if (acpi_s2idle_vendor_amd()) {
+-		/* AMD0004, AMD0005, AMDI0005:
+-		 * - Should use rev_id 0x0
+-		 * - function mask > 0x3: Should use AMD method, but has off by one bug
+-		 * - function mask = 0x3: Should use Microsoft method
+-		 * AMDI0006:
+-		 * - should use rev_id 0x0
+-		 * - function mask = 0x3: Should use Microsoft method
+-		 * AMDI0007:
+-		 * - Should use rev_id 0x2
+-		 * - Should only use AMD method
+-		 */
+-		const char *hid = acpi_device_hid(adev);
+-		rev_id = strcmp(hid, "AMDI0007") ? 0 : 2;
++		static const struct acpi_device_id *dev_id;
++		const struct amd_lps0_hid_device_data *data;
++
++		for (dev_id = &amd_hid_ids[0]; dev_id->id[0]; dev_id++)
++			if (acpi_dev_hid_uid_match(adev, dev_id->id, NULL))
++				break;
++		if (dev_id != NULL)
++			data = (const struct amd_lps0_hid_device_data *) dev_id->driver_data;
++		else
++			data = &amd_rembrandt;
++		rev_id = data->rev_id;
+ 		lps0_dsm_func_mask = validate_dsm(adev->handle,
+ 					ACPI_LPS0_DSM_UUID_AMD, rev_id, &lps0_dsm_guid);
+ 		lps0_dsm_func_mask_microsoft = validate_dsm(adev->handle,
+ 					ACPI_LPS0_DSM_UUID_MICROSOFT, 0,
+ 					&lps0_dsm_guid_microsoft);
+-		if (lps0_dsm_func_mask > 0x3 && (!strcmp(hid, "AMD0004") ||
+-						 !strcmp(hid, "AMD0005") ||
+-						 !strcmp(hid, "AMDI0005"))) {
++		if (lps0_dsm_func_mask > 0x3 && data->check_off_by_one) {
+ 			lps0_dsm_func_mask = (lps0_dsm_func_mask << 1) | 0x1;
+ 			acpi_handle_debug(adev->handle, "_DSM UUID %s: Adjusted function mask: 0x%x\n",
+ 					  ACPI_LPS0_DSM_UUID_AMD, lps0_dsm_func_mask);
+-		} else if (lps0_dsm_func_mask_microsoft > 0 &&
++		} else if (lps0_dsm_func_mask_microsoft > 0 && data->prefer_amd_guid &&
+ 				(!strcmp(hid, "AMDI0007") ||
+ 				 !strcmp(hid, "AMDI0008"))) {
+ 			lps0_dsm_func_mask_microsoft = -EINVAL;
+
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index a8256e5a0e8a..a9b0f2b54a1c 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -27,6 +27,10 @@ static bool sleep_no_lps0 __read_mostly;
+ module_param(sleep_no_lps0, bool, 0644);
+ MODULE_PARM_DESC(sleep_no_lps0, "Do not use the special LPS0 device interface");
+ 
++static bool prefer_microsoft_guid __read_mostly;
++module_param(prefer_microsoft_guid, bool, 0644);
++MODULE_PARM_DESC(prefer_microsoft_guid, "Prefer selecting Microsoft GUID for LPS0 device");
++
+ static const struct acpi_device_id lps0_device_ids[] = {
+ 	{"PNP0D80", },
+ 	{"", },
+@@ -402,6 +406,9 @@ static int lps0_device_attach(struct acpi_device *adev,
+ 	if (lps0_device_handle)
+ 		return 0;
+ 
++	lps0_dsm_func_mask_microsoft = validate_dsm(adev->handle,
++						    ACPI_LPS0_DSM_UUID_MICROSOFT, 0,
++						    &lps0_dsm_guid_microsoft);
+ 	if (acpi_s2idle_vendor_amd()) {
+ 		static const struct acpi_device_id *dev_id;
+ 		const struct amd_lps0_hid_device_data *data;
+@@ -416,16 +423,12 @@ static int lps0_device_attach(struct acpi_device *adev,
+ 		rev_id = data->rev_id;
+ 		lps0_dsm_func_mask = validate_dsm(adev->handle,
+ 					ACPI_LPS0_DSM_UUID_AMD, rev_id, &lps0_dsm_guid);
+-		lps0_dsm_func_mask_microsoft = validate_dsm(adev->handle,
+-					ACPI_LPS0_DSM_UUID_MICROSOFT, 0,
+-					&lps0_dsm_guid_microsoft);
+ 		if (lps0_dsm_func_mask > 0x3 && data->check_off_by_one) {
+ 			lps0_dsm_func_mask = (lps0_dsm_func_mask << 1) | 0x1;
+ 			acpi_handle_debug(adev->handle, "_DSM UUID %s: Adjusted function mask: 0x%x\n",
+ 					  ACPI_LPS0_DSM_UUID_AMD, lps0_dsm_func_mask);
+ 		} else if (lps0_dsm_func_mask_microsoft > 0 && data->prefer_amd_guid &&
+-				(!strcmp(hid, "AMDI0007") ||
+-				 !strcmp(hid, "AMDI0008"))) {
++				!prefer_microsoft_guid) {
+ 			lps0_dsm_func_mask_microsoft = -EINVAL;
+ 			acpi_handle_debug(adev->handle, "_DSM Using AMD method\n");
+ 		}
+@@ -433,7 +436,8 @@ static int lps0_device_attach(struct acpi_device *adev,
+ 		rev_id = 1;
+ 		lps0_dsm_func_mask = validate_dsm(adev->handle,
+ 					ACPI_LPS0_DSM_UUID, rev_id, &lps0_dsm_guid);
+-		lps0_dsm_func_mask_microsoft = -EINVAL;
++		if (!prefer_microsoft_guid)
++			lps0_dsm_func_mask_microsoft = -EINVAL;
+ 	}
+ 
+ 	if (lps0_dsm_func_mask < 0 && lps0_dsm_func_mask_microsoft < 0)
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index a9b0f2b54a1c..6a2c94fdbeae 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -17,6 +17,7 @@
+ 
+ #include <linux/acpi.h>
+ #include <linux/device.h>
++#include <linux/dmi.h>
+ #include <linux/suspend.h>
+ 
+ #include "../sleep.h"
+@@ -400,6 +401,28 @@ static const struct acpi_device_id amd_hid_ids[] = {
+ 	{}
+ };
+ 
++static int lps0_prefer_microsoft(const struct dmi_system_id *id)
++{
++	pr_debug("Preferring Microsoft GUID.\n");
++	prefer_microsoft_guid = true;
++	return 0;
++}
++
++static const struct dmi_system_id s2idle_dmi_table[] __initconst = {
++	{
++		/*
++		 * ASUS TUF Gaming A17 FA707RE
++		 * https://bugzilla.kernel.org/show_bug.cgi?id=216101
++		 */
++		.callback = lps0_prefer_microsoft,
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "ASUS TUF Gaming A17"),
++		},
++	},
++	{}
++};
++
+ static int lps0_device_attach(struct acpi_device *adev,
+ 			      const struct acpi_device_id *not_used)
+ {
+@@ -568,6 +591,7 @@ static const struct platform_s2idle_ops acpi_s2idle_ops_lps0 = {
+ 
+ void acpi_s2idle_setup(void)
+ {
++	dmi_check_system(s2idle_dmi_table);
+ 	acpi_scan_add_handler(&lps0_handler);
+ 	s2idle_set_ops(&acpi_s2idle_ops_lps0);
+ }---
+v3-v4:
+ * Absorb tags
+v2->v3:
+ * Absorb tags
+v1->v2:
+ * New patch
+---
+ drivers/acpi/x86/s2idle.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index 99eae362de6d..2cd381f6c002 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -420,6 +420,14 @@ static const struct dmi_system_id s2idle_dmi_table[] __initconst = {
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "ASUS TUF Gaming A17"),
+ 		},
+ 	},
++	{
++		/* ASUS ROG Zephyrus G14 (2022) */
++		.callback = lps0_prefer_microsoft,
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "ROG Zephyrus G14 GA402"),
++		},
++	},
+ 	{}
+ };
+ 
+-- 
+2.34.1
+---
+v3->v4:
+ * Fix URL for one of the bugzilla links
+v2->v3:
+ * Adjust prefix to cover multiple systems
+ * Add another Link tag
+v1->v2:
+ * New patch
+---
+ drivers/acpi/x86/s2idle.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index 2cd381f6c002..c811eeed42cd 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -428,6 +428,29 @@ static const struct dmi_system_id s2idle_dmi_table[] __initconst = {
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "ROG Zephyrus G14 GA402"),
+ 		},
+ 	},
++	{
++		/*
++		 * Lenovo Slim 7 Pro X 14ARH7
++		 * https://bugzilla.kernel.org/show_bug.cgi?id=216473
++		 */
++		.callback = lps0_prefer_microsoft,
++		.matches = {
++			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
++			DMI_MATCH(DMI_PRODUCT_NAME, "82V2"),
++		},
++	},
++	{
++		/*
++		 * 
++		 * Hijacking patch for GV601
++		 * 
++		 */
++		.callback = lps0_prefer_microsoft,
++		.matches = {
++			DMI_MATCH(DMI_BOARD_VENDOR, "ASUSTeK COMPUTER INC."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "GV601"),
++		},
++	},
+ 	{}
+ };
+ 
+-- 
+2.34.1
+---
+v3->v4:
+ * Absorb tag
+v2->v3:
+ * New patch
+---
+ drivers/acpi/x86/s2idle.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/acpi/x86/s2idle.c b/drivers/acpi/x86/s2idle.c
+index c811eeed42cd..eedd21d8a284 100644
+--- a/drivers/acpi/x86/s2idle.c
++++ b/drivers/acpi/x86/s2idle.c
+@@ -440,6 +440,17 @@ static const struct dmi_system_id s2idle_dmi_table[] __initconst = {
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "82"),
+ 		},
+ 	},
++	{
++		/*
++		 * ASUSTeK COMPUTER INC. ROG Flow X13 GV301RE_GV301RE
++		 * https://gitlab.freedesktop.org/drm/amd/-/issues/2148
++		 */
++		.callback = lps0_prefer_microsoft,
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "ROG Flow X13 GV301"),
++		},
++	},
+ 	{}
+ };
+ 
+-- 
+2.34.1

@@ -1,0 +1,25 @@
+[abi]
+abiname: 12.1
+
+[base]
+arches:
+ amd64
+compiler: gcc
+featuresets:
+ none
+
+[description]
+part-long-up: This kernel is not suitable for SMP (multi-processor,
+ multi-core or hyper-threaded) systems.
+
+[image]
+initramfs-generators: initramfs-tools initramfs-fallback
+type: plain
+
+[relations]
+# compilers
+gcc: gcc
+
+# initramfs-generators
+initramfs-fallback: linux-initramfs-tool
+initramfs-tools: initramfs-tools

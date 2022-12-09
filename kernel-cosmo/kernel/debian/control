@@ -1,0 +1,51 @@
+Source: linux-liquorix
+Section: kernel
+Priority: optional
+Maintainer: Steven Barrett <steven@liquorix.net>
+Standards-Version: 3.9.8
+Build-Depends: debhelper, cpio, python3-six, bc, bison, libelf-dev, libssl-dev, flex, xz-utils, pahole | dwarves:native, libcap-dev, libpci-dev, asciidoctor, libaudit-dev, libbabeltrace-dev, libdw-dev, libiberty-dev, libnewt-dev, libnuma-dev, libperl-dev, libunwind-dev, python3-dev, python3-setuptools, gcc [amd64]
+Homepage: http://www.liquorix.net/
+Vcs-Browser: https://github.com/damentz/liquorix-package
+Vcs-Git: https://github.com/damentz/liquorix-package.git
+
+Package: linux-image-6.0.0-12.1-liquorix-amd64
+Architecture: amd64
+Provides: wireguard-modules
+Depends: kmod, linux-base (>= 4.3~), ${misc:Depends}, initramfs-tools [amd64] | linux-initramfs-tool [amd64]
+Recommends: ${kernel:Recommends}, linux-cosmo-config, firmware-linux-free | linux-firmware, firmware-linux-nonfree | linux-firmware
+Suggests: linux-doc-6.0, crda [amd64], grub-pc [amd64] | extlinux [amd64] | grub-efi-amd64 [amd64]
+Description: Linux 6.0 for 64-bit PCs
+ The Linux kernel 6.0 and modules for use on PCs with AMD64 or Intel 64
+ processors.
+
+Package: linux-image-liquorix-amd64
+Architecture: amd64
+Section: metapackages
+Priority: extra
+Depends: linux-image-6.0.0-12.1-liquorix-amd64 (= ${binary:Version}), ${misc:Depends}
+Recommends: linux-headers-liquorix-amd64 (= ${binary:Version})
+Description: Linux image for liquorix on 64-bit PCs
+ This metapackage depends on the latest binary image for Linux kernel on
+ PCs with AMD64 or Intel 64 processors machines for liquorix.
+
+Package: linux-headers-liquorix-amd64
+Architecture: amd64
+Section: metapackages
+Priority: extra
+Provides: linux-headers
+Depends: linux-headers-6.0.0-12.1-liquorix-amd64 (= ${binary:Version}), ${misc:Depends}
+Description: Linux headers for liquorix on 64-bit PCs
+ This metapackage depends on the latest binary image for Linux kernel on
+ PCs with AMD64 or Intel 64 processors machines for liquorix.
+
+Package: linux-headers-6.0.0-12.1-liquorix-amd64
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, libelf-dev, gcc
+Description: Header files for Linux 6.0.0-12.1-liquorix-amd64
+ This package provides the architecture-specific kernel header files for
+ Linux kernel 6.0.0-12.1-liquorix-amd64, generally used for building
+ out-of-tree kernel modules.  These files are going to be installed into
+ /usr/src/linux-headers-6.0.0-12.1-liquorix-amd64, and can be used for
+ building modules that load into the kernel provided by the
+ linux-image-6.0.0-12.1-liquorix-amd64 package.
+
