@@ -9,10 +9,10 @@ debian/module-demote-invalid-elf-header-magic-error-message-to-pr-debug.patch
 
 # PikaOS/cosmo patches
 cosmo/0001-acpi-proc-idle-skip-dummy-wait.patch
-cosmo/acso.patch
+#cosmo/acso.patch
 cosmo/amdgpu-si-cik-default.patch
 cosmo/asus-linux.patch
 cosmo/linux-surface.patch
-cosmo/OpenRGB.patch
+#cosmo/OpenRGB.patch
 cosmo/steam-deck.patch
 cosmo/v3-1-7-acpi-x86-s2idle-Move-_HID-handling-for-AMD-systems-into-structures.patch
