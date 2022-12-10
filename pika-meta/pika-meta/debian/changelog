@@ -1,3 +1,9 @@
+pika-meta (10:1.0-99pika3) kinetic; urgency=medium
+
+  * Add more codecs
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
 pika-meta (10:1.0-99pika2) kinetic; urgency=medium
 
   * Add office meta
