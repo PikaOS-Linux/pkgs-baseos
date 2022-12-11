@@ -42,7 +42,7 @@ gettext.bindtextdomain(APP, LOCALE_DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-class Application():
+class Application:
 
     def __init__(self):
 
@@ -102,7 +102,7 @@ class Application():
 
         with open('/proc/cmdline') as f:
             cmdline = f.read()
-            if (("boot=casper" in cmdline) or ("boot=live" in cmdline)):
+            if ("boot=casper" in cmdline) or ("boot=live" in cmdline):
                 print ("Live mode detected")
                 self.live_mode = True
                 self.update_cache()
@@ -125,9 +125,24 @@ class Application():
         task = packagekit.Task()
         task.refresh_cache_async(True, Gio.Cancellable(), self.on_cache_update_progress, (None, ), self.on_cache_update_finished, (None, ))
 
-    def on_error(self, msg):
+    def on_error(self, error):
+        # Returns False if the error was from cancelling or failing to authenticate.
+        # This will bring the ui back to pre-apply state. Returning True will reset
+        # entirely.
+
+        # it thinks it's a PkClientError but it's really PkErrorEnum
+        # the GError code is set to 0xFF + code
+        real_code = error.code
+        if error.code >= 0xFF:
+            real_code = error.code - 0xFF
+
+            if real_code == packagekit.ErrorEnum.NOT_AUTHORIZED:
+                # Silently ignore auth failures or cancellation.
+                return False
+
         self.show_page("error_page")
-        self.builder.get_object("error_label").set_label(msg)
+        self.builder.get_object("error_label").set_label(error.message)
+        return True
 
     def on_cache_update_progress(self, progress, ptype, data=None):
         pass
@@ -174,7 +189,7 @@ class Application():
                 print ("  --> Found: %s at %s" % (p.device, p.mountpoint))
                 break
 
-        if mount_point == None:
+        if mount_point is None:
             # Offline and no live media, show the offline page
             print ("  --> None found.")
             self.show_page("offline_page")
@@ -229,16 +244,19 @@ class Application():
         errors = False
         try:
             results = self.pk_task.generic_finish(result)
-        except Exception as e:
-            self.on_driver_changes_revert()
-            self.on_error(str(e))
+        except GLib.Error as e:
             errors = True
-            return
+            if self.on_error(e):
+                # real failure
+                self.on_driver_changes_revert()
+                self.clear_changes()
+            else:
+                self.button_driver_revert.set_sensitive(bool(self.driver_changes))
+                self.button_driver_apply.set_sensitive(bool(self.driver_changes))
 
-        if installs == None or len(installs) == 0:
+        if installs is None or len(installs) == 0 or errors:
             self.needs_restart = (not errors)
             self.progress_bar.set_visible(False)
-            self.clear_changes()
             self.apt_cache = apt.Cache()
             self.set_driver_action_status()
             self.update_label_and_icons_from_status()
@@ -401,7 +419,7 @@ class Application():
         return dependencies
 
     def gather_device_data(self, device):
-        '''Get various device data used to build the GUI.
+        """Get various device data used to build the GUI.
 
           return a tuple of (overall_status string, icon, drivers dict).
           the drivers dict is using this form:
@@ -417,7 +435,7 @@ class Application():
 
              Please note that either manually_installed and no_driver are set to None if not applicable
              (no_driver isn't present if there are builtins)
-        '''
+        """
 
         possible_overall_status = {
             'recommended': (_("This device is using the recommended driver."), "recommended-driver"),
@@ -436,13 +454,26 @@ class Application():
         except KeyError:
             pass
 
+        # -open nvidia drivers are recommended now over normal ones. Go thru the list and get the version of the recommended one,
+        # then we can flag the non-'open' one instead.
+        new_recommended = None
+        for pkg_driver_name in device['drivers']:
+            current_driver = device['drivers'][pkg_driver_name]
+            try:
+                if current_driver['recommended'] and current_driver['from_distro']:
+                    driver_status = 'recommended'
+                    if pkg_driver_name.endswith("-open"):
+                        new_recommended = pkg_driver_name.replace("-open", "")
+            except KeyError:
+                pass
+
         for pkg_driver_name in device['drivers']:
             current_driver = device['drivers'][pkg_driver_name]
 
             # get general status
             driver_status = 'alternative'
             try:
-                if current_driver['recommended'] and current_driver['from_distro']:
+                if (current_driver['recommended'] and current_driver['from_distro']) or pkg_driver_name == new_recommended:
                     driver_status = 'recommended'
             except KeyError:
                 pass
@@ -512,7 +543,7 @@ class Application():
                 if returned_drivers[section][keys]['selected']:
                     (overall_status, icon) = possible_overall_status[section]
 
-        return (overall_status, icon, returned_drivers)
+        return overall_status, icon, returned_drivers
 
     def get_device_icon(self, device):
         vendor = device.get('vendor', _('Unknown'))
@@ -532,7 +563,7 @@ class Application():
         elif "amd64-microcode" in device['drivers']:
             icon = "amd"
 
-        return (GdkPixbuf.Pixbuf.new_from_file_at_size("/usr/share/linuxmint/mintdrivers/icons/%s.svg" % icon, 48, -1))
+        return GdkPixbuf.Pixbuf.new_from_file_at_size("/usr/share/linuxmint/mintdrivers/icons/%s.svg" % icon, 48, -1)
 
     def get_cpu_name(self):
         with open("/proc/cpuinfo") as cpuinfo:
@@ -622,8 +653,8 @@ class Application():
                 # define the order of introspection
                 for section in ('recommended', 'alternative', 'manually_installed', 'no_driver'):
                     for driver in sorted(drivers[section], key=lambda x: self.sort_string(drivers[section], x), reverse=True):
-                        if str(driver).startswith("nvidia-driver") and str(driver).endswith("-server"):
-                            print("Ignoring server NVIDIA driver: ", driver)
+                        if str(driver).startswith("nvidia-driver") and str(driver).endswith(("-server", "-open")):
+                            print("Ignoring server or open NVIDIA driver: ", driver)
                             continue
                         radio_button = Gtk.RadioButton.new(None)
                         label = Gtk.Label()
@@ -668,7 +699,7 @@ class Application():
         return value
 
     def update_label_and_icons_from_status(self):
-        '''Update the current label and icon, computing the new device status'''
+        """Update the current label and icon, computing the new device status"""
 
         for device in self.devices:
             if device in self.dynamic_device_status.keys():
