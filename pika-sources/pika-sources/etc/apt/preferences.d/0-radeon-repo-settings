@@ -10,6 +10,6 @@ Package: rocm*
 Pin: release o=Ubuntu
 Pin-Priority: 100
 
-Package: amdgpu-core amdgpu-pro-core
+Package: amdgpu-core amdgpu-pro-core amdgpu-dkms amdgpu-pro-lib32
 Pin: release a=*
 Pin-Priority: -10

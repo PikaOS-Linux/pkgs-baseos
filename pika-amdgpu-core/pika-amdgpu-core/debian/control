@@ -10,8 +10,8 @@ Package: pika-amdgpu-core
 Section: metapackages
 Architecture: all
 Depends: ${misc:Depends}, libdrm-amdgpu-amdgpu1, libdrm-amdgpu-radeon1, libdrm2-amdgpu, libdrm-amdgpu-common, amdgpu-dkms-firmware
-Suggests: amdgpu-vulkan-switcher, amdgpu-opengl-switcher, amdgpu-opencl-switcher
-Provides: amdgpu-core, amdgpu-pro-core
+Suggests: amdgpu-vulkan-switcher, amdgpu-opengl-switcher, amdgpu-opencl-switcher, pika-amdgpu-config
+Provides: amdgpu-core, amdgpu-pro-core, amdgpu-dkms, amdgpu-pro-lib32
 Multi-Arch: foreign
 Description: Core meta package for Pro components of the unified amdgpu driver, with mesa priority.
 

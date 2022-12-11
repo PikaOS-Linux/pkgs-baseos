@@ -251,10 +251,13 @@ Depends: ${misc:Depends},
 	winetricks,
 	lutris,
 	steamtinkerlaunch,
-	mangohud,
 	vkbasalt,
+	vkbasalt:i386,
 	mangohud,
-	goverlay
+	mangohud:i386,
+	gamemode,
+	libgamemodeauto0:i386,
+	goverlay,
 Description: A Meta package to install pika's collection of gaming software.
 
 Package: pika-codecs-meta
