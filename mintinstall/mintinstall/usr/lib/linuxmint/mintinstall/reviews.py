@@ -6,7 +6,7 @@ import multiprocessing
 
 from pathlib import Path
 
-from gi.repository import GLib
+from gi.repository import GLib, GObject
 
 from misc import print_timing
 
@@ -73,10 +73,13 @@ class JsonObject(object):
 
         return cls(new_dict, json_data["size"])
 
-class ReviewCache(object):
+class ReviewCache(GObject.Object):
+    __gsignals__ = {
+        'reviews-updated': (GObject.SignalFlags.RUN_LAST, None, ()),
+    }
     @print_timing
     def __init__(self):
-        super(ReviewCache, self).__init__()
+        GObject.Object.__init__(self)
 
         self._cache_lock = threading.Lock()
 
@@ -110,7 +113,7 @@ class ReviewCache(object):
 
     def __contains__(self, name):
         with self._cache_lock:
-            return (name in self._reviews)
+            return name in self._reviews
 
     def __len__(self):
         with self._cache_lock:
@@ -128,7 +131,7 @@ class ReviewCache(object):
         except Exception:
             path = None
         finally:
-            if path != None:
+            if path is not None:
                 try:
                     with path.open(mode='r', encoding="utf8") as f:
                         json_object = JsonObject.from_json(json.load(f))
@@ -177,20 +180,24 @@ class ReviewCache(object):
 
         self.proc = None
 
-        if success.value == True:
+        if success.value:
             with self._cache_lock:
                 self._reviews, self._size = self._load_cache()
+                GLib.idle_add(self.emit_reviews_updated)
+
+    def emit_reviews_updated(self, data=None):
+        self.emit("reviews-updated")
 
     def _update_cache_process(self, success, current_size):
         new_reviews = {}
 
         try:
-            r = requests.head("https://community.linuxmint.com/data/new-reviews.list")
+            r = requests.head("https://community.linuxmint.com/data/new-reviews.list", timeout=10)
 
             if r.status_code == 200:
                 if int(r.headers.get("content-length")) != current_size.value:
 
-                    r = requests.get("https://community.linuxmint.com/data/new-reviews.list")
+                    r = requests.get("https://community.linuxmint.com/data/new-reviews.list", timeout=30)
 
                     last_package = None
 
@@ -200,7 +207,7 @@ class ReviewCache(object):
                         elements = decoded.split("~~~")
                         if len(elements) == 5:
                             review = Review(elements[0], float(elements[1]), elements[2], elements[3], elements[4])
-                            if last_package != None and last_package.name == elements[0]:
+                            if last_package is not None and last_package.name == elements[0]:
                                 #Comment is on the same package as previous comment.. no need to search for the package
                                 last_package.reviews.append(review)
                             else:

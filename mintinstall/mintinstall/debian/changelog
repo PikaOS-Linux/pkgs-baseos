@@ -1,3 +1,9 @@
+mintinstall (8.2.2~99pika1) kinetic; urgency=low
+
+  * Upstream update
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 mintinstall (8.1.2~99pika1) kinetic; urgency=low
 
   * Initial Creation
