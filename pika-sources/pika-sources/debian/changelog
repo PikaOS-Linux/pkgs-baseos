@@ -1,3 +1,9 @@
+pika-sources (1.0-99pika4) kinetic; urgency=low
+
+  * Steam Repos fix
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-sources (1.0-99pika2) kinetic; urgency=low
 
   * Change Steam GPG

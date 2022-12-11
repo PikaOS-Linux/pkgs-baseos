@@ -1,0 +1,3 @@
+#! /bin/bash
+sed -i.old -e 's/^/#/' /etc/apt/sources.list.d/steam.list || echo "no steam repos"
+
