@@ -30,6 +30,7 @@ Depends: ${misc:Depends},
     gnome-themes-extra,
     adwaita-icon-theme-full,
     adw-gtk3-theme,
+    papirus-icon-theme,
 # Plugins
     chrome-gnome-shell,
     ghostscript-x,

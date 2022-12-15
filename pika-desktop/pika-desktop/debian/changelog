@@ -1,3 +1,10 @@
+pika-desktop (2.0.0) kinetic; urgency=medium
+
+  * Replace Adwaita with papirus
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
 pika-desktop (1.0.1) kinetic; urgency=medium
 
   * Change office depends to pika-meta
