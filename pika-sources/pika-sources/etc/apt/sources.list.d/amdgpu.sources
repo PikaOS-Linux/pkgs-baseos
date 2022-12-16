@@ -1,6 +1,6 @@
 X-Repolib-Name: Official AMDGPU Sources
 Enabled: yes
 Types: deb deb-src
-URIs: https://repo.radeon.com/amdgpu/22.20.5/ubuntu
+URIs: https://repo.radeon.com/amdgpu/5.4.1/ubuntu
 Suites: jammy
 Components: main proprietary
