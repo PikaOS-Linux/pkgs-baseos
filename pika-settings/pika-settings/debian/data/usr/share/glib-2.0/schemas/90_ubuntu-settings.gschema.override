@@ -24,5 +24,5 @@ font-name = 'Cantarell 11'
 enable-animations = true
 
 [org.gnome.shell]
-favorite-apps = ['pika-calamares.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
+favorite-apps = ['org.vanillaos.Installer.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
 

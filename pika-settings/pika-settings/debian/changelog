@@ -1,3 +1,9 @@
+pika-settings (2.0-99pika2) kinetic; urgency=low
+
+  * Switch to Vanilla Installer
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-settings (2.0-99pika1) kinetic; urgency=low
 
   * Switch to Papirus
