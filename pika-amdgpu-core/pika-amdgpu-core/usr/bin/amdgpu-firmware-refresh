@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if grep -q amdgpu-dkms-firmware
+if timeout 5 grep -q amdgpu-dkms-firmware
 then
     sudo /etc/init.d/amdgpu-pro-lib
     sudo update-initramfs -c -k all
