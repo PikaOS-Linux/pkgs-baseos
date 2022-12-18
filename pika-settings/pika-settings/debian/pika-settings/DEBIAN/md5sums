@@ -1,0 +1,7 @@
+64b35283dce2e1fadf24cfaa64d75076  usr/share/doc/pika-settings/changelog.Debian.gz
+7952f22273e51d7291d456e81b5c31bf  usr/share/glib-2.0/schemas/10_ubuntu-settings.gschema.override
+3376675ca3f45f80e5146d22cc979af1  usr/share/glib-2.0/schemas/90_ubuntu-settings.gschema.override
+4f8e45c39cf737c0f039b7f23a6f78bf  usr/share/ubuntu-wayland/applications/info.desktop
+02f4ada9d9247e5108bdaea8645e9415  usr/share/ubuntu-wayland/applications/texdoctk.desktop
+4f8e45c39cf737c0f039b7f23a6f78bf  usr/share/ubuntu/applications/info.desktop
+02f4ada9d9247e5108bdaea8645e9415  usr/share/ubuntu/applications/texdoctk.desktop

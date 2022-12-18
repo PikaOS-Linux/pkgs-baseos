@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=TeXdoctk
+Exec=texdoctk
+Type=Application
+Terminal=false
+Categories=Settings;
+NoDisplay=true
+X-Ubuntu-Gettext-Domain=ubuntu-default-launchers

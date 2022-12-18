@@ -3,6 +3,7 @@ all:
 
 install:
 	install -d $(DESTDIR)/
+	cp -r usr $(DESTDIR)/
 	cp -r etc $(DESTDIR)/
 	mkdir -p $(DESTDIR)/etc/rc2.d
 	mkdir -p $(DESTDIR)/etc/rc3.d

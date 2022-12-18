@@ -1,0 +1,2 @@
+DPkg::Post-Invoke {"/usr/bin/amdgpu-firmware-refresh";};
+DPkg::Tools::Options::/usr/bin/amdgpu-firmware-refresh::Version "1";

@@ -1,3 +1,9 @@
+pika-amdgpu-core (100:22.20.50205-1511376~22.04-10) kinetic; urgency=low
+
+  * add apt hook
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-amdgpu-core (100:22.20.50205-1511376~22.04) kinetic; urgency=low
 
   * Initial Creation

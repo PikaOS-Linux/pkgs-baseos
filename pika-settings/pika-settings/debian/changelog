@@ -1,3 +1,9 @@
+pika-settings (2.0-99pika3) kinetic; urgency=low
+
+  * Switch back to calamares
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-settings (2.0-99pika2) kinetic; urgency=low
 
   * Switch to Vanilla Installer

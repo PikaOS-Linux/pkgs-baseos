@@ -1,0 +1,28 @@
+[org.gnome.desktop.background]
+picture-uri = 'file:///usr/share/backgrounds/gnome/adwaita-l.webp'
+picture-uri-dark = 'file:///usr/share/backgrounds/gnome/adwaita-d.webp'
+show-desktop-icons = false
+
+[org.gnome.desktop.screensaver]
+picture-uri = 'file:///usr/share/backgrounds/gnome/adwaita-l.webp'
+
+[org.gnome.desktop.wm.preferences]
+button-layout = 'appmenu:close'
+titlebar-font = 'Cantarell Bold 11'
+theme = 'adw-gtk3'
+
+[org.gnome.desktop.sound]
+theme-name = 'freedesktop'
+
+[org.gnome.desktop.interface]
+gtk-theme = 'adw-gtk3'
+icon-theme = 'Papirus'
+cursor-theme = 'Adwaita'
+monospace-font-name = 'Monospace 11'
+document-font-name = 'Sans 11'
+font-name = 'Cantarell 11'
+enable-animations = true
+
+[org.gnome.shell]
+favorite-apps = ['pika-calamares.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
+
