@@ -1,3 +1,10 @@
+pika-sources (3.0-99pika10) kinetic; urgency=low
+
+  * Steam Repos fix again
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+
 pika-sources (1.0-99pika4) kinetic; urgency=low
 
   * Steam Repos fix
