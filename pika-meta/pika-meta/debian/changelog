@@ -1,3 +1,9 @@
+pika-meta (10:1.0-99pika5) kinetic; urgency=medium
+
+  * Add flathub post install
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
 pika-meta (10:1.0-99pika4) kinetic; urgency=medium
 
   * Replace intel-va driver with non-free version
