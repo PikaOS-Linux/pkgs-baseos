@@ -1,0 +1,32 @@
+From 3a3073b69c76a8909374c5f9d610ea2f02ba3402 Mon Sep 17 00:00:00 2001
+From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
+Date: Mon, 28 Nov 2022 08:20:01 -0800
+Subject: thermal: intel: hfi: Remove a pointless die_id check
+
+die_id is an u16 quantity. On single-die systems the default value of
+die_id is 0. No need to check for negative values.
+
+Plus, removing this check makes Coverity happy.
+
+Signed-off-by: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/thermal/intel/intel_hfi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/intel_hfi.c
+index 90a11eef44f7c..6e604bda2b939 100644
+--- a/drivers/thermal/intel/intel_hfi.c
++++ b/drivers/thermal/intel/intel_hfi.c
+@@ -379,7 +379,7 @@ void intel_hfi_online(unsigned int cpu)
+ 	die_id = topology_logical_die_id(cpu);
+ 	hfi_instance = info->hfi_instance;
+ 	if (!hfi_instance) {
+-		if (die_id < 0 || die_id >= max_hfi_instances)
++		if (die_id >= max_hfi_instances)
+ 			return;
+ 
+ 		hfi_instance = &hfi_instances[die_id];
+-- 
+cgit 
+
