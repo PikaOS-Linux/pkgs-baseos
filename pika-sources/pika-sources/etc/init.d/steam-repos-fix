@@ -1,3 +1,0 @@
-#! /bin/bash
-rm -rf /etc/apt/sources.list.d/steam.list || echo "no steam repos"
-

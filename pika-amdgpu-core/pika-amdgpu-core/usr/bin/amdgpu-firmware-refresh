@@ -1,5 +1,5 @@
 #! /bin/bash
 
-    sudo /etc/init.d/amdgpu-pro-lib
+    sudo /usr/bin/amdgpu-lib-refresh
     sudo update-initramfs -c -k all
 

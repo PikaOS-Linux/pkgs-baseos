@@ -2,6 +2,10 @@
 
 set -e
 
+# Enable systemd service
+
+systemctl enable --now amdgpu-pro-lib.service || echo "amdgpu-pro-lib service could not be enabled"
+
 # Add firmware
 
 rm -r /usr/src/amdgpu-official || echo

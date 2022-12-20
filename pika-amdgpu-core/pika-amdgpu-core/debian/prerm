@@ -2,6 +2,8 @@
 
 set -e
 
+systemctl disable --now amdgpu-pro-lib.service || echo "amdgpu-pro-lib service could not be disabled"
+
 rm -r /usr/lib/firmware/amdgpu || echo
 
 update-initramfs -c -k all

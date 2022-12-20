@@ -1,0 +1,8 @@
+[Unit]
+Description=Prevents AMDGPU-PRO dangerous behaviour and symlinks its firmware and libraries to sytem path.
+
+[Service]
+ExecStart=/usr/bin/amdgpu-lib-refresh
+
+[Install]
+WantedBy=multi-user.target
