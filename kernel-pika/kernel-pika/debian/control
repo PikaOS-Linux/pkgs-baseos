@@ -1,0 +1,20 @@
+Source: kernel-pika
+Section: kernel
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+
+
+Package: kernel-pika
+Section: kernel
+Architecture: amd64
+Depends: ${misc:Depends}, linux-image-xanmod-amd64, linux-headers-xanmod-amd64, kernel-pika-config
+Description: metapackage for installing PikaOS kernel
+
+
+Package: kernel-pika-config
+Section: kernel
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: settings for the PikaOS kernel
