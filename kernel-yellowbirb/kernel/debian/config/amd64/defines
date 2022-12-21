@@ -2,7 +2,7 @@
 featuresets:
  none
 flavours:
- yellowbirb-amd64
+ tkg-amd64
 kernel-arch: x86
 
 [build]
