@@ -28,7 +28,6 @@ Build-Depends:
     libperl-dev,
     libunwind-dev,
     python3-dev,
-    python3-setuptools
-Homepage: http://www.yellowbirb.net/
-Vcs-Browser: https://github.com/damentz/yellowbirb-package
-Vcs-Git: https://github.com/damentz/yellowbirb-package.git
+    python3-setuptools,
+    zstd,
+Homepage: https://github.com/PikaOS-Linux

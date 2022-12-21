@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-version=6.1-yellowbirb-amd64
+version=6.1.0-12.1-yellowbirb-amd64
 image_path=/boot/vmlinuz-$version
 
 rm -f /lib/modules/$version/.fresh-install
