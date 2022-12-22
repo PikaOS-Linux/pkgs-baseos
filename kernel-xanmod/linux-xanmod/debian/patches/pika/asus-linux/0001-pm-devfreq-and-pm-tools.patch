@@ -1,0 +1,2255 @@
+From 5fdded8448924e3631d466eea499b11606c43640 Mon Sep 17 00:00:00 2001
+From: Kant Fan <kant@allwinnertech.com>
+Date: Tue, 25 Oct 2022 15:21:09 +0800
+Subject: PM/devfreq: governor: Add a private governor_data for governor
+
+The member void *data in the structure devfreq can be overwrite
+by governor_userspace. For example:
+1. The device driver assigned the devfreq governor to simple_ondemand
+by the function devfreq_add_device() and init the devfreq member
+void *data to a pointer of a static structure devfreq_simple_ondemand_data
+by the function devfreq_add_device().
+2. The user changed the devfreq governor to userspace by the command
+"echo userspace > /sys/class/devfreq/.../governor".
+3. The governor userspace alloced a dynamic memory for the struct
+userspace_data and assigend the member void *data of devfreq to
+this memory by the function userspace_init().
+4. The user changed the devfreq governor back to simple_ondemand
+by the command "echo simple_ondemand > /sys/class/devfreq/.../governor".
+5. The governor userspace exited and assigned the member void *data
+in the structure devfreq to NULL by the function userspace_exit().
+6. The governor simple_ondemand fetched the static information of
+devfreq_simple_ondemand_data in the function
+devfreq_simple_ondemand_func() but the member void *data of devfreq was
+assigned to NULL by the function userspace_exit().
+7. The information of upthreshold and downdifferential is lost
+and the governor simple_ondemand can't work correctly.
+
+The member void *data in the structure devfreq is designed for
+a static pointer used in a governor and inited by the function
+devfreq_add_device(). This patch add an element named governor_data
+in the devfreq structure which can be used by a governor(E.g userspace)
+who want to assign a private data to do some private things.
+
+Fixes: ce26c5bb9569 ("PM / devfreq: Add basic governors")
+Cc: stable@vger.kernel.org # 5.10+
+Reviewed-by: Chanwoo Choi <cwchoi00@gmail.com>
+Acked-by: MyungJoo Ham <myungjoo.ham@samsung.com>
+Signed-off-by: Kant Fan <kant@allwinnertech.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c            |  6 ++----
+ drivers/devfreq/governor_userspace.c | 12 ++++++------
+ include/linux/devfreq.h              |  7 ++++---
+ 3 files changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 63347a5ae5999..8c5f6f7fca112 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -776,8 +776,7 @@ static void remove_sysfs_files(struct devfreq *devfreq,
+  * @dev:	the device to add devfreq feature.
+  * @profile:	device-specific profile to run devfreq.
+  * @governor_name:	name of the policy to choose frequency.
+- * @data:	private data for the governor. The devfreq framework does not
+- *		touch this value.
++ * @data:	devfreq driver pass to governors, governor should not change it.
+  */
+ struct devfreq *devfreq_add_device(struct device *dev,
+ 				   struct devfreq_dev_profile *profile,
+@@ -1011,8 +1010,7 @@ static void devm_devfreq_dev_release(struct device *dev, void *res)
+  * @dev:	the device to add devfreq feature.
+  * @profile:	device-specific profile to run devfreq.
+  * @governor_name:	name of the policy to choose frequency.
+- * @data:	private data for the governor. The devfreq framework does not
+- *		touch this value.
++ * @data:	 devfreq driver pass to governors, governor should not change it.
+  *
+  * This function manages automatically the memory of devfreq device using device
+  * resource management and simplify the free operation for memory of devfreq
+diff --git a/drivers/devfreq/governor_userspace.c b/drivers/devfreq/governor_userspace.c
+index ab9db7adb3ade..d69672ccacc49 100644
+--- a/drivers/devfreq/governor_userspace.c
++++ b/drivers/devfreq/governor_userspace.c
+@@ -21,7 +21,7 @@ struct userspace_data {
+ 
+ static int devfreq_userspace_func(struct devfreq *df, unsigned long *freq)
+ {
+-	struct userspace_data *data = df->data;
++	struct userspace_data *data = df->governor_data;
+ 
+ 	if (data->valid)
+ 		*freq = data->user_frequency;
+@@ -40,7 +40,7 @@ static ssize_t set_freq_store(struct device *dev, struct device_attribute *attr,
+ 	int err = 0;
+ 
+ 	mutex_lock(&devfreq->lock);
+-	data = devfreq->data;
++	data = devfreq->governor_data;
+ 
+ 	sscanf(buf, "%lu", &wanted);
+ 	data->user_frequency = wanted;
+@@ -60,7 +60,7 @@ static ssize_t set_freq_show(struct device *dev,
+ 	int err = 0;
+ 
+ 	mutex_lock(&devfreq->lock);
+-	data = devfreq->data;
++	data = devfreq->governor_data;
+ 
+ 	if (data->valid)
+ 		err = sprintf(buf, "%lu\n", data->user_frequency);
+@@ -91,7 +91,7 @@ static int userspace_init(struct devfreq *devfreq)
+ 		goto out;
+ 	}
+ 	data->valid = false;
+-	devfreq->data = data;
++	devfreq->governor_data = data;
+ 
+ 	err = sysfs_create_group(&devfreq->dev.kobj, &dev_attr_group);
+ out:
+@@ -107,8 +107,8 @@ static void userspace_exit(struct devfreq *devfreq)
+ 	if (devfreq->dev.kobj.sd)
+ 		sysfs_remove_group(&devfreq->dev.kobj, &dev_attr_group);
+ 
+-	kfree(devfreq->data);
+-	devfreq->data = NULL;
++	kfree(devfreq->governor_data);
++	devfreq->governor_data = NULL;
+ }
+ 
+ static int devfreq_userspace_handler(struct devfreq *devfreq,
+diff --git a/include/linux/devfreq.h b/include/linux/devfreq.h
+index 34aab4dd336c8..4dc7cda4fd469 100644
+--- a/include/linux/devfreq.h
++++ b/include/linux/devfreq.h
+@@ -152,8 +152,8 @@ struct devfreq_stats {
+  * @max_state:		count of entry present in the frequency table.
+  * @previous_freq:	previously configured frequency value.
+  * @last_status:	devfreq user device info, performance statistics
+- * @data:	Private data of the governor. The devfreq framework does not
+- *		touch this.
++ * @data:	devfreq driver pass to governors, governor should not change it.
++ * @governor_data:	private data for governors, devfreq core doesn't touch it.
+  * @user_min_freq_req:	PM QoS minimum frequency request from user (via sysfs)
+  * @user_max_freq_req:	PM QoS maximum frequency request from user (via sysfs)
+  * @scaling_min_freq:	Limit minimum frequency requested by OPP interface
+@@ -193,7 +193,8 @@ struct devfreq {
+ 	unsigned long previous_freq;
+ 	struct devfreq_dev_status last_status;
+ 
+-	void *data; /* private data for governors */
++	void *data;
++	void *governor_data;
+ 
+ 	struct dev_pm_qos_request user_min_freq_req;
+ 	struct dev_pm_qos_request user_max_freq_req;
+-- 
+cgit 
+
+
+From 5975e2558e2dea7ef35fbb1a29613e1c176bd190 Mon Sep 17 00:00:00 2001
+From: Saket Kumar Bhaskar <skb99@linux.vnet.ibm.com>
+Date: Wed, 23 Nov 2022 13:52:08 +0530
+Subject: tools/cpupower: Choose base_cpu to display default cpupower details
+
+The default output of cpupower info utils shows unexpected output
+when CPU 0 is disabled.
+
+Considering a case where CPU 0 is disabled, output of cpupower idle-info:
+
+Before change:
+cpupower idle-info
+CPUidle driver: pseries_idle
+CPUidle governor: menu
+analyzing CPU 0:
+ *is offline
+
+After change:
+./cpupower idle-info
+CPUidle driver: pseries_idle
+CPUidle governor: menu
+analyzing CPU 50:
+
+Number of idle states: 2
+Available idle states: snooze CEDE
+snooze:
+Flags/Description: snooze
+Latency: 0
+Usage: 101748
+Duration: 2724058
+CEDE:
+Flags/Description: CEDE
+Latency: 12
+Usage: 270004
+Duration: 283019526849
+
+If -c option is not passed, CPU 0 was chosen as the default chosen CPU to
+display details. However when CPU 0 is offline, it results in showing
+unexpected output. This commit chooses the base_cpu
+instead of CPU 0, hence keeping the output more relevant in all cases.
+The base_cpu is the number of CPU on which the calling thread is
+currently executing.
+
+Signed-off-by: Saket Kumar Bhaskar <skb99@linux.vnet.ibm.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/power/cpupower/utils/cpufreq-info.c  | 4 ++--
+ tools/power/cpupower/utils/cpuidle-info.c  | 4 ++--
+ tools/power/cpupower/utils/cpupower-info.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tools/power/cpupower/utils/cpufreq-info.c b/tools/power/cpupower/utils/cpufreq-info.c
+index 0646f615fe2d4..c96b77365c637 100644
+--- a/tools/power/cpupower/utils/cpufreq-info.c
++++ b/tools/power/cpupower/utils/cpufreq-info.c
+@@ -572,9 +572,9 @@ int cmd_freq_info(int argc, char **argv)
+ 
+ 	ret = 0;
+ 
+-	/* Default is: show output of CPU 0 only */
++	/* Default is: show output of base_cpu only */
+ 	if (bitmask_isallclear(cpus_chosen))
+-		bitmask_setbit(cpus_chosen, 0);
++		bitmask_setbit(cpus_chosen, base_cpu);
+ 
+ 	switch (output_param) {
+ 	case -1:
+diff --git a/tools/power/cpupower/utils/cpuidle-info.c b/tools/power/cpupower/utils/cpuidle-info.c
+index f2b202c5552a3..44126a87fa7ae 100644
+--- a/tools/power/cpupower/utils/cpuidle-info.c
++++ b/tools/power/cpupower/utils/cpuidle-info.c
+@@ -176,9 +176,9 @@ int cmd_idle_info(int argc, char **argv)
+ 		cpuidle_exit(EXIT_FAILURE);
+ 	}
+ 
+-	/* Default is: show output of CPU 0 only */
++	/* Default is: show output of base_cpu only */
+ 	if (bitmask_isallclear(cpus_chosen))
+-		bitmask_setbit(cpus_chosen, 0);
++		bitmask_setbit(cpus_chosen, base_cpu);
+ 
+ 	if (output_param == 0)
+ 		cpuidle_general_output();
+diff --git a/tools/power/cpupower/utils/cpupower-info.c b/tools/power/cpupower/utils/cpupower-info.c
+index 06345b5437869..18fd7751f509f 100644
+--- a/tools/power/cpupower/utils/cpupower-info.c
++++ b/tools/power/cpupower/utils/cpupower-info.c
+@@ -67,9 +67,9 @@ int cmd_info(int argc, char **argv)
+ 	if (!params.params)
+ 		params.params = 0x7;
+ 
+-	/* Default is: show output of CPU 0 only */
++	/* Default is: show output of base_cpu only */
+ 	if (bitmask_isallclear(cpus_chosen))
+-		bitmask_setbit(cpus_chosen, 0);
++		bitmask_setbit(cpus_chosen, base_cpu);
+ 
+ 	/* Add more per cpu options here */
+ 	if (!params.perf_bias)
+-- 
+cgit 
+
+
+From 4680b734e7291cd804c4ea2c377935a2332366b1 Mon Sep 17 00:00:00 2001
+From: Zurab Kargareteli <zuraxt@gmail.com>
+Date: Tue, 29 Nov 2022 00:01:27 +0400
+Subject: cpupower: Add Georgian translation
+
+Add Georgian language for cpupower
+
+Signed-off-by: Zurab Kargareteli <zuraxt@gmail.com>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/power/cpupower/po/ka.po | 983 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 983 insertions(+)
+ create mode 100644 tools/power/cpupower/po/ka.po
+
+diff --git a/tools/power/cpupower/po/ka.po b/tools/power/cpupower/po/ka.po
+new file mode 100644
+index 0000000000000..ef71dbac5a135
+--- /dev/null
++++ b/tools/power/cpupower/po/ka.po
+@@ -0,0 +1,983 @@
++# Georgian translation for cpufrequtils package
++# Georgian messages for cpufrequtils.
++# Copyright (C) 2004-2022 Dominik Brodowski <linux@dominikbrodowski.net>
++# This file is distributed under the same license as the cpufrequtils package.
++# Ekaterine Papava <katopapava@gmail.com>, 2022.
++
++msgid ""
++msgstr ""
++"Project-Id-Version: cpufrequtils 006\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2011-03-08 17:03+0100\n"
++"PO-Revision-Date: 2022-09-18 22:12+0200\n"
++"Last-Translator: Ekaterine Papava <katopapava@gmail.com>\n"
++"Language-Team: NONE\n"
++"Language: ka\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=(n != 1);\n"
++"X-Generator: Poedit 3.1.1\n"
++
++#: utils/idle_monitor/nhm_idle.c:36
++msgid "Processor Core C3"
++msgstr "პროცესორის ბირთვი C3"
++
++#: utils/idle_monitor/nhm_idle.c:43
++msgid "Processor Core C6"
++msgstr "პროცესორის ბირთვი C6"
++
++#: utils/idle_monitor/nhm_idle.c:51
++msgid "Processor Package C3"
++msgstr "პროცესორის პაკეტი C3"
++
++#: utils/idle_monitor/nhm_idle.c:58 utils/idle_monitor/amd_fam14h_idle.c:70
++msgid "Processor Package C6"
++msgstr "პროცესორის პაკეტი C6"
++
++#: utils/idle_monitor/snb_idle.c:33
++msgid "Processor Core C7"
++msgstr "პროცესორის Core C7"
++
++#: utils/idle_monitor/snb_idle.c:40
++msgid "Processor Package C2"
++msgstr "პროცესორის პაკეტი C2"
++
++#: utils/idle_monitor/snb_idle.c:47
++msgid "Processor Package C7"
++msgstr "პროცესორის პაკეტი C7"
++
++#: utils/idle_monitor/amd_fam14h_idle.c:56
++msgid "Package in sleep state (PC1 or deeper)"
++msgstr "პაკეტი ძილის მდგომარეობაში (PC1 ან ღრმა)"
++
++#: utils/idle_monitor/amd_fam14h_idle.c:63
++msgid "Processor Package C1"
++msgstr "პროცესორის პაკეტი C1"
++
++#: utils/idle_monitor/amd_fam14h_idle.c:77
++msgid "North Bridge P1 boolean counter (returns 0 or 1)"
++msgstr "ჩრდილო ხიდის P1 ლოგიკური მთვლელი (აბრუნებს 0 ან 1-ს)"
++
++#: utils/idle_monitor/mperf_monitor.c:35
++msgid "Processor Core not idle"
++msgstr "პროცესორის ბირთვი უქმი არაა"
++
++#: utils/idle_monitor/mperf_monitor.c:42
++msgid "Processor Core in an idle state"
++msgstr "პროცესორის ბირთვი უქმ მდგომარეობაში არაა"
++
++#: utils/idle_monitor/mperf_monitor.c:50
++msgid "Average Frequency (including boost) in MHz"
++msgstr "საშუალო სიხშირე (პიკურის ჩათვლით) მეგაჰერცებში"
++
++#: utils/idle_monitor/cpupower-monitor.c:66
++#, c-format
++msgid ""
++"cpupower monitor: [-h] [ [-t] | [-l] | [-m <mon1>,[<mon2>] ] ] [-i "
++"interval_sec | -c command ...]\n"
++msgstr ""
++"cpupower monitor: [-h] [ [-t] | [-l] | [-m <mon1>,[<mon2>] ] ] [-i "
++"ინტერვალი_წმ | -c ბრძანება ...]\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:69
++#, c-format
++msgid ""
++"cpupower monitor: [-v] [-h] [ [-t] | [-l] | [-m <mon1>,[<mon2>] ] ] [-i "
++"interval_sec | -c command ...]\n"
++msgstr ""
++"cpupower monitor: [-v] [-h] [ [-t] | [-l] | [-m <mon1>,[<mon2>] ] ] [-i "
++"ინტერვალი_წმ | -c ბრძანება ...]\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:71
++#, c-format
++msgid "\t -v: be more verbose\n"
++msgstr "\t -v: დამატებითი ინფორმაციის გამოტანა\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:73
++#, c-format
++msgid "\t -h: print this help\n"
++msgstr "\t -h: ამ დახმარების გამოტანა\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:74
++#, c-format
++msgid "\t -i: time interval to measure for in seconds (default 1)\n"
++msgstr ""
++"\t -i: გასაზომი დროის ინტერვალი, წამებში (ნაგულისხმები მნიშვნელობაა 1)\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:75
++#, c-format
++msgid "\t -t: show CPU topology/hierarchy\n"
++msgstr "\t -t: CPU -ის ტოპოლოგიის/იერარქიის ჩვენება\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:76
++#, c-format
++msgid "\t -l: list available CPU sleep monitors (for use with -m)\n"
++msgstr ""
++"\t -l: CPU-ის ძილის მონიტორების სიის გამოტანა (განკუთვნილია -m -სთან ერთად "
++"გამოსაყენებლად)\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:77
++#, c-format
++msgid "\t -m: show specific CPU sleep monitors only (in same order)\n"
++msgstr ""
++"\t -m: მხოლოდ მითითებული CPU-ის ძილის მონიტორების ჩვენება (იგივე "
++"მიმდევრობით)\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:79
++#, c-format
++msgid ""
++"only one of: -t, -l, -m are allowed\n"
++"If none of them is passed,"
++msgstr ""
++"დასაშვებია მხოლოდ ერთ-ერთის: -t, -l ან -m მითითება\n"
++"თუ მითითებული არც ერთი არაა,"
++
++#: utils/idle_monitor/cpupower-monitor.c:80
++#, c-format
++msgid " all supported monitors are shown\n"
++msgstr " ნაჩვენები იქნება ყველა მხარდაჭერილი მონიტორი\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:197
++#, c-format
++msgid "Monitor %s, Counter %s has no count function. Implementation error\n"
++msgstr ""
++"მონიტორი %s, მთვლელი %s. დათვლის ფუნქცია არ გააჩნია. განხორციელების შეცდომა\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:207
++#, c-format
++msgid " *is offline\n"
++msgstr " *გათიშულია\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:236
++#, c-format
++msgid "%s: max monitor name length (%d) exceeded\n"
++msgstr "%s: მონიტორის სახელის მაქსიმალური სიგრძე (%d) გადაჭარბებულია\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:250
++#, c-format
++msgid "No matching monitor found in %s, try -l option\n"
++msgstr "%s-ში აღწერილი მონიტორი ვერ ვიპოვე. სცადეთ -l პარამეტრი\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:266
++#, c-format
++msgid "Monitor \"%s\" (%d states) - Might overflow after %u s\n"
++msgstr "მონიტორი \"%s\" (%d მდგომარეობა) - გადაივსება %u წამის შემდეგ\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:319
++#, c-format
++msgid "%s took %.5f seconds and exited with status %d\n"
++msgstr "%s-ს %.5f წამი დასჭირდა და მუშაობა სტატუსით %d დაასრულა\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:406
++#, c-format
++msgid "Cannot read number of available processors\n"
++msgstr "ხელმისაწვდომი პროცესორების რიცხვის წაკითხვა შეუძლებელია\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:417
++#, c-format
++msgid "Available monitor %s needs root access\n"
++msgstr "ხელმისაწვდომ მონიტორს (%s) root-ის წვდომს სჭირდება\n"
++
++#: utils/idle_monitor/cpupower-monitor.c:428
++#, c-format
++msgid "No HW Cstate monitors found\n"
++msgstr "აპარატურული C-მდგომარეობის მონიტორები ვერ ვიპოვე\n"
++
++#: utils/cpupower.c:78
++#, c-format
++msgid "cpupower [ -c cpulist ] subcommand [ARGS]\n"
++msgstr "cpupower [ -c cpu-ებისსია ] ქვებრძანება [არგუმენტები]\n"
++
++#: utils/cpupower.c:79
++#, c-format
++msgid "cpupower --version\n"
++msgstr "cpupower --version\n"
++
++#: utils/cpupower.c:80
++#, c-format
++msgid "Supported subcommands are:\n"
++msgstr "ხელმისაწვდომი ქვებრძანებებია:\n"
++
++#: utils/cpupower.c:83
++#, c-format
++msgid ""
++"\n"
++"Some subcommands can make use of the -c cpulist option.\n"
++msgstr ""
++"\n"
++"ზოგიერთ ქვებრძანებას შეუძლია -c cpu-ებისსია პარამეტრი გამოიყენოს.\n"
++
++#: utils/cpupower.c:84
++#, c-format
++msgid "Look at the general cpupower manpage how to use it\n"
++msgstr ""
++"გამოყენების ინსტრუქციისთვის cpupower-ის სახელმძღვანელოში (manpage) ჩაიხედეთ\n"
++
++#: utils/cpupower.c:85
++#, c-format
++msgid "and read up the subcommand's manpage whether it is supported.\n"
++msgstr ""
++"და წაიკითხეთ ქვებრძანების სახელმძღვანელო (manpage), თუ ის მხარდაჭერილია.\n"
++
++#: utils/cpupower.c:86
++#, c-format
++msgid ""
++"\n"
++"Use cpupower help subcommand for getting help for above subcommands.\n"
++msgstr ""
++"\n"
++"ზემოთ მოყვანილი ქვებრძანებების შესახებ ინფორმაციის მისაღებად გამოიყენეთ "
++"cpupower help ქვებრძანების_სახელი.\n"
++
++#: utils/cpupower.c:91
++#, c-format
++msgid "Report errors and bugs to %s, please.\n"
++msgstr "გთხოვთ, შეცდომების შესახებ გვაცნობეთ აქ; %s.\n"
++
++#: utils/cpupower.c:114
++#, c-format
++msgid "Error parsing cpu list\n"
++msgstr "CPU-ების სიის დამუშავების შეცდომა\n"
++
++#: utils/cpupower.c:172
++#, c-format
++msgid "Subcommand %s needs root privileges\n"
++msgstr "ქვებრძანებას %s root-ის პრივილეგიები სჭირდება\n"
++
++#: utils/cpufreq-info.c:31
++#, c-format
++msgid "Couldn't count the number of CPUs (%s: %s), assuming 1\n"
++msgstr ""
++"CPU-ების (%s: %s) რაოდენობის მიღების შეცდომა. ჩაითვლება, რომ უდრის 1-ს\n"
++
++#: utils/cpufreq-info.c:63
++#, c-format
++msgid ""
++"          minimum CPU frequency  -  maximum CPU frequency  -  governor\n"
++msgstr ""
++"          CPU-ის მინიმალური სიხშირე  -  CPU-ის მაქსიმალური სიხშირე  -  "
++"მმართველი\n"
++
++#: utils/cpufreq-info.c:151
++#, c-format
++msgid "Error while evaluating Boost Capabilities on CPU %d -- are you root?\n"
++msgstr ""
++"შეცდომა %d-ე CPU-ის პიკური დატვირთვის მართვის შესაძლებლობების შეფასებისას -- "
++"გაქვთ თუ არა root პრივილეგიები?\n"
++
++#. P state changes via MSR are identified via cpuid 80000007
++#. on Intel and AMD, but we assume boost capable machines can do that
++#. if (cpuid_eax(0x80000000) >= 0x80000007
++#. && (cpuid_edx(0x80000007) & (1 << 7)))
++#.
++#: utils/cpufreq-info.c:161
++#, c-format
++msgid "  boost state support: \n"
++msgstr "  პიკის მდგომარეობის მხარდაჭერა: \n"
++
++#: utils/cpufreq-info.c:163
++#, c-format
++msgid "    Supported: %s\n"
++msgstr "    მხარდაჭერილია: %s\n"
++
++#: utils/cpufreq-info.c:163 utils/cpufreq-info.c:164
++msgid "yes"
++msgstr "დიახ"
++
++#: utils/cpufreq-info.c:163 utils/cpufreq-info.c:164
++msgid "no"
++msgstr "არა"
++
++#: utils/cpufreq-info.c:164
++#, c-format
++msgid "    Active: %s\n"
++msgstr "    აქტიური: %s\n"
++
++#: utils/cpufreq-info.c:177
++#, c-format
++msgid "    Boost States: %d\n"
++msgstr "    პიკის მდგომარეობები: %d\n"
++
++#: utils/cpufreq-info.c:178
++#, c-format
++msgid "    Total States: %d\n"
++msgstr "    სულ მდგომარეობები: %d\n"
++
++#: utils/cpufreq-info.c:181
++#, c-format
++msgid "    Pstate-Pb%d: %luMHz (boost state)\n"
++msgstr "    Pstate-Pb%d: %luმჰც (პიკში)\n"
++
++#: utils/cpufreq-info.c:184
++#, c-format
++msgid "    Pstate-P%d:  %luMHz\n"
++msgstr "    Pstate-P%d:  %luმჰც\n"
++
++#: utils/cpufreq-info.c:211
++#, c-format
++msgid "  no or unknown cpufreq driver is active on this CPU\n"
++msgstr " ამ CPU-ზე cpufreq-ის დრაივერი უცნობია, ან არ არსებობს\n"
++
++#: utils/cpufreq-info.c:213
++#, c-format
++msgid "  driver: %s\n"
++msgstr "  დრაივერი: %s\n"
++
++#: utils/cpufreq-info.c:219
++#, c-format
++msgid "  CPUs which run at the same hardware frequency: "
++msgstr "  CPU-ები, რომლებიც ერთი და იგივე აპარატურულ სიხშირეზე მუშაობენ: "
++
++#: utils/cpufreq-info.c:230
++#, c-format
++msgid "  CPUs which need to have their frequency coordinated by software: "
++msgstr "  CPU-ები, რომლებსაც მათი სიხშირის პროგრამული კოორდინაცია სჭირდებათ: "
++
++#: utils/cpufreq-info.c:241
++#, c-format
++msgid "  maximum transition latency: "
++msgstr "  მაქსიმალური გარდამავალი დაყოვნება: "
++
++#: utils/cpufreq-info.c:247
++#, c-format
++msgid "  hardware limits: "
++msgstr "  აპარატურული ლიმიტები: "
++
++#: utils/cpufreq-info.c:256
++#, c-format
++msgid "  available frequency steps: "
++msgstr "  ხელმისაწვდომი სიხშირის ბიჯები: "
++
++#: utils/cpufreq-info.c:269
++#, c-format
++msgid "  available cpufreq governors: "
++msgstr "  cpufreq -ის ხელმისაწვდომი მმართველები: "
++
++#: utils/cpufreq-info.c:280
++#, c-format
++msgid "  current policy: frequency should be within "
++msgstr "  მიმდინარე პოლიტიკა: სიხშირის დიაპაზონია "
++
++#: utils/cpufreq-info.c:282
++#, c-format
++msgid " and "
++msgstr " და "
++
++#: utils/cpufreq-info.c:286
++#, c-format
++msgid ""
++"The governor \"%s\" may decide which speed to use\n"
++"                  within this range.\n"
++msgstr ""
++"მმართველს \"%s\" შეუძლია გადაწყვიტოს, რომელი სიჩქარე გამოიყენოს\n"
++"                                                         ამ დიაპაზონიდან.\n"
++
++#: utils/cpufreq-info.c:293
++#, c-format
++msgid "  current CPU frequency is "
++msgstr "  CPU-ის მიმდინარე სიხშირეა "
++
++#: utils/cpufreq-info.c:296
++#, c-format
++msgid " (asserted by call to hardware)"
++msgstr " (დამტკიცებულია აპარატურული გადამოწმებით)"
++
++#: utils/cpufreq-info.c:304
++#, c-format
++msgid "  cpufreq stats: "
++msgstr "  cpufreq -ის სტატისტიკა: "
++
++#: utils/cpufreq-info.c:472
++#, c-format
++msgid "Usage: cpupower freqinfo [options]\n"
++msgstr "გამოყენება: cpupower freqinfo [პარამეტრები]\n"
++
++#: utils/cpufreq-info.c:473 utils/cpufreq-set.c:26 utils/cpupower-set.c:23
++#: utils/cpupower-info.c:22 utils/cpuidle-info.c:148
++#, c-format
++msgid "Options:\n"
++msgstr "პარამეტრები:\n"
++
++#: utils/cpufreq-info.c:474
++#, c-format
++msgid "  -e, --debug          Prints out debug information [default]\n"
++msgstr "  -e, --debug          გამართვის ინფორმაციის ჩვენება [ნაგულისხმები]\n"
++
++#: utils/cpufreq-info.c:475
++#, c-format
++msgid ""
++"  -f, --freq           Get frequency the CPU currently runs at, according\n"
++"                       to the cpufreq core *\n"
++msgstr ""
++"  -f, --freq          სიხშირის მიღება, რომლითაც CPU ამჟამად მუშაობს, \n"
++"                       cpufreq ბირთვის შესაბამისად *\n"
++
++#: utils/cpufreq-info.c:477
++#, c-format
++msgid ""
++"  -w, --hwfreq         Get frequency the CPU currently runs at, by reading\n"
++"                       it from hardware (only available to root) *\n"
++msgstr ""
++"  -w, --hwfreq         სიხშირის მიღება, რომლითაც CPU ახლა მუშაობს, "
++"მნიშვნელობის\n"
++"                       პირდაპირ აპარატურიდან წაკითხვით (საჭიროა root-ის "
++"პრივილეგიები) *\n"
++
++#: utils/cpufreq-info.c:479
++#, c-format
++msgid ""
++"  -l, --hwlimits       Determine the minimum and maximum CPU frequency "
++"allowed *\n"
++msgstr ""
++"  -l, --hwlimits       CPU-ის მინიმალური და მაქსიმალური დასაშვები სიხშირის "
++"განსაზღვრა *\n"
++
++#: utils/cpufreq-info.c:480
++#, c-format
++msgid "  -d, --driver         Determines the used cpufreq kernel driver *\n"
++msgstr ""
++"  -d, --driver         ბირთვის მიერ გამოყენებული cpufreq -ის დრაივერი *\n"
++
++#: utils/cpufreq-info.c:481
++#, c-format
++msgid "  -p, --policy         Gets the currently used cpufreq policy *\n"
++msgstr ""
++"  -p, --policy         cpufreq -ის ამჟამად გამოყენებული პოლიტიკის მიღება*\n"
++
++#: utils/cpufreq-info.c:482
++#, c-format
++msgid "  -g, --governors      Determines available cpufreq governors *\n"
++msgstr ""
++"  -g, --governors      cpufreq-ის ხელმისაწვდომი მმართველების დადგენა *\n"
++
++#: utils/cpufreq-info.c:483
++#, c-format
++msgid ""
++"  -r, --related-cpus   Determines which CPUs run at the same hardware "
++"frequency *\n"
++msgstr ""
++"  -r, --related-cpus   განსაზღვრავს, რომელი CPU-ები მუშაობს ერთი და იგივე "
++"აპარატურულ სიხშირეზე *\n"
++
++#: utils/cpufreq-info.c:484
++#, c-format
++msgid ""
++"  -a, --affected-cpus  Determines which CPUs need to have their frequency\n"
++"                       coordinated by software *\n"
++msgstr ""
++"  -a, --affected-cpus  განსაზღვრავს, რომელი CPU-ებს სჭირდებათ მათი სიხშირის\n"
++"                       პროგრამული კოორდინაცია *\n"
++
++#: utils/cpufreq-info.c:486
++#, c-format
++msgid "  -s, --stats          Shows cpufreq statistics if available\n"
++msgstr ""
++"  -s, --stats          cpufreq -ის სტატისტიკის ჩვენება, თუ ის "
++"ხელმისაწვდომია\n"
++
++#: utils/cpufreq-info.c:487
++#, c-format
++msgid ""
++"  -y, --latency        Determines the maximum latency on CPU frequency "
++"changes *\n"
++msgstr ""
++"  -y, --latency        CPU -ის სიხშირის ცვლილების მაქსიმალური დაყოვნების "
++"დადგენა *\n"
++
++#: utils/cpufreq-info.c:488
++#, c-format
++msgid "  -b, --boost          Checks for turbo or boost modes  *\n"
++msgstr "  -b, --boost          ტურბო და პიკური რეჟიმების შემოწმება  *\n"
++
++#: utils/cpufreq-info.c:489
++#, c-format
++msgid ""
++"  -o, --proc           Prints out information like provided by the /proc/"
++"cpufreq\n"
++"                       interface in 2.4. and early 2.6. kernels\n"
++msgstr ""
++"  -o, --proc           გამოიტანს ინფორმაციას, რომელიც /proc/cpufreq-ის "
++"მიერაა მოწოდებული.\n"
++"                       ეს ინტერფეისი 2.4. და ადრეულ 2.6. ბირთვებში იყო "
++"ხელმისაწვდომი\n"
++
++#: utils/cpufreq-info.c:491
++#, c-format
++msgid ""
++"  -m, --human          human-readable output for the -f, -w, -s and -y "
++"parameters\n"
++msgstr ""
++"  -m, --human           -f, -w, -s და -y პარამეტრების გამოტანის "
++"ადამიანისთვის გასაგებ ფორმატში ჩვენება\n"
++
++#: utils/cpufreq-info.c:492 utils/cpuidle-info.c:152
++#, c-format
++msgid "  -h, --help           Prints out this screen\n"
++msgstr "  -h, --help           ამ ეკრანის გამოტანა\n"
++
++#: utils/cpufreq-info.c:495
++#, c-format
++msgid ""
++"If no argument or only the -c, --cpu parameter is given, debug output about\n"
++"cpufreq is printed which is useful e.g. for reporting bugs.\n"
++msgstr ""
++"თუ არგუმენტები საერთოდ არ გადაცემულა ან გადაცემულია -c ან --cpu, მოხდება "
++"cpufreq-ის\n"
++"დრაივერის დამატებითი შეტყობინებების გამოტანა, რომელიც გამართვისთვისაა "
++"საჭირო.\n"
++
++#: utils/cpufreq-info.c:497
++#, c-format
++msgid ""
++"For the arguments marked with *, omitting the -c or --cpu argument is\n"
++"equivalent to setting it to zero\n"
++msgstr ""
++"არგუმენტებისთვის, რომლებიც *-ით არიან მონიშნულები, -c/--cpu \n"
++"არგუმენტის გამოტოვება მის ნულოვან მნიშვნელობაზე დაყენებას უდრის\n"
++
++#: utils/cpufreq-info.c:580
++#, c-format
++msgid ""
++"The argument passed to this tool can't be combined with passing a --cpu "
++"argument\n"
++msgstr ""
++"ამ პროგრამისთვის გადაცემული არგუმენტის --cpu არგუმენტთან გადაცემა ერთად არ "
++"შეიძლება\n"
++
++#: utils/cpufreq-info.c:596
++#, c-format
++msgid ""
++"You can't specify more than one --cpu parameter and/or\n"
++"more than one output-specific argument\n"
++msgstr ""
++"ერთ --cpu პარამეტრზე ან/და ერთ გამოტანის-შესატყვისი \n"
++"არგუმენტზე მეტის მითითება აკრძალულია\n"
++
++#: utils/cpufreq-info.c:600 utils/cpufreq-set.c:82 utils/cpupower-set.c:42
++#: utils/cpupower-info.c:42 utils/cpuidle-info.c:213
++#, c-format
++msgid "invalid or unknown argument\n"
++msgstr "არასწორი ან უცნობი არგუმენტი\n"
++
++#: utils/cpufreq-info.c:617
++#, c-format
++msgid "couldn't analyze CPU %d as it doesn't seem to be present\n"
++msgstr "%d-ე CPU-ის ანალიზი შეუძლებელია. ის არ არსებობს\n"
++
++#: utils/cpufreq-info.c:620 utils/cpupower-info.c:142
++#, c-format
++msgid "analyzing CPU %d:\n"
++msgstr "%d-ე CPU -ის ანალიზი:\n"
++
++#: utils/cpufreq-set.c:25
++#, c-format
++msgid "Usage: cpupower frequency-set [options]\n"
++msgstr "გამოყენება: cpupower frequency-set [პარამეტრები]\n"
++
++#: utils/cpufreq-set.c:27
++#, c-format
++msgid ""
++"  -d FREQ, --min FREQ      new minimum CPU frequency the governor may "
++"select\n"
++msgstr ""
++"  -d FREQ, --min FREQ      CPU-ის ახალი მინიმალური სიხშირე, რომელიც "
++"მმართველს შეუძლია, აირჩიოს\n"
++
++#: utils/cpufreq-set.c:28
++#, c-format
++msgid ""
++"  -u FREQ, --max FREQ      new maximum CPU frequency the governor may "
++"select\n"
++msgstr ""
++"  -u FREQ, --max FREQ      CPU-ის ახალი მაქსიმალური სიხშირე, რომელიც "
++"მმართველს შეუძლია, აირჩიოს\n"
++
++#: utils/cpufreq-set.c:29
++#, c-format
++msgid "  -g GOV, --governor GOV   new cpufreq governor\n"
++msgstr "  -g GOV, --governor GOV   cpufreq-ის ახალი მმართველი\n"
++
++#: utils/cpufreq-set.c:30
++#, c-format
++msgid ""
++"  -f FREQ, --freq FREQ     specific frequency to be set. Requires userspace\n"
++"                           governor to be available and loaded\n"
++msgstr ""
++"  -f FREQ, --freq FREQ     მითითებული სიხშირის დაყენება. საჭიროა, "
++"მომხმარებლის სივრცეში გაშვებული\n"
++"                           მმართველი ხელმისაწვდომი და ჩატვირთული იყოს\n"
++
++#: utils/cpufreq-set.c:32
++#, c-format
++msgid "  -r, --related            Switches all hardware-related CPUs\n"
++msgstr ""
++"  -r, --related            ყველა აპარატურულად-დაავშირებული CPU-ის გადართვა\n"
++
++#: utils/cpufreq-set.c:33 utils/cpupower-set.c:28 utils/cpupower-info.c:27
++#, c-format
++msgid "  -h, --help               Prints out this screen\n"
++msgstr "  -h, --help           ამ ეკრანის გამოტანა\n"
++
++#: utils/cpufreq-set.c:35
++#, c-format
++msgid ""
++"Notes:\n"
++"1. Omitting the -c or --cpu argument is equivalent to setting it to \"all\"\n"
++msgstr ""
++"შენიშვნა:\n"
++"1. -c/--cpu პარამეტრის გამოტოვება იგივეა, რაც \"all\" (ყველას) მითითება\n"
++
++#: utils/cpufreq-set.c:37
++#, c-format
++msgid ""
++"2. The -f FREQ, --freq FREQ parameter cannot be combined with any other "
++"parameter\n"
++"   except the -c CPU, --cpu CPU parameter\n"
++"3. FREQuencies can be passed in Hz, kHz (default), MHz, GHz, or THz\n"
++"   by postfixing the value with the wanted unit name, without any space\n"
++"   (FREQuency in kHz =^ Hz * 0.001 =^ MHz * 1000 =^ GHz * 1000000).\n"
++msgstr ""
++"2. The -f FREQ, --freq FREQ პარამეტრის შეთავსება შეუძლებელია სხვა "
++"პარამეტრებთან,\n"
++"   -c CPU, --cpu CPU -ის გარდა\n"
++"3. სიხშირეების გადაცემა შეიძლება ჰერცებში (hz), კილოჰერცებში, (KHz) "
++"(ნაგულისხმები), მეგაჰერცებში (MHz), GHz და THz.\n"
++"   რიცხვის შემდეგ შესაბამისი ერთეულის, გამოტოვების გარეშე, მიწერით\n"
++"   (სიხშირე in kHz(კილოჰერცი) =^ Hz(ჰერცი) * 0.001 =^ MHz(მეგაჰერცი) * 1000 "
++"=^ GHz(გიგაჰერცი) * 1000000).\n"
++
++#: utils/cpufreq-set.c:57
++#, c-format
++msgid ""
++"Error setting new values. Common errors:\n"
++"- Do you have proper administration rights? (super-user?)\n"
++"- Is the governor you requested available and modprobed?\n"
++"- Trying to set an invalid policy?\n"
++"- Trying to set a specific frequency, but userspace governor is not "
++"available,\n"
++"   for example because of hardware which cannot be set to a specific "
++"frequency\n"
++"   or because the userspace governor isn't loaded?\n"
++msgstr ""
++"ახალი მნიშვნელოების დაყენება შეუძლებელია. ხშირად დაშვებული შეცდომებია:\n"
++"- გაქვთ თუ არა ადმინისტრატორის უფლებები? (მომხმარებელი root)\n"
++"- არის თუ არა მოთხოვნილი მმართველი ხელმისაწვდომი და შესაბამისი მოდული "
++"modprobe-ით ჩატვირთული?\n"
++"- ცდილობთ დააყენოთ არასწორი პოლიტიკა?\n"
++"- ცდილობთ დააყენოთ განსაზღვრული სიხშირე მაშინ, როცა მომხმარებლის სივრცის "
++"მმართველი ხელმიუწვდომელია.\n"
++"  მაგალითად აპარატურის გამო, რომელსაც მითითებული სიხშირის დაყენება არ "
++"შეუძლია,\n"
++"  ან იქნებ მომხმარებლის სივრცის მმართველი ჩატვირთული არაა?\n"
++
++#: utils/cpufreq-set.c:170
++#, c-format
++msgid "wrong, unknown or unhandled CPU?\n"
++msgstr "არასწორი, უცნობი ან არასასურველი CPU?\n"
++
++#: utils/cpufreq-set.c:302
++#, c-format
++msgid ""
++"the -f/--freq parameter cannot be combined with -d/--min, -u/--max or\n"
++"-g/--governor parameters\n"
++msgstr ""
++"პარამეტრი -f/--freq არ შეიძლება-d/--min, -u/--max და\n"
++"-g/--governor პარამეტრებთან ერთად იყოს მითითებული\n"
++
++#: utils/cpufreq-set.c:308
++#, c-format
++msgid ""
++"At least one parameter out of -f/--freq, -d/--min, -u/--max, and\n"
++"-g/--governor must be passed\n"
++msgstr ""
++"საჭიროა -f/--freq, -d/--min, -u/--max, and\n"
++"-g/--governor პარამეტრებიდან ერთის გადაცემა მაინც\n"
++
++#: utils/cpufreq-set.c:347
++#, c-format
++msgid "Setting cpu: %d\n"
++msgstr "CPU-ის დაყენება: %d\n"
++
++#: utils/cpupower-set.c:22
++#, c-format
++msgid "Usage: cpupower set [ -b val ] [ -m val ] [ -s val ]\n"
++msgstr "გამოყენება: cpupower set [ -b მნიშვნ ] [ -m მნიშვნ ] [ -s მნიშვნ ]\n"
++
++#: utils/cpupower-set.c:24
++#, c-format
++msgid ""
++"  -b, --perf-bias [VAL]    Sets CPU's power vs performance policy on some\n"
++"                           Intel models [0-15], see manpage for details\n"
++msgstr ""
++"  -b, --perf-bias [VAL]    Intel-ის ზოგიერთ მოდელზე [0-15] CPU-ის კვებასა და "
++"წარმადობას შორის დამოკიდებულების დაყენება\n"
++"                           მეტი დეტალისთვის იხილეთ სახელმძღვანელო (manpage)\n"
++
++#: utils/cpupower-set.c:26
++#, c-format
++msgid ""
++"  -m, --sched-mc  [VAL]    Sets the kernel's multi core scheduler policy.\n"
++msgstr ""
++"  -m, --sched-mc   [VAL]     ბირთვის მრავალბირთვიანობის მგეგმავის პოლიტიკის "
++"დაყენება.\n"
++
++#: utils/cpupower-set.c:27
++#, c-format
++msgid ""
++"  -s, --sched-smt [VAL]    Sets the kernel's thread sibling scheduler "
++"policy.\n"
++msgstr ""
++"  -s, --sched-smt  [VAL]    ბირთვის ნაკადის დის მგეგმავის პოლიტიკის "
++"დაყენება.\n"
++
++#: utils/cpupower-set.c:80
++#, c-format
++msgid "--perf-bias param out of range [0-%d]\n"
++msgstr "--perf-bias პარამეტრი დიაპაზონიდან [0-%d]\n"
++
++#: utils/cpupower-set.c:91
++#, c-format
++msgid "--sched-mc param out of range [0-%d]\n"
++msgstr "--sched-mc პარამეტრი დიაპაზონიდან [0-%d]\n"
++
++#: utils/cpupower-set.c:102
++#, c-format
++msgid "--sched-smt param out of range [0-%d]\n"
++msgstr "--sched-smt პარამეტრი დიაპაზონიდან [0-%d]\n"
++
++#: utils/cpupower-set.c:121
++#, c-format
++msgid "Error setting sched-mc %s\n"
++msgstr "შეცდომა sched-mc -ის დაყენებისას: %s\n"
++
++#: utils/cpupower-set.c:127
++#, c-format
++msgid "Error setting sched-smt %s\n"
++msgstr "შეცდომა sched-smt-ის დაყენებისას: %s\n"
++
++#: utils/cpupower-set.c:146
++#, c-format
++msgid "Error setting perf-bias value on CPU %d\n"
++msgstr "%d-ე CPU-ზე perf-bias -ის მნიშვნელობის დაყენების შეცდომა\n"
++
++#: utils/cpupower-info.c:21
++#, c-format
++msgid "Usage: cpupower info [ -b ] [ -m ] [ -s ]\n"
++msgstr "გამოყენება: cpupower info [ -b ] [ -m ] [ -s ]\n"
++
++#: utils/cpupower-info.c:23
++#, c-format
++msgid ""
++"  -b, --perf-bias    Gets CPU's power vs performance policy on some\n"
++"                           Intel models [0-15], see manpage for details\n"
++msgstr ""
++"  -b, --perf-bias [VAL]    Intel-ის ზოგიერთ მოდელზე [0-15] CPU-ის კვებასა და "
++"წარმადობას შორის დამოკიდებულების მიღება\n"
++"                           მეტი დეტალისთვის იხილეთ სახელმძღვანელო (manpage)\n"
++
++#: utils/cpupower-info.c:25
++#, c-format
++msgid "  -m, --sched-mc     Gets the kernel's multi core scheduler policy.\n"
++msgstr ""
++"  -m, --sched-mc     ბირთვის მრავალბირთვიანობის მგეგმავის პოლიტიკის მიღება.\n"
++
++#: utils/cpupower-info.c:26
++#, c-format
++msgid ""
++"  -s, --sched-smt    Gets the kernel's thread sibling scheduler policy.\n"
++msgstr "  -s, --sched-smt    ბირთვის ნაკადის დის მგეგმავის პოლიტიკის მიღება.\n"
++
++#: utils/cpupower-info.c:28
++#, c-format
++msgid ""
++"\n"
++"Passing no option will show all info, by default only on core 0\n"
++msgstr ""
++"\n"
++"მნიშვნელობის არ-გადაცემის შემთხვევაში ნაჩვენები იქნება სრული ინფორმაცია. "
++"ნაგულისხმევად მხოლოდ ნულოვან ბირთვზე\n"
++
++#: utils/cpupower-info.c:102
++#, c-format
++msgid "System's multi core scheduler setting: "
++msgstr "სისტემის მრავალბირთვიანობის მმართველის პარამეტრი: "
++
++#. if sysfs file is missing it's: errno == ENOENT
++#: utils/cpupower-info.c:105 utils/cpupower-info.c:114
++#, c-format
++msgid "not supported\n"
++msgstr "მხარდაუჭერელია\n"
++
++#: utils/cpupower-info.c:111
++#, c-format
++msgid "System's thread sibling scheduler setting: "
++msgstr "სისტემის ნაკადის დის მართვის პარამეტრი: "
++
++#: utils/cpupower-info.c:126
++#, c-format
++msgid "Intel's performance bias setting needs root privileges\n"
++msgstr "Intel-ის წარმადობის bias-ის დაყენებას root-ის პრივილეგიები სჭირდება\n"
++
++#: utils/cpupower-info.c:128
++#, c-format
++msgid "System does not support Intel's performance bias setting\n"
++msgstr ""
++"სისტემას intel-ის performance bias-ის დაყენების მხარდაჭერა არ გააჩნია\n"
++
++#: utils/cpupower-info.c:147
++#, c-format
++msgid "Could not read perf-bias value\n"
++msgstr "შეცდომა perf-bias -ის მნიშვნელობის წაკითხვისას\n"
++
++#: utils/cpupower-info.c:150
++#, c-format
++msgid "perf-bias: %d\n"
++msgstr "perf-bias: %d\n"
++
++#: utils/cpuidle-info.c:28
++#, c-format
++msgid "Analyzing CPU %d:\n"
++msgstr "%d-ე CPU -ის ანალიზი:\n"
++
++#: utils/cpuidle-info.c:32
++#, c-format
++msgid "CPU %u: No idle states\n"
++msgstr "CPU %u: უქმი მდგომარეობების გარეშე\n"
++
++#: utils/cpuidle-info.c:36
++#, c-format
++msgid "CPU %u: Can't read idle state info\n"
++msgstr "CPU %u: უქმი მდგომარეობის ინფორმაციის წაკითხვა შეუძლებელია\n"
++
++#: utils/cpuidle-info.c:41
++#, c-format
++msgid "Could not determine max idle state %u\n"
++msgstr "მაქსიმალური უქმე მდგომარეობის %u დადგენის შეცდომა\n"
++
++#: utils/cpuidle-info.c:46
++#, c-format
++msgid "Number of idle states: %d\n"
++msgstr "უქმე მდგომარეობების რაოდენობა: %d\n"
++
++#: utils/cpuidle-info.c:48
++#, c-format
++msgid "Available idle states:"
++msgstr "ხელმისაწვდომი უქმე მდგომარეობები:"
++
++#: utils/cpuidle-info.c:71
++#, c-format
++msgid "Flags/Description: %s\n"
++msgstr "ალმები/აღწერა: %s\n"
++
++#: utils/cpuidle-info.c:74
++#, c-format
++msgid "Latency: %lu\n"
++msgstr "დაყოვება: %lu\n"
++
++#: utils/cpuidle-info.c:76
++#, c-format
++msgid "Usage: %lu\n"
++msgstr "გამოყენება: %lu\n"
++
++#: utils/cpuidle-info.c:78
++#, c-format
++msgid "Duration: %llu\n"
++msgstr "ხანგრძლივობა: %llu\n"
++
++#: utils/cpuidle-info.c:90
++#, c-format
++msgid "Could not determine cpuidle driver\n"
++msgstr "CPUidle-ის დრაივერის დადგენის შეცდომა\n"
++
++#: utils/cpuidle-info.c:94
++#, c-format
++msgid "CPUidle driver: %s\n"
++msgstr "CPUidle -ის დრაივერი: %s\n"
++
++#: utils/cpuidle-info.c:99
++#, c-format
++msgid "Could not determine cpuidle governor\n"
++msgstr "CPUidle-ის მმართველის დადგენის შეცდომა\n"
++
++#: utils/cpuidle-info.c:103
++#, c-format
++msgid "CPUidle governor: %s\n"
++msgstr "CPUidle მმართველი: %s\n"
++
++#: utils/cpuidle-info.c:122
++#, c-format
++msgid "CPU %u: Can't read C-state info\n"
++msgstr "CPU %u: C-state -ის ინფორმაციის წაკითხვის შეცდომა\n"
++
++#. printf("Cstates: %d\n", cstates);
++#: utils/cpuidle-info.c:127
++#, c-format
++msgid "active state:            C0\n"
++msgstr "აქტიური მდგომარეობა:            C0\n"
++
++#: utils/cpuidle-info.c:128
++#, c-format
++msgid "max_cstate:              C%u\n"
++msgstr "max_cstate:              C%u\n"
++
++#: utils/cpuidle-info.c:129
++#, c-format
++msgid "maximum allowed latency: %lu usec\n"
++msgstr "მაქსიმალური დასაშვები დაყოვნება: %lu usec\n"
++
++#: utils/cpuidle-info.c:130
++#, c-format
++msgid "states:\t\n"
++msgstr "მდგომარეობები:\t\n"
++
++#: utils/cpuidle-info.c:132
++#, c-format
++msgid "    C%d:                  type[C%d] "
++msgstr "    C%d:                  ტიპი[C%d] "
++
++#: utils/cpuidle-info.c:134
++#, c-format
++msgid "promotion[--] demotion[--] "
++msgstr "promotion[--] demotion[--] "
++
++#: utils/cpuidle-info.c:135
++#, c-format
++msgid "latency[%03lu] "
++msgstr "დაყოვნება[%03lu] "
++
++#: utils/cpuidle-info.c:137
++#, c-format
++msgid "usage[%08lu] "
++msgstr "გამოყენება[%08lu] "
++
++#: utils/cpuidle-info.c:139
++#, c-format
++msgid "duration[%020Lu] \n"
++msgstr "ხანგრძლივობა[%020Lu] \n"
++
++#: utils/cpuidle-info.c:147
++#, c-format
++msgid "Usage: cpupower idleinfo [options]\n"
++msgstr "გამოყენება: cpupower idleinfo [პარამეტრები]\n"
++
++#: utils/cpuidle-info.c:149
++#, c-format
++msgid "  -s, --silent         Only show general C-state information\n"
++msgstr "  -s, --silent         მხოლოდ ზოგადი C-state -ის ინფორმაციის ჩვენება\n"
++
++#: utils/cpuidle-info.c:150
++#, c-format
++msgid ""
++"  -o, --proc           Prints out information like provided by the /proc/"
++"acpi/processor/*/power\n"
++"                       interface in older kernels\n"
++msgstr ""
++"  -o, --proc           გამოაქვს ინფორმაცია, როგორც ის /proc/acpi/processor/*/"
++"power ფაილშია აღწერილი.\n"
++"                       ინტერფეისი ძველ ბირთვებში იყო ხელმისაწვდომი\n"
++
++#: utils/cpuidle-info.c:209
++#, c-format
++msgid "You can't specify more than one output-specific argument\n"
++msgstr "ერთზე მეტი გამოტანის-შესატყვისი არგუმენტის მითითება აკრძალულია\n"
+-- 
+cgit 
+
+
+From c2294c1496b7169d5b14c2fa27526ba35da9f5ac Mon Sep 17 00:00:00 2001
+From: Thomas Renninger <trenn@suse.de>
+Date: Wed, 23 Nov 2022 12:18:09 +0100
+Subject: cpupower: Introduce powercap intel-rapl library and powercap-info
+ command
+
+Read out powercap zone information via:
+cpupower powercap-info
+and show the zone hierarchy to the user:
+
+./cpupower powercap-info
+Driver: intel-rapl
+Powercap domain hierarchy:
+
+Zone: package-0 (enabled)
+Power consumption can be monitored in micro Watts
+
+        Zone: core (disabled)
+        Power consumption can be monitored in micro Watts
+
+        Zone: uncore (disabled)
+        Power consumption can be monitored in micro Watts
+
+        Zone: dram (disabled)
+        Power consumption can be monitored in micro Watts
+
+There is a dummy -a option for powercap-info which can/should be used to
+show more detailed info later. Like that other args can be added easily
+later as well.
+
+A enable/disable option via powercap-set subcommand is also an enhancement
+for later.
+
+Also not all RAPL domains are shown. The func walking through RAPL
+subdomains is restricted and hardcoded to: "intel-rapl/intel-rapl:0"
+On my system above powercap domains map to:
+intel-rapl/intel-rapl:0
+-> pack (age-0)
+intel-rapl/intel-rapl:0/intel-rapl:0:0
+-> core
+intel-rapl/intel-rapl:0/intel-rapl:0:1
+-> uncore
+
+Missing ones on my system are:
+intel-rapl-mmio/intel-rapl-mmio:0
+-> pack (age-0)
+
+intel-rapl/intel-rapl:1
+-> psys
+
+This could get enhanced in:
+struct powercap_zone *powercap_init_zones()
+and adopted to walk through all intel-rapl zones, but
+also to other powercap drivers like dtpm
+(Dynamic Thermal Power Management framework),
+cmp with: drivers/powercap/dtpm_*
+
+Signed-off-by: Thomas Renninger <trenn@suse.de>
+CC: Shuah Khan <skhan@linuxfoundation.org>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/power/cpupower/Makefile                     |  14 +-
+ tools/power/cpupower/lib/powercap.c               | 290 ++++++++++++++++++++++
+ tools/power/cpupower/lib/powercap.h               |  54 ++++
+ tools/power/cpupower/man/cpupower-powercap-info.1 |  25 ++
+ tools/power/cpupower/utils/builtin.h              |   2 +
+ tools/power/cpupower/utils/cpupower.c             |   1 +
+ tools/power/cpupower/utils/powercap-info.c        | 117 +++++++++
+ 7 files changed, 499 insertions(+), 4 deletions(-)
+ create mode 100644 tools/power/cpupower/lib/powercap.c
+ create mode 100644 tools/power/cpupower/lib/powercap.h
+ create mode 100644 tools/power/cpupower/man/cpupower-powercap-info.1
+ create mode 100644 tools/power/cpupower/utils/powercap-info.c
+
+diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefile
+index e9b6de314654f..9fd3b309b3a6d 100644
+--- a/tools/power/cpupower/Makefile
++++ b/tools/power/cpupower/Makefile
+@@ -133,7 +133,7 @@ UTIL_OBJS =  utils/helpers/amd.o utils/helpers/msr.o \
+ 	utils/idle_monitor/mperf_monitor.o utils/idle_monitor/cpupower-monitor.o \
+ 	utils/cpupower.o utils/cpufreq-info.o utils/cpufreq-set.o \
+ 	utils/cpupower-set.o utils/cpupower-info.o utils/cpuidle-info.o \
+-	utils/cpuidle-set.o
++	utils/cpuidle-set.o utils/powercap-info.o
+ 
+ UTIL_SRC := $(UTIL_OBJS:.o=.c)
+ 
+@@ -143,9 +143,12 @@ UTIL_HEADERS = utils/helpers/helpers.h utils/idle_monitor/cpupower-monitor.h \
+ 	utils/helpers/bitmask.h \
+ 	utils/idle_monitor/idle_monitors.h utils/idle_monitor/idle_monitors.def
+ 
+-LIB_HEADERS = 	lib/cpufreq.h lib/cpupower.h lib/cpuidle.h lib/acpi_cppc.h
+-LIB_SRC = 	lib/cpufreq.c lib/cpupower.c lib/cpuidle.c lib/acpi_cppc.c
+-LIB_OBJS = 	lib/cpufreq.o lib/cpupower.o lib/cpuidle.o lib/acpi_cppc.o
++LIB_HEADERS = 	lib/cpufreq.h lib/cpupower.h lib/cpuidle.h lib/acpi_cppc.h \
++	lib/powercap.h
++LIB_SRC = 	lib/cpufreq.c lib/cpupower.c lib/cpuidle.c lib/acpi_cppc.c \
++	lib/powercap.c
++LIB_OBJS = 	lib/cpufreq.o lib/cpupower.o lib/cpuidle.o lib/acpi_cppc.o \
++	lib/powercap.o
+ LIB_OBJS :=	$(addprefix $(OUTPUT),$(LIB_OBJS))
+ 
+ override CFLAGS +=	-pipe
+@@ -276,6 +279,7 @@ install-lib: libcpupower
+ 	$(INSTALL) -d $(DESTDIR)${includedir}
+ 	$(INSTALL_DATA) lib/cpufreq.h $(DESTDIR)${includedir}/cpufreq.h
+ 	$(INSTALL_DATA) lib/cpuidle.h $(DESTDIR)${includedir}/cpuidle.h
++	$(INSTALL_DATA) lib/powercap.h $(DESTDIR)${includedir}/powercap.h
+ 
+ install-tools: $(OUTPUT)cpupower
+ 	$(INSTALL) -d $(DESTDIR)${bindir}
+@@ -292,6 +296,7 @@ install-man:
+ 	$(INSTALL_DATA) -D man/cpupower-set.1 $(DESTDIR)${mandir}/man1/cpupower-set.1
+ 	$(INSTALL_DATA) -D man/cpupower-info.1 $(DESTDIR)${mandir}/man1/cpupower-info.1
+ 	$(INSTALL_DATA) -D man/cpupower-monitor.1 $(DESTDIR)${mandir}/man1/cpupower-monitor.1
++	$(INSTALL_DATA) -D man/cpupower-powercap-info.1 $(DESTDIR)${mandir}/man1/cpupower-powercap-info.1
+ 
+ install-gmo: create-gmo
+ 	$(INSTALL) -d $(DESTDIR)${localedir}
+@@ -321,6 +326,7 @@ uninstall:
+ 	- rm -f $(DESTDIR)${mandir}/man1/cpupower-set.1
+ 	- rm -f $(DESTDIR)${mandir}/man1/cpupower-info.1
+ 	- rm -f $(DESTDIR)${mandir}/man1/cpupower-monitor.1
++	- rm -f $(DESTDIR)${mandir}/man1/cpupower-powercap-info.1
+ 	- for HLANG in $(LANGUAGES); do \
+ 		rm -f $(DESTDIR)${localedir}/$$HLANG/LC_MESSAGES/cpupower.mo; \
+ 	  done;
+diff --git a/tools/power/cpupower/lib/powercap.c b/tools/power/cpupower/lib/powercap.c
+new file mode 100644
+index 0000000000000..0ce29ee4c2e46
+--- /dev/null
++++ b/tools/power/cpupower/lib/powercap.c
+@@ -0,0 +1,290 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ *  (C) 2016 SUSE Software Solutions GmbH
++ *           Thomas Renninger <trenn@suse.de>
++ */
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <dirent.h>
++
++#include "powercap.h"
++
++static unsigned int sysfs_read_file(const char *path, char *buf, size_t buflen)
++{
++	int fd;
++	ssize_t numread;
++
++	fd = open(path, O_RDONLY);
++	if (fd == -1)
++		return 0;
++
++	numread = read(fd, buf, buflen - 1);
++	if (numread < 1) {
++		close(fd);
++		return 0;
++	}
++
++	buf[numread] = '\0';
++	close(fd);
++
++	return (unsigned int) numread;
++}
++
++static int sysfs_get_enabled(char *path, int *mode)
++{
++	int fd;
++	char yes_no;
++
++	*mode = 0;
++
++	fd = open(path, O_RDONLY);
++	if (fd == -1)
++		return -1;
++
++	if (read(fd, &yes_no, 1) != 1) {
++		close(fd);
++		return -1;
++	}
++
++	if (yes_no == '1') {
++		*mode = 1;
++		return 0;
++	} else if (yes_no == '0') {
++		return 0;
++	}
++	return -1;
++}
++
++int powercap_get_enabled(int *mode)
++{
++	char path[SYSFS_PATH_MAX] = PATH_TO_POWERCAP "/intel-rapl/enabled";
++
++	return sysfs_get_enabled(path, mode);
++}
++
++/*
++ * Hardcoded, because rapl is the only powercap implementation
++- * this needs to get more generic if more powercap implementations
++ * should show up
++ */
++int powercap_get_driver(char *driver, int buflen)
++{
++	char file[SYSFS_PATH_MAX] = PATH_TO_RAPL;
++
++	struct stat statbuf;
++
++	if (stat(file, &statbuf) != 0 || !S_ISDIR(statbuf.st_mode)) {
++		driver = "";
++		return -1;
++	} else if (buflen > 10) {
++		strcpy(driver, "intel-rapl");
++		return 0;
++	} else
++		return -1;
++}
++
++enum powercap_get64 {
++	GET_ENERGY_UJ,
++	GET_MAX_ENERGY_RANGE_UJ,
++	GET_POWER_UW,
++	GET_MAX_POWER_RANGE_UW,
++	MAX_GET_64_FILES
++};
++
++static const char *powercap_get64_files[MAX_GET_64_FILES] = {
++	[GET_POWER_UW] = "power_uw",
++	[GET_MAX_POWER_RANGE_UW] = "max_power_range_uw",
++	[GET_ENERGY_UJ] = "energy_uj",
++	[GET_MAX_ENERGY_RANGE_UJ] = "max_energy_range_uj",
++};
++
++static int sysfs_powercap_get64_val(struct powercap_zone *zone,
++				      enum powercap_get64 which,
++				      uint64_t *val)
++{
++	char file[SYSFS_PATH_MAX] = PATH_TO_POWERCAP "/";
++	int ret;
++	char buf[MAX_LINE_LEN];
++
++	strcat(file, zone->sys_name);
++	strcat(file, "/");
++	strcat(file, powercap_get64_files[which]);
++
++	ret = sysfs_read_file(file, buf, MAX_LINE_LEN);
++	if (ret < 0)
++		return ret;
++	if (ret == 0)
++		return -1;
++
++	*val = strtoll(buf, NULL, 10);
++	return 0;
++}
++
++int powercap_get_max_energy_range_uj(struct powercap_zone *zone, uint64_t *val)
++{
++	return sysfs_powercap_get64_val(zone, GET_MAX_ENERGY_RANGE_UJ, val);
++}
++
++int powercap_get_energy_uj(struct powercap_zone *zone, uint64_t *val)
++{
++	return sysfs_powercap_get64_val(zone, GET_ENERGY_UJ, val);
++}
++
++int powercap_get_max_power_range_uw(struct powercap_zone *zone, uint64_t *val)
++{
++	return sysfs_powercap_get64_val(zone, GET_MAX_POWER_RANGE_UW, val);
++}
++
++int powercap_get_power_uw(struct powercap_zone *zone, uint64_t *val)
++{
++	return sysfs_powercap_get64_val(zone, GET_POWER_UW, val);
++}
++
++int powercap_zone_get_enabled(struct powercap_zone *zone, int *mode)
++{
++	char path[SYSFS_PATH_MAX] = PATH_TO_POWERCAP;
++
++	if ((strlen(PATH_TO_POWERCAP) + strlen(zone->sys_name)) +
++	    strlen("/enabled") + 1 >= SYSFS_PATH_MAX)
++		return -1;
++
++	strcat(path, "/");
++	strcat(path, zone->sys_name);
++	strcat(path, "/enabled");
++
++	return sysfs_get_enabled(path, mode);
++}
++
++int powercap_zone_set_enabled(struct powercap_zone *zone, int mode)
++{
++	/* To be done if needed */
++	return 0;
++}
++
++
++int powercap_read_zone(struct powercap_zone *zone)
++{
++	struct dirent *dent;
++	DIR *zone_dir;
++	char sysfs_dir[SYSFS_PATH_MAX] = PATH_TO_POWERCAP;
++	struct powercap_zone *child_zone;
++	char file[SYSFS_PATH_MAX] = PATH_TO_POWERCAP;
++	int i, ret = 0;
++	uint64_t val = 0;
++
++	strcat(sysfs_dir, "/");
++	strcat(sysfs_dir, zone->sys_name);
++
++	zone_dir = opendir(sysfs_dir);
++	if (zone_dir == NULL)
++		return -1;
++
++	strcat(file, "/");
++	strcat(file, zone->sys_name);
++	strcat(file, "/name");
++	sysfs_read_file(file, zone->name, MAX_LINE_LEN);
++	if (zone->parent)
++		zone->tree_depth = zone->parent->tree_depth + 1;
++	ret = powercap_get_energy_uj(zone, &val);
++	if (ret == 0)
++		zone->has_energy_uj = 1;
++	ret = powercap_get_power_uw(zone, &val);
++	if (ret == 0)
++		zone->has_power_uw = 1;
++
++	while ((dent = readdir(zone_dir)) != NULL) {
++		struct stat st;
++
++		if (strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
++			continue;
++
++		if (stat(dent->d_name, &st) != 0 || !S_ISDIR(st.st_mode))
++			if (fstatat(dirfd(zone_dir), dent->d_name, &st, 0) < 0)
++				continue;
++
++		if (strncmp(dent->d_name, "intel-rapl:", 11) != 0)
++			continue;
++
++		child_zone = calloc(1, sizeof(struct powercap_zone));
++		if (child_zone == NULL)
++			return -1;
++		for (i = 0; i < POWERCAP_MAX_CHILD_ZONES; i++) {
++			if (zone->children[i] == NULL) {
++				zone->children[i] = child_zone;
++				break;
++			}
++			if (i == POWERCAP_MAX_CHILD_ZONES - 1) {
++				free(child_zone);
++				fprintf(stderr, "Reached POWERCAP_MAX_CHILD_ZONES %d\n",
++				       POWERCAP_MAX_CHILD_ZONES);
++				return -1;
++			}
++		}
++		strcpy(child_zone->sys_name, zone->sys_name);
++		strcat(child_zone->sys_name, "/");
++		strcat(child_zone->sys_name, dent->d_name);
++		child_zone->parent = zone;
++		if (zone->tree_depth >= POWERCAP_MAX_TREE_DEPTH) {
++			fprintf(stderr, "Maximum zone hierarchy depth[%d] reached\n",
++				POWERCAP_MAX_TREE_DEPTH);
++			ret = -1;
++			break;
++		}
++		powercap_read_zone(child_zone);
++	}
++	closedir(zone_dir);
++	return ret;
++}
++
++struct powercap_zone *powercap_init_zones(void)
++{
++	int enabled;
++	struct powercap_zone *root_zone;
++	int ret;
++	char file[SYSFS_PATH_MAX] = PATH_TO_RAPL "/enabled";
++
++	ret = sysfs_get_enabled(file, &enabled);
++
++	if (ret)
++		return NULL;
++
++	if (!enabled)
++		return NULL;
++
++	root_zone = calloc(1, sizeof(struct powercap_zone));
++	if (!root_zone)
++		return NULL;
++
++	strcpy(root_zone->sys_name, "intel-rapl/intel-rapl:0");
++
++	powercap_read_zone(root_zone);
++
++	return root_zone;
++}
++
++/* Call function *f on the passed zone and all its children */
++
++int powercap_walk_zones(struct powercap_zone *zone,
++			int (*f)(struct powercap_zone *zone))
++{
++	int i, ret;
++
++	if (!zone)
++		return -1;
++
++	ret = f(zone);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < POWERCAP_MAX_CHILD_ZONES; i++) {
++		if (zone->children[i] != NULL)
++			powercap_walk_zones(zone->children[i], f);
++	}
++	return 0;
++}
+diff --git a/tools/power/cpupower/lib/powercap.h b/tools/power/cpupower/lib/powercap.h
+new file mode 100644
+index 0000000000000..c049c109f22f0
+--- /dev/null
++++ b/tools/power/cpupower/lib/powercap.h
+@@ -0,0 +1,54 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ *  (C) 2016 SUSE Software Solutions GmbH
++ *           Thomas Renninger <trenn@suse.de>
++ */
++
++#ifndef __CPUPOWER_RAPL_H__
++#define __CPUPOWER_RAPL_H__
++
++#define PATH_TO_POWERCAP "/sys/devices/virtual/powercap"
++#define PATH_TO_RAPL "/sys/devices/virtual/powercap/intel-rapl"
++#define PATH_TO_RAPL_CLASS "/sys/devices/virtual/powercap/intel-rapl"
++
++#define POWERCAP_MAX_CHILD_ZONES 10
++#define POWERCAP_MAX_TREE_DEPTH 10
++
++#define MAX_LINE_LEN 4096
++#define SYSFS_PATH_MAX 255
++
++#include <stdint.h>
++
++struct powercap_zone {
++	char name[MAX_LINE_LEN];
++	/*
++	 * sys_name relative to PATH_TO_POWERCAP,
++	 * do not forget the / in between
++	 */
++	char sys_name[SYSFS_PATH_MAX];
++	int tree_depth;
++	struct powercap_zone *parent;
++	struct powercap_zone *children[POWERCAP_MAX_CHILD_ZONES];
++	/* More possible caps or attributes to be added? */
++	uint32_t has_power_uw:1,
++		 has_energy_uj:1;
++
++};
++
++int powercap_walk_zones(struct powercap_zone *zone,
++			int (*f)(struct powercap_zone *zone));
++
++struct powercap_zone *powercap_init_zones(void);
++int powercap_get_enabled(int *mode);
++int powercap_set_enabled(int mode);
++int powercap_get_driver(char *driver, int buflen);
++
++int powercap_get_max_energy_range_uj(struct powercap_zone *zone, uint64_t *val);
++int powercap_get_energy_uj(struct powercap_zone *zone, uint64_t *val);
++int powercap_get_max_power_range_uw(struct powercap_zone *zone, uint64_t *val);
++int powercap_get_power_uw(struct powercap_zone *zone, uint64_t *val);
++int powercap_zone_get_enabled(struct powercap_zone *zone, int *mode);
++int powercap_zone_set_enabled(struct powercap_zone *zone, int mode);
++
++
++#endif /* __CPUPOWER_RAPL_H__ */
+diff --git a/tools/power/cpupower/man/cpupower-powercap-info.1 b/tools/power/cpupower/man/cpupower-powercap-info.1
+new file mode 100644
+index 0000000000000..df3087000efb8
+--- /dev/null
++++ b/tools/power/cpupower/man/cpupower-powercap-info.1
+@@ -0,0 +1,25 @@
++.TH CPUPOWER\-POWERCAP\-INFO "1" "05/08/2016" "" "cpupower Manual"
++.SH NAME
++cpupower\-powercap\-info \- Shows powercapping related kernel and hardware configurations
++.SH SYNOPSIS
++.ft B
++.B cpupower powercap-info
++
++.SH DESCRIPTION
++\fBcpupower powercap-info \fP shows kernel powercapping subsystem information.
++This needs hardware support and a loaded powercapping driver (at this time only
++intel_rapl driver exits) exporting hardware values userspace via sysfs.
++
++Some options are platform wide, some affect single cores. By default values
++of core zero are displayed only. cpupower --cpu all cpuinfo will show the
++settings of all cores, see cpupower(1) how to choose specific cores.
++
++.SH "DOCUMENTATION"
++
++kernel sources:
++Documentation/power/powercap/powercap.txt
++
++
++.SH "SEE ALSO"
++
++cpupower(1)
+diff --git a/tools/power/cpupower/utils/builtin.h b/tools/power/cpupower/utils/builtin.h
+index f7065ae60a144..e1caefd467cd8 100644
+--- a/tools/power/cpupower/utils/builtin.h
++++ b/tools/power/cpupower/utils/builtin.h
+@@ -8,6 +8,8 @@ extern int cmd_freq_set(int argc, const char **argv);
+ extern int cmd_freq_info(int argc, const char **argv);
+ extern int cmd_idle_set(int argc, const char **argv);
+ extern int cmd_idle_info(int argc, const char **argv);
++extern int cmd_cap_info(int argc, const char **argv);
++extern int cmd_cap_set(int argc, const char **argv);
+ extern int cmd_monitor(int argc, const char **argv);
+ 
+ #endif
+diff --git a/tools/power/cpupower/utils/cpupower.c b/tools/power/cpupower/utils/cpupower.c
+index 8ac3304a9957d..9ec973165af13 100644
+--- a/tools/power/cpupower/utils/cpupower.c
++++ b/tools/power/cpupower/utils/cpupower.c
+@@ -54,6 +54,7 @@ static struct cmd_struct commands[] = {
+ 	{ "frequency-set",	cmd_freq_set,	1	},
+ 	{ "idle-info",		cmd_idle_info,	0	},
+ 	{ "idle-set",		cmd_idle_set,	1	},
++	{ "powercap-info",	cmd_cap_info,	0	},
+ 	{ "set",		cmd_set,	1	},
+ 	{ "info",		cmd_info,	0	},
+ 	{ "monitor",		cmd_monitor,	0	},
+diff --git a/tools/power/cpupower/utils/powercap-info.c b/tools/power/cpupower/utils/powercap-info.c
+new file mode 100644
+index 0000000000000..3ea4486f1a0e2
+--- /dev/null
++++ b/tools/power/cpupower/utils/powercap-info.c
+@@ -0,0 +1,117 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ *  (C) 2016 SUSE Software Solutions GmbH
++ *           Thomas Renninger <trenn@suse.de>
++ */
++
++#include <unistd.h>
++#include <stdio.h>
++#include <errno.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <string.h>
++
++#include <getopt.h>
++
++#include "powercap.h"
++#include "helpers/helpers.h"
++
++int powercap_show_all;
++
++static struct option info_opts[] = {
++	{ "all",		no_argument,		 NULL,	 'a'},
++	{ },
++};
++
++static int powercap_print_one_zone(struct powercap_zone *zone)
++{
++	int mode, i, ret = 0;
++	char pr_prefix[1024] = "";
++
++	for (i = 0; i < zone->tree_depth && i < POWERCAP_MAX_TREE_DEPTH; i++)
++		strcat(pr_prefix, "\t");
++
++	printf("%sZone: %s", pr_prefix, zone->name);
++	ret = powercap_zone_get_enabled(zone, &mode);
++	if (ret < 0)
++		return ret;
++	printf(" (%s)\n", mode ? "enabled" : "disabled");
++
++	if (zone->has_power_uw)
++		printf(_("%sPower can be monitored in micro Jules\n"),
++		       pr_prefix);
++
++	if (zone->has_energy_uj)
++		printf(_("%sPower can be monitored in micro Watts\n"),
++		       pr_prefix);
++
++	printf("\n");
++
++	if (ret != 0)
++		return ret;
++	return ret;
++}
++
++static int powercap_show(void)
++{
++	struct powercap_zone *root_zone;
++	char line[MAX_LINE_LEN] = "";
++	int ret, val;
++
++	ret = powercap_get_driver(line, MAX_LINE_LEN);
++	if (ret < 0) {
++		printf(_("No powercapping driver loaded\n"));
++		return ret;
++	}
++
++	printf("Driver: %s\n", line);
++	ret = powercap_get_enabled(&val);
++	if (ret < 0)
++		return ret;
++	if (!val) {
++		printf(_("Powercapping is disabled\n"));
++		return -1;
++	}
++
++	printf(_("Powercap domain hierarchy:\n\n"));
++	root_zone = powercap_init_zones();
++
++	if (root_zone == NULL) {
++		printf(_("No powercap info found\n"));
++		return 1;
++	}
++
++	powercap_walk_zones(root_zone, powercap_print_one_zone);
++
++	return 0;
++}
++
++int cmd_cap_set(int argc, char **argv)
++{
++	return 0;
++};
++int cmd_cap_info(int argc, char **argv)
++{
++	int ret = 0, cont = 1;
++
++	do {
++		ret = getopt_long(argc, argv, "a", info_opts, NULL);
++		switch (ret) {
++		case '?':
++			cont = 0;
++			break;
++		case -1:
++			cont = 0;
++			break;
++		case 'a':
++			powercap_show_all = 1;
++			break;
++		default:
++			fprintf(stderr, _("invalid or unknown argument\n"));
++			return EXIT_FAILURE;
++		}
++	} while (cont);
++
++	powercap_show();
++	return 0;
++}
+-- 
+cgit 
+
+
+From 8c37df3d635eac64a8fbb4b26672fb881e0cb673 Mon Sep 17 00:00:00 2001
+From: Thomas Renninger <trenn@suse.de>
+Date: Wed, 23 Nov 2022 12:18:10 +0100
+Subject: cpupower: rapl monitor - shows the used power consumption in uj for
+ each rapl domain
+
+This CPU power monitor shows the power consumption
+as exposed by the powercap subsystem, cmp with:
+Documentation/power/powercap/powercap.rst
+
+cpupower monitor -m RAPL
+    | RAPL
+ CPU| pack | core | unco
+   0|6853926|967832|442381
+   8|6853926|967832|442381
+   1|6853926|967832|442381
+   9|6853926|967832|442381
+
+Unfortunately RAPL domains cannot be directly mapped to the corresponding
+CPU socket/package, core it belongs to.
+Not sure this is possible at all with the current data exposed from the
+kernel.
+
+Still it can be worthful information for developers trying to optimize
+power consumption of workloads or their system in general.
+
+Signed-off-by: Thomas Renninger <trenn@suse.de>
+CC: Zhang Rui <rui.zhang@intel.com>
+CC: Shuah Khan <skhan@linuxfoundation.org>
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/power/cpupower/Makefile                      |   1 +
+ .../cpupower/utils/idle_monitor/cpupower-monitor.c |   7 +-
+ .../cpupower/utils/idle_monitor/idle_monitors.def  |   1 +
+ .../cpupower/utils/idle_monitor/rapl_monitor.c     | 148 +++++++++++++++++++++
+ 4 files changed, 154 insertions(+), 3 deletions(-)
+ create mode 100644 tools/power/cpupower/utils/idle_monitor/rapl_monitor.c
+
+diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefile
+index 9fd3b309b3a6d..59bfa05dec5d8 100644
+--- a/tools/power/cpupower/Makefile
++++ b/tools/power/cpupower/Makefile
+@@ -131,6 +131,7 @@ UTIL_OBJS =  utils/helpers/amd.o utils/helpers/msr.o \
+ 	utils/idle_monitor/hsw_ext_idle.o \
+ 	utils/idle_monitor/amd_fam14h_idle.o utils/idle_monitor/cpuidle_sysfs.o \
+ 	utils/idle_monitor/mperf_monitor.o utils/idle_monitor/cpupower-monitor.o \
++	utils/idle_monitor/rapl_monitor.o \
+ 	utils/cpupower.o utils/cpufreq-info.o utils/cpufreq-set.o \
+ 	utils/cpupower-set.o utils/cpupower-info.o utils/cpuidle-info.o \
+ 	utils/cpuidle-set.o utils/powercap-info.o
+diff --git a/tools/power/cpupower/utils/idle_monitor/cpupower-monitor.c b/tools/power/cpupower/utils/idle_monitor/cpupower-monitor.c
+index 7c77045fef52f..075e766ff1f30 100644
+--- a/tools/power/cpupower/utils/idle_monitor/cpupower-monitor.c
++++ b/tools/power/cpupower/utils/idle_monitor/cpupower-monitor.c
+@@ -459,9 +459,10 @@ int cmd_monitor(int argc, char **argv)
+ 			print_results(1, cpu);
+ 	}
+ 
+-	for (num = 0; num < avail_monitors; num++)
+-		monitors[num]->unregister();
+-
++	for (num = 0; num < avail_monitors; num++) {
++		if (monitors[num]->unregister)
++			monitors[num]->unregister();
++	}
+ 	cpu_topology_release(cpu_top);
+ 	return 0;
+ }
+diff --git a/tools/power/cpupower/utils/idle_monitor/idle_monitors.def b/tools/power/cpupower/utils/idle_monitor/idle_monitors.def
+index 0d6ba4dbb9c71..7c926e90c87e5 100644
+--- a/tools/power/cpupower/utils/idle_monitor/idle_monitors.def
++++ b/tools/power/cpupower/utils/idle_monitor/idle_monitors.def
+@@ -4,5 +4,6 @@ DEF(intel_nhm)
+ DEF(intel_snb)
+ DEF(intel_hsw_ext)
+ DEF(mperf)
++DEF(rapl)
+ #endif
+ DEF(cpuidle_sysfs)
+diff --git a/tools/power/cpupower/utils/idle_monitor/rapl_monitor.c b/tools/power/cpupower/utils/idle_monitor/rapl_monitor.c
+new file mode 100644
+index 0000000000000..46153f1291c3d
+--- /dev/null
++++ b/tools/power/cpupower/utils/idle_monitor/rapl_monitor.c
+@@ -0,0 +1,148 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ *  (C) 2016 SUSE Software Solutions GmbH
++ *           Thomas Renninger <trenn@suse.de>
++ */
++
++#if defined(__i386__) || defined(__x86_64__)
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <time.h>
++#include <string.h>
++
++#include <pci/pci.h>
++
++#include "idle_monitor/cpupower-monitor.h"
++#include "helpers/helpers.h"
++#include "powercap.h"
++
++#define MAX_RAPL_ZONES 10
++
++int rapl_zone_count;
++cstate_t rapl_zones[MAX_RAPL_ZONES];
++struct powercap_zone *rapl_zones_pt[MAX_RAPL_ZONES] = { 0 };
++
++unsigned long long rapl_zone_previous_count[MAX_RAPL_ZONES];
++unsigned long long rapl_zone_current_count[MAX_RAPL_ZONES];
++unsigned long long rapl_max_count;
++
++static int rapl_get_count_uj(unsigned int id, unsigned long long *count,
++			     unsigned int cpu)
++{
++	if (rapl_zones_pt[id] == NULL)
++		/* error */
++		return -1;
++
++	*count = rapl_zone_current_count[id] - rapl_zone_previous_count[id];
++
++	return 0;
++}
++
++static int powercap_count_zones(struct powercap_zone *zone)
++{
++	uint64_t val;
++	int uj;
++
++	if (rapl_zone_count >= MAX_RAPL_ZONES)
++		return -1;
++
++	if (!zone->has_energy_uj)
++		return 0;
++
++	printf("%s\n", zone->sys_name);
++	uj = powercap_get_energy_uj(zone, &val);
++	printf("%d\n", uj);
++
++	strncpy(rapl_zones[rapl_zone_count].name, zone->name, CSTATE_NAME_LEN - 1);
++	strcpy(rapl_zones[rapl_zone_count].desc, "");
++	rapl_zones[rapl_zone_count].id = rapl_zone_count;
++	rapl_zones[rapl_zone_count].range = RANGE_MACHINE;
++	rapl_zones[rapl_zone_count].get_count = rapl_get_count_uj;
++	rapl_zones_pt[rapl_zone_count] = zone;
++	rapl_zone_count++;
++
++	return 0;
++}
++
++static int rapl_start(void)
++{
++	int i, ret;
++	uint64_t uj_val;
++
++	for (i = 0; i < rapl_zone_count; i++) {
++		ret = powercap_get_energy_uj(rapl_zones_pt[i], &uj_val);
++		if (ret)
++			return ret;
++		rapl_zone_previous_count[i] = uj_val;
++	}
++
++	return 0;
++}
++
++static int rapl_stop(void)
++{
++	int i;
++	uint64_t uj_val;
++
++	for (i = 0; i < rapl_zone_count; i++) {
++		int ret;
++
++		ret = powercap_get_energy_uj(rapl_zones_pt[i], &uj_val);
++		if (ret)
++			return ret;
++		rapl_zone_current_count[i] = uj_val;
++		if (rapl_max_count < uj_val)
++			rapl_max_count = uj_val - rapl_zone_previous_count[i];
++	}
++	return 0;
++}
++
++struct cpuidle_monitor *rapl_register(void)
++{
++	struct powercap_zone *root_zone;
++	char line[MAX_LINE_LEN] = "";
++	int ret, val;
++
++	ret = powercap_get_driver(line, MAX_LINE_LEN);
++	if (ret < 0) {
++		dprint("No powercapping driver loaded\n");
++		return NULL;
++	}
++
++	dprint("Driver: %s\n", line);
++	ret = powercap_get_enabled(&val);
++	if (ret < 0)
++		return NULL;
++	if (!val) {
++		dprint("Powercapping is disabled\n");
++		return NULL;
++	}
++
++	dprint("Powercap domain hierarchy:\n\n");
++	root_zone = powercap_init_zones();
++
++	if (root_zone == NULL) {
++		dprint("No powercap info found\n");
++		return NULL;
++	}
++
++	powercap_walk_zones(root_zone, powercap_count_zones);
++	rapl_monitor.hw_states_num = rapl_zone_count;
++
++	return &rapl_monitor;
++}
++
++struct cpuidle_monitor rapl_monitor = {
++	.name			= "RAPL",
++	.hw_states		= rapl_zones,
++	.hw_states_num		= 0,
++	.start			= rapl_start,
++	.stop			= rapl_stop,
++	.do_register		= rapl_register,
++	.flags.needs_root	= 0,
++	.overflow_s		= 60 * 60 * 24 * 100, /* To be implemented */
++};
++
++#endif
+-- 
+cgit 
+
+
+From fba395369af5b9ca9c091ec3bfdb02915e8f1141 Mon Sep 17 00:00:00 2001
+From: ye xingchen <ye.xingchen@zte.com.cn>
+Date: Fri, 25 Nov 2022 15:16:22 +0800
+Subject: PM / devfreq: Use device_match_of_node()
+
+Replace the open-code with device_match_of_node().
+
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 8c5f6f7fca112..817c71da391a6 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -1057,7 +1057,7 @@ struct devfreq *devfreq_get_devfreq_by_node(struct device_node *node)
+ 	mutex_lock(&devfreq_list_lock);
+ 	list_for_each_entry(devfreq, &devfreq_list, node) {
+ 		if (devfreq->dev.parent
+-			&& devfreq->dev.parent->of_node == node) {
++			&& device_match_of_node(devfreq->dev.parent, node)) {
+ 			mutex_unlock(&devfreq_list_lock);
+ 			return devfreq;
+ 		}
+-- 
+cgit 
+
+
+From ad44c2fd0e22910080e7761fb889c6c6c8c914d8 Mon Sep 17 00:00:00 2001
+From: ye xingchen <ye.xingchen@zte.com.cn>
+Date: Fri, 25 Nov 2022 15:10:04 +0800
+Subject: PM / devfreq: event: Use device_match_of_node()
+
+Replace the open-code with device_match_of_node().
+
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq-event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/devfreq/devfreq-event.c b/drivers/devfreq/devfreq-event.c
+index 6765c03334bc8..f041edccd1078 100644
+--- a/drivers/devfreq/devfreq-event.c
++++ b/drivers/devfreq/devfreq-event.c
+@@ -233,7 +233,7 @@ struct devfreq_event_dev *devfreq_event_get_edev_by_phandle(struct device *dev,
+ 
+ 	mutex_lock(&devfreq_event_list_lock);
+ 	list_for_each_entry(edev, &devfreq_event_list, node) {
+-		if (edev->dev.parent && edev->dev.parent->of_node == node)
++		if (edev->dev.parent && device_match_of_node(edev->dev.parent, node))
+ 			goto out;
+ 	}
+ 
+-- 
+cgit 
+
+
+From 7fc7f25419f5a6b09199ba4b5026b94ef184fa79 Mon Sep 17 00:00:00 2001
+From: Minghao Chi <chi.minghao@zte.com.cn>
+Date: Tue, 22 Nov 2022 09:42:28 +0800
+Subject: PM / devfreq: event: use devm_platform_get_and_ioremap_resource()
+
+Convert platform_get_resource(), devm_ioremap_resource() to a single
+call to devm_platform_get_and_ioremap_resource(), as this is exactly
+what this function does.
+
+Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/event/exynos-nocp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/devfreq/event/exynos-nocp.c b/drivers/devfreq/event/exynos-nocp.c
+index ccc531ee6938f..c1cc23bcb995c 100644
+--- a/drivers/devfreq/event/exynos-nocp.c
++++ b/drivers/devfreq/event/exynos-nocp.c
+@@ -214,8 +214,7 @@ static int exynos_nocp_parse_dt(struct platform_device *pdev,
+ 		nocp->clk = NULL;
+ 
+ 	/* Maps the memory mapped IO to control nocp register */
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	base = devm_ioremap_resource(dev, res);
++	base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
+ 	if (IS_ERR(base))
+ 		return PTR_ERR(base);
+ 
+-- 
+cgit 
+

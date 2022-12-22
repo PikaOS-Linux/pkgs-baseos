@@ -1,0 +1,440 @@
+From ebb92d58b90753e658059f5d8590d9048395491a Mon Sep 17 00:00:00 2001
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Date: Tue, 8 Nov 2022 09:46:23 +0800
+Subject: ACPI: irq: Fix some kernel-doc issues
+
+The following commit change the second parameter of acpi_set_irq_model()
+but forgot to update the function description. Let's fix it.
+
+  commit 7327b16f5f56 ("APCI: irq: Add support for multiple GSI domains")
+
+Also add description of parameter 'gsi' for
+acpi_get_irq_source_fwhandle() to avoid the following build W=1 warning.
+
+  drivers/acpi/irq.c:108: warning: Function parameter or member 'gsi' not described in 'acpi_get_irq_source_fwhandle'
+
+Fixes: 7327b16f5f56 ("APCI: irq: Add support for multiple GSI domains")
+Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/acpi/irq.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/acpi/irq.c b/drivers/acpi/irq.c
+index 1cc4647f78b86..c2c786eb95abc 100644
+--- a/drivers/acpi/irq.c
++++ b/drivers/acpi/irq.c
+@@ -94,6 +94,7 @@ EXPORT_SYMBOL_GPL(acpi_unregister_gsi);
+ /**
+  * acpi_get_irq_source_fwhandle() - Retrieve fwhandle from IRQ resource source.
+  * @source: acpi_resource_source to use for the lookup.
++ * @gsi: GSI IRQ number
+  *
+  * Description:
+  * Retrieve the fwhandle of the device referenced by the given IRQ resource
+@@ -297,8 +298,8 @@ EXPORT_SYMBOL_GPL(acpi_irq_get);
+ /**
+  * acpi_set_irq_model - Setup the GSI irqdomain information
+  * @model: the value assigned to acpi_irq_model
+- * @fwnode: the irq_domain identifier for mapping and looking up
+- *          GSI interrupts
++ * @fn: a dispatcher function that will return the domain fwnode
++ *	for a given GSI
+  */
+ void __init acpi_set_irq_model(enum acpi_irq_model_id model,
+ 			       struct fwnode_handle *(*fn)(u32))
+-- 
+cgit 
+
+
+From 110d7b0325c55ff3620073ba4201845f59e22ebf Mon Sep 17 00:00:00 2001
+From: Yang Yingliang <yangyingliang@huawei.com>
+Date: Fri, 11 Nov 2022 09:23:58 +0800
+Subject: PNP: fix name memory leak in pnp_alloc_dev()
+
+After commit 1fa5ae857bb1 ("driver core: get rid of struct device's
+bus_id string array"), the name of device is allocated dynamically,
+move dev_set_name() after pnp_add_id() to avoid memory leak.
+
+Fixes: 1fa5ae857bb1 ("driver core: get rid of struct device's bus_id string array")
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+Reviewed-by: Hanjun Guo <guohanjun@huawei.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/pnp/core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pnp/core.c b/drivers/pnp/core.c
+index 4df5aa6a309c3..6a60c5d83383b 100644
+--- a/drivers/pnp/core.c
++++ b/drivers/pnp/core.c
+@@ -148,14 +148,14 @@ struct pnp_dev *pnp_alloc_dev(struct pnp_protocol *protocol, int id,
+ 	dev->dev.coherent_dma_mask = dev->dma_mask;
+ 	dev->dev.release = &pnp_release_device;
+ 
+-	dev_set_name(&dev->dev, "%02x:%02x", dev->protocol->number, dev->number);
+-
+ 	dev_id = pnp_add_id(dev, pnpid);
+ 	if (!dev_id) {
+ 		kfree(dev);
+ 		return NULL;
+ 	}
+ 
++	dev_set_name(&dev->dev, "%02x:%02x", dev->protocol->number, dev->number);
++
+ 	return dev;
+ }
+ 
+-- 
+cgit 
+
+
+From a10b1c99e2dccee69838b512419843c21b2b87f8 Mon Sep 17 00:00:00 2001
+From: Huisong Li <lihuisong@huawei.com>
+Date: Sat, 12 Nov 2022 10:05:27 +0800
+Subject: ACPI: PCC: Setup PCC Opregion handler only if platform interrupt is
+ available
+
+Currently, PCC OpRegion handler depends on the availability of platform
+interrupt to be functional currently. If it is not available, the OpRegion
+can't be executed successfully or the desired outcome won't be possible.
+So let's reject setting up the PCC OpRegion handler on the platform if
+it doesn't support or have platform interrupt available.
+
+Signed-off-by: Huisong Li <lihuisong@huawei.com>
+Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/acpi/acpi_pcc.c | 47 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/acpi/acpi_pcc.c b/drivers/acpi/acpi_pcc.c
+index 3e252be047b85..07a034a53acac 100644
+--- a/drivers/acpi/acpi_pcc.c
++++ b/drivers/acpi/acpi_pcc.c
+@@ -53,6 +53,7 @@ acpi_pcc_address_space_setup(acpi_handle region_handle, u32 function,
+ 	struct pcc_data *data;
+ 	struct acpi_pcc_info *ctx = handler_context;
+ 	struct pcc_mbox_chan *pcc_chan;
++	static acpi_status ret;
+ 
+ 	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+@@ -69,23 +70,35 @@ acpi_pcc_address_space_setup(acpi_handle region_handle, u32 function,
+ 	if (IS_ERR(data->pcc_chan)) {
+ 		pr_err("Failed to find PCC channel for subspace %d\n",
+ 		       ctx->subspace_id);
+-		kfree(data);
+-		return AE_NOT_FOUND;
++		ret = AE_NOT_FOUND;
++		goto err_free_data;
+ 	}
+ 
+ 	pcc_chan = data->pcc_chan;
++	if (!pcc_chan->mchan->mbox->txdone_irq) {
++		pr_err("This channel-%d does not support interrupt.\n",
++		       ctx->subspace_id);
++		ret = AE_SUPPORT;
++		goto err_free_channel;
++	}
+ 	data->pcc_comm_addr = acpi_os_ioremap(pcc_chan->shmem_base_addr,
+ 					      pcc_chan->shmem_size);
+ 	if (!data->pcc_comm_addr) {
+ 		pr_err("Failed to ioremap PCC comm region mem for %d\n",
+ 		       ctx->subspace_id);
+-		pcc_mbox_free_channel(data->pcc_chan);
+-		kfree(data);
+-		return AE_NO_MEMORY;
++		ret = AE_NO_MEMORY;
++		goto err_free_channel;
+ 	}
+ 
+ 	*region_context = data;
+ 	return AE_OK;
++
++err_free_channel:
++	pcc_mbox_free_channel(data->pcc_chan);
++err_free_data:
++	kfree(data);
++
++	return ret;
+ }
+ 
+ static acpi_status
+@@ -106,19 +119,17 @@ acpi_pcc_address_space_handler(u32 function, acpi_physical_address addr,
+ 	if (ret < 0)
+ 		return AE_ERROR;
+ 
+-	if (data->pcc_chan->mchan->mbox->txdone_irq) {
+-		/*
+-		 * pcc_chan->latency is just a Nominal value. In reality the remote
+-		 * processor could be much slower to reply. So add an arbitrary
+-		 * amount of wait on top of Nominal.
+-		 */
+-		usecs_lat = PCC_CMD_WAIT_RETRIES_NUM * data->pcc_chan->latency;
+-		ret = wait_for_completion_timeout(&data->done,
+-						  usecs_to_jiffies(usecs_lat));
+-		if (ret == 0) {
+-			pr_err("PCC command executed timeout!\n");
+-			return AE_TIME;
+-		}
++	/*
++	 * pcc_chan->latency is just a Nominal value. In reality the remote
++	 * processor could be much slower to reply. So add an arbitrary
++	 * amount of wait on top of Nominal.
++	 */
++	usecs_lat = PCC_CMD_WAIT_RETRIES_NUM * data->pcc_chan->latency;
++	ret = wait_for_completion_timeout(&data->done,
++						usecs_to_jiffies(usecs_lat));
++	if (ret == 0) {
++		pr_err("PCC command executed timeout!\n");
++		return AE_TIME;
+ 	}
+ 
+ 	mbox_chan_txdone(data->pcc_chan->mchan, ret);
+-- 
+cgit 
+
+
+From 6d7d3c287410c0ad499e478e2338dc3d7e3392b1 Mon Sep 17 00:00:00 2001
+From: Huisong Li <lihuisong@huawei.com>
+Date: Sat, 12 Nov 2022 10:05:28 +0800
+Subject: mailbox: pcc: Reset pcc_chan_count to zero in case of PCC probe
+ failure
+
+Currently, 'pcc_chan_count' is remains set to a non-zero value if PCC
+subspaces are parsed successfully but something else fail later during
+the initial PCC probing phase. This will result in pcc_mbox_request_channel
+trying to access the resources that are not initialised or allocated and
+may end up in a system crash.
+
+Reset pcc_chan_count to 0 when the PCC probe fails in order to prevent
+the possible issue as described above.
+
+Fixes: ce028702ddbc ("mailbox: pcc: Move bulk of PCCT parsing into pcc_mbox_probe")
+Signed-off-by: Huisong Li <lihuisong@huawei.com>
+Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/mailbox/pcc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
+index 3c2bc0ca454cf..105d46c9801ba 100644
+--- a/drivers/mailbox/pcc.c
++++ b/drivers/mailbox/pcc.c
+@@ -743,6 +743,7 @@ static int __init pcc_init(void)
+ 
+ 	if (IS_ERR(pcc_pdev)) {
+ 		pr_debug("Err creating PCC platform bundle\n");
++		pcc_chan_count = 0;
+ 		return PTR_ERR(pcc_pdev);
+ 	}
+ 
+-- 
+cgit 
+
+
+From f2ae44ae5335864794acb5b0490746ba9db3ccd7 Mon Sep 17 00:00:00 2001
+From: Hanjun Guo <guohanjun@huawei.com>
+Date: Tue, 22 Nov 2022 16:53:28 +0800
+Subject: ACPI: fan: Bail out if extract package failed
+
+Bail out if we extract the _FIF package failed, or we will end
+of referencing the garbage information in fields[], the fan control
+will be in mess, fix it.
+
+Fiexes: d445571fa369 ("ACPI: fan: Optimize struct acpi_fan_fif")
+Signed-off-by: Hanjun Guo <guohanjun@huawei.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/acpi/fan_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/acpi/fan_core.c b/drivers/acpi/fan_core.c
+index 52a0b303b70aa..9dccbae9e8ea7 100644
+--- a/drivers/acpi/fan_core.c
++++ b/drivers/acpi/fan_core.c
+@@ -236,6 +236,7 @@ static int acpi_fan_get_fif(struct acpi_device *device)
+ 	if (ACPI_FAILURE(status)) {
+ 		dev_err(&device->dev, "Invalid _FIF element\n");
+ 		status = -EINVAL;
++		goto err;
+ 	}
+ 
+ 	fan->fif.revision = fields[0];
+-- 
+cgit 
+
+
+From 62a0ec9dc1dfb0f58138f1e2527e4a26567268e5 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 24 Nov 2022 11:53:05 +0100
+Subject: PNP: Do not disable devices on suspend when they cannot be re-enabled
+ on resume
+
+On an Advantech MICA-071 tablet, with a builtin barcode scanner connected
+to ttyS0, the following message is shown on suspend:
+
+serial 00:02: disabled
+
+And after suspend/resume trying to use the barcode scanner / ttyS0 shows:
+
+serial 00:02: LSR safety check engaged!
+
+Indicating that the UARTs io-ports are no longer reachable.
+
+This is caused by __pnp_bus_suspend() calling pnp_stop_dev() on the "00:02"
+pnp device on suspend (this outputs the disabled message).
+
+The problem is that pnp_can_write() returns false for the "00:02" pnp
+device, so after disabling it (disabling its decoding of IO addresses)
+during suspend, it cannot be re-enabled.
+
+Add a pnp_can_write() check to the suspend path and only disable devices
+which can actually be re-enabled on resume.
+
+This fixes the Advantech MICA-071's ttyS0 no longer working after
+a suspend/resume.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/pnp/driver.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/pnp/driver.c b/drivers/pnp/driver.c
+index c02e7bf643a6b..46c534f6b1c97 100644
+--- a/drivers/pnp/driver.c
++++ b/drivers/pnp/driver.c
+@@ -182,7 +182,8 @@ static int __pnp_bus_suspend(struct device *dev, pm_message_t state)
+ 			return error;
+ 	}
+ 
+-	if (pnp_can_disable(pnp_dev)) {
++	/* can_write is necessary to be able to re-start the device on resume */
++	if (pnp_can_disable(pnp_dev) && pnp_can_write(pnp_dev)) {
+ 		error = pnp_stop_dev(pnp_dev);
+ 		if (error)
+ 			return error;
+-- 
+cgit 
+
+
+From 92266c65e08793fda74d1d71edfbe25000807f39 Mon Sep 17 00:00:00 2001
+From: ye xingchen <ye.xingchen@zte.com.cn>
+Date: Wed, 30 Nov 2022 16:16:08 +0800
+Subject: ACPI: use sysfs_emit() instead of scnprintf()
+
+Replace the open-code with sysfs_emit() to simplify the code.
+
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/acpi/acpi_pad.c  | 4 ++--
+ drivers/acpi/cppc_acpi.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/acpi/acpi_pad.c b/drivers/acpi/acpi_pad.c
+index ec0e22a1e25d6..0c305cd6bb42a 100644
+--- a/drivers/acpi/acpi_pad.c
++++ b/drivers/acpi/acpi_pad.c
+@@ -287,7 +287,7 @@ static ssize_t rrtime_store(struct device *dev,
+ static ssize_t rrtime_show(struct device *dev,
+ 	struct device_attribute *attr, char *buf)
+ {
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", round_robin_time);
++	return sysfs_emit(buf, "%d\n", round_robin_time);
+ }
+ static DEVICE_ATTR_RW(rrtime);
+ 
+@@ -309,7 +309,7 @@ static ssize_t idlepct_store(struct device *dev,
+ static ssize_t idlepct_show(struct device *dev,
+ 	struct device_attribute *attr, char *buf)
+ {
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", idle_pct);
++	return sysfs_emit(buf, "%d\n", idle_pct);
+ }
+ static DEVICE_ATTR_RW(idlepct);
+ 
+diff --git a/drivers/acpi/cppc_acpi.c b/drivers/acpi/cppc_acpi.c
+index 093675b1a1ffb..0f17b1c32718e 100644
+--- a/drivers/acpi/cppc_acpi.c
++++ b/drivers/acpi/cppc_acpi.c
+@@ -148,7 +148,7 @@ __ATTR(_name, 0444, show_##_name, NULL)
+ 		if (ret)						\
+ 			return ret;					\
+ 									\
+-		return scnprintf(buf, PAGE_SIZE, "%llu\n",		\
++		return sysfs_emit(buf, "%llu\n",		\
+ 				(u64)st_name.member_name);		\
+ 	}								\
+ 	define_one_cppc_ro(member_name)
+@@ -174,7 +174,7 @@ static ssize_t show_feedback_ctrs(struct kobject *kobj,
+ 	if (ret)
+ 		return ret;
+ 
+-	return scnprintf(buf, PAGE_SIZE, "ref:%llu del:%llu\n",
++	return sysfs_emit(buf, "ref:%llu del:%llu\n",
+ 			fb_ctrs.reference, fb_ctrs.delivered);
+ }
+ define_one_cppc_ro(feedback_ctrs);
+-- 
+cgit 
+
+
+From 64ee25282610fcf872a4491ed5eaec440d3a485b Mon Sep 17 00:00:00 2001
+From: ye xingchen <ye.xingchen@zte.com.cn>
+Date: Tue, 6 Dec 2022 15:19:45 +0800
+Subject: ACPI: fan: Convert to use sysfs_emit_at() API
+
+Follow the advice of the Documentation/filesystems/sysfs.rst and show()
+should only use sysfs_emit() or sysfs_emit_at() when formatting the
+value to be returned to user space.
+
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/acpi/fan_attr.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/acpi/fan_attr.c b/drivers/acpi/fan_attr.c
+index f15157d40713e..f4f6e2381f1d3 100644
+--- a/drivers/acpi/fan_attr.c
++++ b/drivers/acpi/fan_attr.c
+@@ -27,24 +27,24 @@ static ssize_t show_state(struct device *dev, struct device_attribute *attr, cha
+ 		count = scnprintf(buf, PAGE_SIZE, "%lld:", fps->control);
+ 
+ 	if (fps->trip_point == 0xFFFFFFFF || fps->trip_point > 9)
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "not-defined:");
++		count += sysfs_emit_at(buf, count, "not-defined:");
+ 	else
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "%lld:", fps->trip_point);
++		count += sysfs_emit_at(buf, count, "%lld:", fps->trip_point);
+ 
+ 	if (fps->speed == 0xFFFFFFFF)
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "not-defined:");
++		count += sysfs_emit_at(buf, count, "not-defined:");
+ 	else
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "%lld:", fps->speed);
++		count += sysfs_emit_at(buf, count, "%lld:", fps->speed);
+ 
+ 	if (fps->noise_level == 0xFFFFFFFF)
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "not-defined:");
++		count += sysfs_emit_at(buf, count, "not-defined:");
+ 	else
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "%lld:", fps->noise_level * 100);
++		count += sysfs_emit_at(buf, count, "%lld:", fps->noise_level * 100);
+ 
+ 	if (fps->power == 0xFFFFFFFF)
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "not-defined\n");
++		count += sysfs_emit_at(buf, count, "not-defined\n");
+ 	else
+-		count += scnprintf(&buf[count], PAGE_SIZE - count, "%lld\n", fps->power);
++		count += sysfs_emit_at(buf, count, "%lld\n", fps->power);
+ 
+ 	return count;
+ }
+-- 
+cgit 
+

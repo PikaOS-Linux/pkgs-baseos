@@ -1,0 +1,2236 @@
+From f0f4c3adcfe6d93508a7fbe241b115aa5b24fe36 Mon Sep 17 00:00:00 2001
+From: Luca Weiss <luca@z3ntu.xyz>
+Date: Sun, 16 Oct 2022 11:00:34 +0200
+Subject: dt-bindings: thermal: tsens: Add sm8450 compatible
+
+Document the tsens-v2 compatible for sm8450 SoC.
+
+Signed-off-by: Luca Weiss <luca@z3ntu.xyz>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221016090035.565350-5-luca@z3ntu.xyz
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ Documentation/devicetree/bindings/thermal/qcom-tsens.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+index 038d81338fcf1..7db905c1d5558 100644
+--- a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
++++ b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+@@ -57,6 +57,7 @@ properties:
+               - qcom,sm8150-tsens
+               - qcom,sm8250-tsens
+               - qcom,sm8350-tsens
++              - qcom,sm8450-tsens
+           - const: qcom,tsens-v2
+ 
+   reg:
+-- 
+cgit 
+
+
+From 1f455f144fb05e53ae47f84eb109a8021fe168d1 Mon Sep 17 00:00:00 2001
+From: Marcus Folkesson <marcus.folkesson@gmail.com>
+Date: Fri, 14 Oct 2022 10:16:20 +0200
+Subject: thermal/drivers/imx8mm_thermal: Use GENMASK() when appropriate
+
+GENMASK() is preferred to use for bitmasks.
+
+Signed-off-by: Marcus Folkesson <marcus.folkesson@gmail.com>
+Link: https://lore.kernel.org/r/20221014081620.1599511-1-marcus.folkesson@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/imx8mm_thermal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/thermal/imx8mm_thermal.c b/drivers/thermal/imx8mm_thermal.c
+index e2c2673025a7a..68608d8e5e29f 100644
+--- a/drivers/thermal/imx8mm_thermal.c
++++ b/drivers/thermal/imx8mm_thermal.c
+@@ -23,8 +23,8 @@
+ 
+ #define TER_ADC_PD		BIT(30)
+ #define TER_EN			BIT(31)
+-#define TRITSR_TEMP0_VAL_MASK	0xff
+-#define TRITSR_TEMP1_VAL_MASK	0xff0000
++#define TRITSR_TEMP0_VAL_MASK	GENMASK(7, 0)
++#define TRITSR_TEMP1_VAL_MASK	GENMASK(23, 16)
+ 
+ #define PROBE_SEL_ALL		GENMASK(31, 30)
+ 
+-- 
+cgit 
+
+
+From d37edc7370273306d8747097fafa62436c1cfe16 Mon Sep 17 00:00:00 2001
+From: Marcus Folkesson <marcus.folkesson@gmail.com>
+Date: Fri, 14 Oct 2022 09:35:07 +0200
+Subject: thermal/drivers/imx8mm_thermal: Validate temperature range
+
+Check against the upper temperature limit (125 degrees C) before
+consider the temperature valid.
+
+Fixes: 5eed800a6811 ("thermal: imx8mm: Add support for i.MX8MM thermal monitoring unit")
+Signed-off-by: Marcus Folkesson <marcus.folkesson@gmail.com>
+Reviewed-by: Jacky Bai <ping.bai@nxp.com>
+Link: https://lore.kernel.org/r/20221014073507.1594844-1-marcus.folkesson@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/imx8mm_thermal.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/imx8mm_thermal.c b/drivers/thermal/imx8mm_thermal.c
+index 68608d8e5e29f..182cc207afe90 100644
+--- a/drivers/thermal/imx8mm_thermal.c
++++ b/drivers/thermal/imx8mm_thermal.c
+@@ -65,8 +65,14 @@ static int imx8mm_tmu_get_temp(void *data, int *temp)
+ 	u32 val;
+ 
+ 	val = readl_relaxed(tmu->base + TRITSR) & TRITSR_TEMP0_VAL_MASK;
++
++	/*
++	 * Do not validate against the V bit (bit 31) due to errata
++	 * ERR051272: TMU: Bit 31 of registers TMU_TSCR/TMU_TRITSR/TMU_TRATSR invalid
++	 */
++
+ 	*temp = val * 1000;
+-	if (*temp < VER1_TEMP_LOW_LIMIT)
++	if (*temp < VER1_TEMP_LOW_LIMIT || *temp > VER2_TEMP_HIGH_LIMIT)
+ 		return -EAGAIN;
+ 
+ 	return 0;
+-- 
+cgit 
+
+
+From 87f9fe8c4b603bd18f025d8c5fc9bb5f17b9a4cc Mon Sep 17 00:00:00 2001
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 11 Oct 2022 12:52:35 -0500
+Subject: dt-bindings: thermal: Convert generic-adc-thermal to DT schema
+
+Convert the 'generic-adc-thermal' binding to DT schema format.
+
+The binding said '#thermal-sensor-cells' should be 1, but all in tree
+users are 0 and 1 doesn't make sense for a single channel.
+
+Drop the example's related providers and consumers of the
+'generic-adc-thermal' node as the convention is to not have those in
+the examples.
+
+Signed-off-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221011175235.3191509-1-robh@kernel.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ .../bindings/thermal/generic-adc-thermal.yaml      | 84 +++++++++++++++++++
+ .../bindings/thermal/thermal-generic-adc.txt       | 95 ----------------------
+ 2 files changed, 84 insertions(+), 95 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/thermal/generic-adc-thermal.yaml
+ delete mode 100644 Documentation/devicetree/bindings/thermal/thermal-generic-adc.txt
+
+diff --git a/Documentation/devicetree/bindings/thermal/generic-adc-thermal.yaml b/Documentation/devicetree/bindings/thermal/generic-adc-thermal.yaml
+new file mode 100644
+index 0000000000000..f1fc3b0d86085
+--- /dev/null
++++ b/Documentation/devicetree/bindings/thermal/generic-adc-thermal.yaml
+@@ -0,0 +1,84 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/thermal/generic-adc-thermal.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: General Purpose Analog To Digital Converter (ADC) based thermal sensor
++
++maintainers:
++  - Laxman Dewangan <ldewangan@nvidia.com>
++
++description:
++  On some of platforms, thermal sensor like thermistors are connected to
++  one of ADC channel and sensor resistance is read via voltage across the
++  sensor resistor. The voltage read across the sensor is mapped to
++  temperature using voltage-temperature lookup table.
++
++properties:
++  compatible:
++    const: generic-adc-thermal
++
++  '#thermal-sensor-cells':
++    const: 0
++
++  io-channels:
++    maxItems: 1
++
++  io-channel-names:
++    const: sensor-channel
++
++  temperature-lookup-table:
++    description: |
++      Lookup table to map the relation between ADC value and temperature.
++      When ADC is read, the value is looked up on the table to get the
++      equivalent temperature.
++
++      If not specified, driver assumes the ADC channel gives milliCelsius
++      directly.
++    $ref: /schemas/types.yaml#/definitions/int32-matrix
++    items:
++      items:
++        - description: Temperature in milliCelsius
++        - description: ADC read value
++
++required:
++  - compatible
++  - '#thermal-sensor-cells'
++  - io-channels
++  - io-channel-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/thermal/thermal.h>
++
++    thermal-sensor {
++        compatible = "generic-adc-thermal";
++        #thermal-sensor-cells = <0>;
++        io-channels = <&ads1015 1>;
++        io-channel-names = "sensor-channel";
++        temperature-lookup-table = <
++              (-40000) 2578
++              (-39000) 2577
++              (-38000) 2576
++              (-37000) 2575
++              (-36000) 2574
++              (-35000) 2573
++              (-34000) 2572
++              (-33000) 2571
++              (-32000) 2569
++              (-31000) 2568
++              (-30000) 2567
++              /* skip */
++              118000 254
++              119000 247
++              120000 240
++              121000 233
++              122000 226
++              123000 220
++              124000 214
++              125000 208>;
++    };
++...
+diff --git a/Documentation/devicetree/bindings/thermal/thermal-generic-adc.txt b/Documentation/devicetree/bindings/thermal/thermal-generic-adc.txt
+deleted file mode 100644
+index e136946a2f4fd..0000000000000
+--- a/Documentation/devicetree/bindings/thermal/thermal-generic-adc.txt
++++ /dev/null
+@@ -1,95 +0,0 @@
+-General Purpose Analog To Digital Converter (ADC) based thermal sensor.
+-
+-On some of platforms, thermal sensor like thermistors are connected to
+-one of ADC channel and sensor resistance is read via voltage across the
+-sensor resistor. The voltage read across the sensor is mapped to
+-temperature using voltage-temperature lookup table.
+-
+-Required properties:
+-===================
+-- compatible:		     Must be "generic-adc-thermal".
+-- #thermal-sensor-cells:     Should be 1. See Documentation/devicetree/bindings/thermal/thermal-sensor.yaml for a description
+-		             of this property.
+-Optional properties:
+-===================
+-- temperature-lookup-table:  Two dimensional array of Integer; lookup table
+-			     to map the relation between ADC value and
+-			     temperature. When ADC is read, the value is
+-			     looked up on the table to get the equivalent
+-			     temperature.
+-
+-			     The first value of the each row of array is the
+-			     temperature in milliCelsius and second value of
+-			     the each row of array is the ADC read value.
+-
+-			     If not specified, driver assumes the ADC channel
+-			     gives milliCelsius directly.
+-
+-Example :
+-#include <dt-bindings/thermal/thermal.h>
+-
+-i2c@7000c400 {
+-	ads1015: ads1015@4a {
+-		reg = <0x4a>;
+-		compatible = "ads1015";
+-		sampling-frequency = <3300>;
+-		#io-channel-cells = <1>;
+-	};
+-};
+-
+-tboard_thermistor: thermal-sensor {
+-	compatible = "generic-adc-thermal";
+-	#thermal-sensor-cells = <0>;
+-	io-channels = <&ads1015 1>;
+-	io-channel-names = "sensor-channel";
+-	temperature-lookup-table = <    (-40000) 2578
+-					(-39000) 2577
+-					(-38000) 2576
+-					(-37000) 2575
+-					(-36000) 2574
+-					(-35000) 2573
+-					(-34000) 2572
+-					(-33000) 2571
+-					(-32000) 2569
+-					(-31000) 2568
+-					(-30000) 2567
+-					::::::::::
+-					118000 254
+-					119000 247
+-					120000 240
+-					121000 233
+-					122000 226
+-					123000 220
+-					124000 214
+-					125000 208>;
+-};
+-
+-dummy_cool_dev: dummy-cool-dev {
+-	compatible = "dummy-cooling-dev";
+-	#cooling-cells = <2>; /* min followed by max */
+-};
+-
+-thermal-zones {
+-	Tboard {
+-		polling-delay = <15000>; /* milliseconds */
+-		polling-delay-passive = <0>; /* milliseconds */
+-		thermal-sensors = <&tboard_thermistor>;
+-
+-		trips {
+-			therm_est_trip: therm_est_trip {
+-				temperature = <40000>;
+-				type = "active";
+-				hysteresis = <1000>;
+-			};
+-		};
+-
+-		cooling-maps {
+-			map0 {
+-				trip = <&therm_est_trip>;
+-				cooling-device = <&dummy_cool_dev THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+-				contribution = <100>;
+-			};
+-
+-		};
+-	};
+-};
+-- 
+cgit 
+
+
+From a7c42af78b19a11e98a5555a664c343e3a672632 Mon Sep 17 00:00:00 2001
+From: Keerthy <j-keerthy@ti.com>
+Date: Mon, 10 Oct 2022 09:11:26 +0530
+Subject: thermal/drivers/k3_j72xx_bandgap: Fix the debug print message
+
+The debug print message to check the workaround applicability is inverted.
+Fix the same.
+
+Fixes: ffcb2fc86eb7 ("thermal: k3_j72xx_bandgap: Add the bandgap driver support")
+Reported-by: Bryan Brattlof <bb@ti.com>
+Signed-off-by: Keerthy <j-keerthy@ti.com>
+Link: https://lore.kernel.org/r/20221010034126.3550-1-j-keerthy@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/k3_j72xx_bandgap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/k3_j72xx_bandgap.c b/drivers/thermal/k3_j72xx_bandgap.c
+index 16b6bcf1bf4fa..c073b1023bbe7 100644
+--- a/drivers/thermal/k3_j72xx_bandgap.c
++++ b/drivers/thermal/k3_j72xx_bandgap.c
+@@ -439,7 +439,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 		workaround_needed = false;
+ 
+ 	dev_dbg(bgp->dev, "Work around %sneeded\n",
+-		workaround_needed ? "not " : "");
++		workaround_needed ? "" : "not ");
+ 
+ 	if (!workaround_needed)
+ 		init_table(5, ref_table, golden_factors);
+-- 
+cgit 
+
+
+From 7ef2f023c2c77a452ba5d0c9b1ad04a5a895d553 Mon Sep 17 00:00:00 2001
+From: Ido Schimmel <idosch@nvidia.com>
+Date: Thu, 20 Oct 2022 13:36:58 +0300
+Subject: thermal/of: Fix memory leak on thermal_of_zone_register() failure
+
+The function does not free 'of_ops' upon failure, leading to a memory
+leak [1].
+
+Fix by freeing 'of_ops' in the error path.
+
+[1]
+unreferenced object 0xffff8ee846198c80 (size 128):
+  comm "swapper/0", pid 1, jiffies 4294699704 (age 70.076s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    d0 3f 6e 8c ff ff ff ff 00 00 00 00 00 00 00 00  .?n.............
+  backtrace:
+    [<00000000d136f562>] __kmalloc_node_track_caller+0x42/0x120
+    [<0000000063f31678>] kmemdup+0x1d/0x40
+    [<00000000e6d24096>] thermal_of_zone_register+0x49/0x520
+    [<000000005e78c755>] devm_thermal_of_zone_register+0x54/0x90
+    [<00000000ee6b209e>] pmbus_add_sensor+0x1b4/0x1d0
+    [<00000000896105e3>] pmbus_add_sensor_attrs_one+0x123/0x440
+    [<0000000049e990a6>] pmbus_add_sensor_attrs+0xfe/0x1d0
+    [<00000000466b5440>] pmbus_do_probe+0x66b/0x14e0
+    [<0000000084d42285>] i2c_device_probe+0x13b/0x2f0
+    [<0000000029e2ae74>] really_probe+0xce/0x2c0
+    [<00000000692df15c>] driver_probe_device+0x19/0xd0
+    [<00000000547d9cce>] __device_attach_driver+0x6f/0x100
+    [<0000000020abd24b>] bus_for_each_drv+0x76/0xc0
+    [<00000000665d9563>] __device_attach+0xfc/0x180
+    [<000000008ddd4d6a>] bus_probe_device+0x82/0xa0
+    [<000000009e61132b>] device_add+0x3fe/0x920
+
+Fixes: 3fd6d6e2b4e8 ("thermal/of: Rework the thermal device tree initialization")
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Vadim Pasternak <vadimp@nvidia.com>
+Link: https://lore.kernel.org/r/20221020103658.802457-1-idosch@nvidia.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/thermal_of.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/thermal/thermal_of.c b/drivers/thermal/thermal_of.c
+index d4b6335ace15f..aacba30bc10c1 100644
+--- a/drivers/thermal/thermal_of.c
++++ b/drivers/thermal/thermal_of.c
+@@ -604,13 +604,15 @@ struct thermal_zone_device *thermal_of_zone_register(struct device_node *sensor,
+ 	if (IS_ERR(np)) {
+ 		if (PTR_ERR(np) != -ENODEV)
+ 			pr_err("Failed to find thermal zone for %pOFn id=%d\n", sensor, id);
+-		return ERR_CAST(np);
++		ret = PTR_ERR(np);
++		goto out_kfree_of_ops;
+ 	}
+ 
+ 	trips = thermal_of_trips_init(np, &ntrips);
+ 	if (IS_ERR(trips)) {
+ 		pr_err("Failed to find trip points for %pOFn id=%d\n", sensor, id);
+-		return ERR_CAST(trips);
++		ret = PTR_ERR(trips);
++		goto out_kfree_of_ops;
+ 	}
+ 
+ 	ret = thermal_of_monitor_init(np, &delay, &pdelay);
+@@ -659,6 +661,8 @@ out_kfree_tzp:
+ 	kfree(tzp);
+ out_kfree_trips:
+ 	kfree(trips);
++out_kfree_of_ops:
++	kfree(of_ops);
+ 
+ 	return ERR_PTR(ret);
+ }
+-- 
+cgit 
+
+
+From c6db32ec7c600ae7ab92eb6c56a9fb2918fcd780 Mon Sep 17 00:00:00 2001
+From: Robert Marko <robimarko@gmail.com>
+Date: Fri, 19 Aug 2022 00:02:41 +0200
+Subject: dt-bindings: thermal: tsens: Add ipq8074 compatible
+
+Qualcomm IPQ8074 has tsens v2.3.0 block, though unlike existing v2 IP it
+only uses one IRQ, so tsens v2 compatible cannot be used as the fallback.
+
+We also have to make sure that correct interrupts are set according to
+compatibles, so populate interrupt information per compatibles.
+
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20220818220245.338396-1-robimarko@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ .../devicetree/bindings/thermal/qcom-tsens.yaml    | 76 ++++++++++++++++++----
+ 1 file changed, 65 insertions(+), 11 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+index 7db905c1d5558..f0bd4b979e28a 100644
+--- a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
++++ b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+@@ -60,6 +60,10 @@ properties:
+               - qcom,sm8450-tsens
+           - const: qcom,tsens-v2
+ 
++      - description: v2 of TSENS with combined interrupt
++        enum:
++          - qcom,ipq8074-tsens
++
+   reg:
+     items:
+       - description: TM registers
+@@ -67,15 +71,11 @@ properties:
+ 
+   interrupts:
+     minItems: 1
+-    items:
+-      - description: Combined interrupt if upper or lower threshold crossed
+-      - description: Interrupt if critical threshold crossed
++    maxItems: 2
+ 
+   interrupt-names:
+     minItems: 1
+-    items:
+-      - const: uplow
+-      - const: critical
++    maxItems: 2
+ 
+   nvmem-cells:
+     minItems: 1
+@@ -129,22 +129,61 @@ allOf:
+     then:
+       properties:
+         interrupts:
+-          maxItems: 1
++          items:
++            - description: Combined interrupt if upper or lower threshold crossed
+         interrupt-names:
+-          maxItems: 1
++          items:
++            - const: uplow
+ 
+-    else:
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - qcom,msm8953-tsens
++              - qcom,msm8996-tsens
++              - qcom,msm8998-tsens
++              - qcom,sc7180-tsens
++              - qcom,sc7280-tsens
++              - qcom,sc8180x-tsens
++              - qcom,sdm630-tsens
++              - qcom,sdm845-tsens
++              - qcom,sm8150-tsens
++              - qcom,sm8250-tsens
++              - qcom,sm8350-tsens
++              - qcom,tsens-v2
++    then:
++      properties:
++        interrupts:
++          items:
++            - description: Combined interrupt if upper or lower threshold crossed
++            - description: Interrupt if critical threshold crossed
++        interrupt-names:
++          items:
++            - const: uplow
++            - const: critical
++
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - qcom,ipq8074-tsens
++    then:
+       properties:
+         interrupts:
+-          minItems: 2
++          items:
++            - description: Combined interrupt if upper, lower or critical thresholds crossed
+         interrupt-names:
+-          minItems: 2
++          items:
++            - const: combined
+ 
+   - if:
+       properties:
+         compatible:
+           contains:
+             enum:
++              - qcom,ipq8074-tsens
+               - qcom,tsens-v0_1
+               - qcom,tsens-v1
+               - qcom,tsens-v2
+@@ -227,4 +266,19 @@ examples:
+            #qcom,sensors = <13>;
+            #thermal-sensor-cells = <1>;
+     };
++
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    // Example 4 (for any IPQ8074 based SoC-s):
++    tsens4: thermal-sensor@4a9000 {
++           compatible = "qcom,ipq8074-tsens";
++           reg = <0x4a9000 0x1000>,
++                 <0x4a8000 0x1000>;
++
++           interrupts = <GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>;
++           interrupt-names = "combined";
++
++           #qcom,sensors = <16>;
++           #thermal-sensor-cells = <1>;
++    };
+ ...
+-- 
+cgit 
+
+
+From 4360af35273b742ffc6605ce44f37ac654272443 Mon Sep 17 00:00:00 2001
+From: Robert Marko <robimarko@gmail.com>
+Date: Fri, 19 Aug 2022 00:02:42 +0200
+Subject: thermal/drivers/tsens: Add support for combined interrupt
+
+Despite using tsens v2.3 IP, IPQ8074 and IPQ6018 only have one IRQ for
+signaling both up/low and critical trips.
+
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+Link: https://lore.kernel.org/r/20220818220245.338396-2-robimarko@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/qcom/tsens-8960.c |  1 +
+ drivers/thermal/qcom/tsens-v0_1.c |  1 +
+ drivers/thermal/qcom/tsens-v1.c   |  1 +
+ drivers/thermal/qcom/tsens-v2.c   |  1 +
+ drivers/thermal/qcom/tsens.c      | 38 ++++++++++++++++++++++++++++++++------
+ drivers/thermal/qcom/tsens.h      |  2 ++
+ 6 files changed, 38 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/thermal/qcom/tsens-8960.c b/drivers/thermal/qcom/tsens-8960.c
+index 67c1748cdf734..ee584e5b07e56 100644
+--- a/drivers/thermal/qcom/tsens-8960.c
++++ b/drivers/thermal/qcom/tsens-8960.c
+@@ -269,6 +269,7 @@ static const struct tsens_ops ops_8960 = {
+ static struct tsens_features tsens_8960_feat = {
+ 	.ver_major	= VER_0,
+ 	.crit_int	= 0,
++	.combo_int	= 0,
+ 	.adc		= 1,
+ 	.srot_split	= 0,
+ 	.max_sensors	= 11,
+diff --git a/drivers/thermal/qcom/tsens-v0_1.c b/drivers/thermal/qcom/tsens-v0_1.c
+index 327f37202c69f..8cdc3d135d6a8 100644
+--- a/drivers/thermal/qcom/tsens-v0_1.c
++++ b/drivers/thermal/qcom/tsens-v0_1.c
+@@ -539,6 +539,7 @@ static int calibrate_9607(struct tsens_priv *priv)
+ static struct tsens_features tsens_v0_1_feat = {
+ 	.ver_major	= VER_0_1,
+ 	.crit_int	= 0,
++	.combo_int	= 0,
+ 	.adc		= 1,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 11,
+diff --git a/drivers/thermal/qcom/tsens-v1.c b/drivers/thermal/qcom/tsens-v1.c
+index 573e261ccca74..a4f561a6e5821 100644
+--- a/drivers/thermal/qcom/tsens-v1.c
++++ b/drivers/thermal/qcom/tsens-v1.c
+@@ -302,6 +302,7 @@ static int calibrate_8976(struct tsens_priv *priv)
+ static struct tsens_features tsens_v1_feat = {
+ 	.ver_major	= VER_1_X,
+ 	.crit_int	= 0,
++	.combo_int	= 0,
+ 	.adc		= 1,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 11,
+diff --git a/drivers/thermal/qcom/tsens-v2.c b/drivers/thermal/qcom/tsens-v2.c
+index b293ed32174b5..129cdb247381c 100644
+--- a/drivers/thermal/qcom/tsens-v2.c
++++ b/drivers/thermal/qcom/tsens-v2.c
+@@ -31,6 +31,7 @@
+ static struct tsens_features tsens_v2_feat = {
+ 	.ver_major	= VER_2_X,
+ 	.crit_int	= 1,
++	.combo_int	= 0,
+ 	.adc		= 0,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 16,
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index b1b10005fb286..e2511e76f2969 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -532,6 +532,27 @@ static irqreturn_t tsens_irq_thread(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
++/**
++ * tsens_combined_irq_thread() - Threaded interrupt handler for combined interrupts
++ * @irq: irq number
++ * @data: tsens controller private data
++ *
++ * Handle the combined interrupt as if it were 2 separate interrupts, so call the
++ * critical handler first and then the up/low one.
++ *
++ * Return: IRQ_HANDLED
++ */
++static irqreturn_t tsens_combined_irq_thread(int irq, void *data)
++{
++	irqreturn_t ret;
++
++	ret = tsens_critical_irq_thread(irq, data);
++	if (ret != IRQ_HANDLED)
++		return ret;
++
++	return tsens_irq_thread(irq, data);
++}
++
+ static int tsens_set_trips(struct thermal_zone_device *tz, int low, int high)
+ {
+ 	struct tsens_sensor *s = tz->devdata;
+@@ -1071,13 +1092,18 @@ static int tsens_register(struct tsens_priv *priv)
+ 				   tsens_mC_to_hw(priv->sensor, 0));
+ 	}
+ 
+-	ret = tsens_register_irq(priv, "uplow", tsens_irq_thread);
+-	if (ret < 0)
+-		return ret;
++	if (priv->feat->combo_int) {
++		ret = tsens_register_irq(priv, "combined",
++					 tsens_combined_irq_thread);
++	} else {
++		ret = tsens_register_irq(priv, "uplow", tsens_irq_thread);
++		if (ret < 0)
++			return ret;
+ 
+-	if (priv->feat->crit_int)
+-		ret = tsens_register_irq(priv, "critical",
+-					 tsens_critical_irq_thread);
++		if (priv->feat->crit_int)
++			ret = tsens_register_irq(priv, "critical",
++						 tsens_critical_irq_thread);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/drivers/thermal/qcom/tsens.h b/drivers/thermal/qcom/tsens.h
+index ba05c82333565..1678c5e9e60bd 100644
+--- a/drivers/thermal/qcom/tsens.h
++++ b/drivers/thermal/qcom/tsens.h
+@@ -493,6 +493,7 @@ enum regfield_ids {
+  * struct tsens_features - Features supported by the IP
+  * @ver_major: Major number of IP version
+  * @crit_int: does the IP support critical interrupts?
++ * @combo_int: does the IP use one IRQ for up, low and critical thresholds?
+  * @adc:      do the sensors only output adc code (instead of temperature)?
+  * @srot_split: does the IP neatly splits the register space into SROT and TM,
+  *              with SROT only being available to secure boot firmware?
+@@ -502,6 +503,7 @@ enum regfield_ids {
+ struct tsens_features {
+ 	unsigned int ver_major;
+ 	unsigned int crit_int:1;
++	unsigned int combo_int:1;
+ 	unsigned int adc:1;
+ 	unsigned int srot_split:1;
+ 	unsigned int has_watchdog:1;
+-- 
+cgit 
+
+
+From f63baced3839f591db76c227e09d47001373d6db Mon Sep 17 00:00:00 2001
+From: Robert Marko <robimarko@gmail.com>
+Date: Fri, 19 Aug 2022 00:02:43 +0200
+Subject: thermal/drivers/tsens: Allow configuring min and max trips
+
+IPQ8074 and IPQ6018 dont support negative trip temperatures and support
+up to 204 degrees C as the max trip temperature.
+
+So, instead of always setting the -40 as min and 120 degrees C as max
+allow it to be configured as part of the features.
+
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+Link: https://lore.kernel.org/r/20220818220245.338396-3-robimarko@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/qcom/tsens-8960.c | 2 ++
+ drivers/thermal/qcom/tsens-v0_1.c | 2 ++
+ drivers/thermal/qcom/tsens-v1.c   | 2 ++
+ drivers/thermal/qcom/tsens-v2.c   | 2 ++
+ drivers/thermal/qcom/tsens.c      | 4 ++--
+ drivers/thermal/qcom/tsens.h      | 4 ++++
+ 6 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/thermal/qcom/tsens-8960.c b/drivers/thermal/qcom/tsens-8960.c
+index ee584e5b07e56..4585904fb3800 100644
+--- a/drivers/thermal/qcom/tsens-8960.c
++++ b/drivers/thermal/qcom/tsens-8960.c
+@@ -273,6 +273,8 @@ static struct tsens_features tsens_8960_feat = {
+ 	.adc		= 1,
+ 	.srot_split	= 0,
+ 	.max_sensors	= 11,
++	.trip_min_temp	= -40000,
++	.trip_max_temp	= 120000,
+ };
+ 
+ struct tsens_plat_data data_8960 = {
+diff --git a/drivers/thermal/qcom/tsens-v0_1.c b/drivers/thermal/qcom/tsens-v0_1.c
+index 8cdc3d135d6a8..04d012e4f7288 100644
+--- a/drivers/thermal/qcom/tsens-v0_1.c
++++ b/drivers/thermal/qcom/tsens-v0_1.c
+@@ -543,6 +543,8 @@ static struct tsens_features tsens_v0_1_feat = {
+ 	.adc		= 1,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 11,
++	.trip_min_temp	= -40000,
++	.trip_max_temp	= 120000,
+ };
+ 
+ static const struct reg_field tsens_v0_1_regfields[MAX_REGFIELDS] = {
+diff --git a/drivers/thermal/qcom/tsens-v1.c b/drivers/thermal/qcom/tsens-v1.c
+index a4f561a6e5821..1d7f8a80bd13a 100644
+--- a/drivers/thermal/qcom/tsens-v1.c
++++ b/drivers/thermal/qcom/tsens-v1.c
+@@ -306,6 +306,8 @@ static struct tsens_features tsens_v1_feat = {
+ 	.adc		= 1,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 11,
++	.trip_min_temp	= -40000,
++	.trip_max_temp	= 120000,
+ };
+ 
+ static const struct reg_field tsens_v1_regfields[MAX_REGFIELDS] = {
+diff --git a/drivers/thermal/qcom/tsens-v2.c b/drivers/thermal/qcom/tsens-v2.c
+index 129cdb247381c..9babc69bfd22e 100644
+--- a/drivers/thermal/qcom/tsens-v2.c
++++ b/drivers/thermal/qcom/tsens-v2.c
+@@ -35,6 +35,8 @@ static struct tsens_features tsens_v2_feat = {
+ 	.adc		= 0,
+ 	.srot_split	= 1,
+ 	.max_sensors	= 16,
++	.trip_min_temp	= -40000,
++	.trip_max_temp	= 120000,
+ };
+ 
+ static const struct reg_field tsens_v2_regfields[MAX_REGFIELDS] = {
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index e2511e76f2969..f31510489a9ab 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -573,8 +573,8 @@ static int tsens_set_trips(struct thermal_zone_device *tz, int low, int high)
+ 	dev_dbg(dev, "[%u] %s: proposed thresholds: (%d:%d)\n",
+ 		hw_id, __func__, low, high);
+ 
+-	cl_high = clamp_val(high, -40000, 120000);
+-	cl_low  = clamp_val(low, -40000, 120000);
++	cl_high = clamp_val(high, priv->feat->trip_min_temp, priv->feat->trip_max_temp);
++	cl_low  = clamp_val(low, priv->feat->trip_min_temp, priv->feat->trip_max_temp);
+ 
+ 	high_val = tsens_mC_to_hw(s, cl_high);
+ 	low_val  = tsens_mC_to_hw(s, cl_low);
+diff --git a/drivers/thermal/qcom/tsens.h b/drivers/thermal/qcom/tsens.h
+index 1678c5e9e60bd..8dc21ca0f2a3f 100644
+--- a/drivers/thermal/qcom/tsens.h
++++ b/drivers/thermal/qcom/tsens.h
+@@ -499,6 +499,8 @@ enum regfield_ids {
+  *              with SROT only being available to secure boot firmware?
+  * @has_watchdog: does this IP support watchdog functionality?
+  * @max_sensors: maximum sensors supported by this version of the IP
++ * @trip_min_temp: minimum trip temperature supported by this version of the IP
++ * @trip_max_temp: maximum trip temperature supported by this version of the IP
+  */
+ struct tsens_features {
+ 	unsigned int ver_major;
+@@ -508,6 +510,8 @@ struct tsens_features {
+ 	unsigned int srot_split:1;
+ 	unsigned int has_watchdog:1;
+ 	unsigned int max_sensors;
++	int trip_min_temp;
++	int trip_max_temp;
+ };
+ 
+ /**
+-- 
+cgit 
+
+
+From 6840455debd38ea82b1f9fbbf8019944da36f7eb Mon Sep 17 00:00:00 2001
+From: Robert Marko <robimarko@gmail.com>
+Date: Fri, 19 Aug 2022 00:02:44 +0200
+Subject: thermal/drivers/tsens: Add IPQ8074 support
+
+Qualcomm IPQ8074 uses tsens v2.3 IP, however unlike other tsens v2 IP
+it only has one IRQ, that is used for up/low as well as critical.
+It also does not support negative trip temperatures.
+
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+Link: https://lore.kernel.org/r/20220818220245.338396-4-robimarko@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+---
+ drivers/thermal/qcom/tsens-v2.c | 17 +++++++++++++++++
+ drivers/thermal/qcom/tsens.c    |  3 +++
+ drivers/thermal/qcom/tsens.h    |  2 +-
+ 3 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/qcom/tsens-v2.c b/drivers/thermal/qcom/tsens-v2.c
+index 9babc69bfd22e..29a61d2d6ca31 100644
+--- a/drivers/thermal/qcom/tsens-v2.c
++++ b/drivers/thermal/qcom/tsens-v2.c
+@@ -39,6 +39,17 @@ static struct tsens_features tsens_v2_feat = {
+ 	.trip_max_temp	= 120000,
+ };
+ 
++static struct tsens_features ipq8074_feat = {
++	.ver_major	= VER_2_X,
++	.crit_int	= 1,
++	.combo_int	= 1,
++	.adc		= 0,
++	.srot_split	= 1,
++	.max_sensors	= 16,
++	.trip_min_temp	= 0,
++	.trip_max_temp	= 204000,
++};
++
+ static const struct reg_field tsens_v2_regfields[MAX_REGFIELDS] = {
+ 	/* ----- SROT ------ */
+ 	/* VERSION */
+@@ -104,6 +115,12 @@ struct tsens_plat_data data_tsens_v2 = {
+ 	.fields	= tsens_v2_regfields,
+ };
+ 
++struct tsens_plat_data data_ipq8074 = {
++	.ops		= &ops_generic_v2,
++	.feat		= &ipq8074_feat,
++	.fields	= tsens_v2_regfields,
++};
++
+ /* Kept around for backward compatibility with old msm8996.dtsi */
+ struct tsens_plat_data data_8996 = {
+ 	.num_sensors	= 13,
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index f31510489a9ab..b7d978295b2f9 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -980,6 +980,9 @@ static const struct of_device_id tsens_table[] = {
+ 	{
+ 		.compatible = "qcom,ipq8064-tsens",
+ 		.data = &data_8960,
++	}, {
++		.compatible = "qcom,ipq8074-tsens",
++		.data = &data_ipq8074,
+ 	}, {
+ 		.compatible = "qcom,mdm9607-tsens",
+ 		.data = &data_9607,
+diff --git a/drivers/thermal/qcom/tsens.h b/drivers/thermal/qcom/tsens.h
+index 8dc21ca0f2a3f..899af128855f7 100644
+--- a/drivers/thermal/qcom/tsens.h
++++ b/drivers/thermal/qcom/tsens.h
+@@ -597,6 +597,6 @@ extern struct tsens_plat_data data_8916, data_8939, data_8974, data_9607;
+ extern struct tsens_plat_data data_tsens_v1, data_8976;
+ 
+ /* TSENS v2 targets */
+-extern struct tsens_plat_data data_8996, data_tsens_v2;
++extern struct tsens_plat_data data_8996, data_ipq8074, data_tsens_v2;
+ 
+ #endif /* __QCOM_TSENS_H__ */
+-- 
+cgit 
+
+
+From de48d8766afcd97d147699aaff78a338081c9973 Mon Sep 17 00:00:00 2001
+From: Christian Marangi <ansuelsmth@gmail.com>
+Date: Sat, 22 Oct 2022 14:56:55 +0200
+Subject: thermal/drivers/qcom/tsens: Init debugfs only with successful probe
+
+Calibrate and tsens_register can fail or PROBE_DEFER. This will cause a
+double or a wrong init of the debugfs information. Init debugfs only
+with successful probe fixing warning about directory already present.
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Acked-by: Thara Gopinath <thara.gopinath@linaro.org>
+Link: https://lore.kernel.org/r/20221022125657.22530-2-ansuelsmth@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/tsens.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index b7d978295b2f9..3ac780404c72c 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -939,8 +939,6 @@ int __init init_common(struct tsens_priv *priv)
+ 	if (tsens_version(priv) >= VER_0_1)
+ 		tsens_enable_irq(priv);
+ 
+-	tsens_debug_init(op);
+-
+ err_put_device:
+ 	put_device(&op->dev);
+ 	return ret;
+@@ -1182,7 +1180,11 @@ static int tsens_probe(struct platform_device *pdev)
+ 		}
+ 	}
+ 
+-	return tsens_register(priv);
++	ret = tsens_register(priv);
++	if (!ret)
++		tsens_debug_init(pdev);
++
++	return ret;
+ }
+ 
+ static int tsens_remove(struct platform_device *pdev)
+-- 
+cgit 
+
+
+From c7e077e921fa94e0c06c8d14af6c0504c8a5f4bd Mon Sep 17 00:00:00 2001
+From: Christian Marangi <ansuelsmth@gmail.com>
+Date: Sat, 22 Oct 2022 14:56:56 +0200
+Subject: thermal/drivers/qcom/tsens: Fix wrong version id dbg_version_show
+
+For VER_0 the version was incorrectly reported as 0.1.0.
+
+Fix that and correctly report the major version for this old tsens
+revision.
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Link: https://lore.kernel.org/r/20221022125657.22530-3-ansuelsmth@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/tsens.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index 3ac780404c72c..5f8d8f04351eb 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -713,7 +713,7 @@ static int dbg_version_show(struct seq_file *s, void *data)
+ 			return ret;
+ 		seq_printf(s, "%d.%d.%d\n", maj_ver, min_ver, step_ver);
+ 	} else {
+-		seq_puts(s, "0.1.0\n");
++		seq_printf(s, "0.%d.0\n", priv->feat->ver_major);
+ 	}
+ 
+ 	return 0;
+-- 
+cgit 
+
+
+From 89992d95ed1046338c7866ef7bbe6de543a2af91 Mon Sep 17 00:00:00 2001
+From: Christian Marangi <ansuelsmth@gmail.com>
+Date: Sat, 22 Oct 2022 14:56:57 +0200
+Subject: thermal/drivers/qcom/tsens: Rework debugfs file structure
+
+The current tsens debugfs structure is composed by:
+- a tsens dir in debugfs with a version file
+- a directory for each tsens istance with sensors file to dump all the
+  sensors value.
+
+This works on the assumption that we have the same version for each
+istance but this assumption seems fragile and with more than one tsens
+istance results in the version file not tracking each of them.
+
+A better approach is to just create a subdirectory for each tsens
+istance and put there version and sensors debugfs file.
+
+Using this new implementation results in less code since debugfs entry
+are created only on successful tsens probe.
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Link: https://lore.kernel.org/r/20221022125657.22530-4-ansuelsmth@gmail.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/tsens.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/thermal/qcom/tsens.c b/drivers/thermal/qcom/tsens.c
+index 5f8d8f04351eb..b5b136ff323f9 100644
+--- a/drivers/thermal/qcom/tsens.c
++++ b/drivers/thermal/qcom/tsens.c
+@@ -725,21 +725,14 @@ DEFINE_SHOW_ATTRIBUTE(dbg_sensors);
+ static void tsens_debug_init(struct platform_device *pdev)
+ {
+ 	struct tsens_priv *priv = platform_get_drvdata(pdev);
+-	struct dentry *root, *file;
+ 
+-	root = debugfs_lookup("tsens", NULL);
+-	if (!root)
++	priv->debug_root = debugfs_lookup("tsens", NULL);
++	if (!priv->debug_root)
+ 		priv->debug_root = debugfs_create_dir("tsens", NULL);
+-	else
+-		priv->debug_root = root;
+-
+-	file = debugfs_lookup("version", priv->debug_root);
+-	if (!file)
+-		debugfs_create_file("version", 0444, priv->debug_root,
+-				    pdev, &dbg_version_fops);
+ 
+ 	/* A directory for each instance of the TSENS IP */
+ 	priv->debug = debugfs_create_dir(dev_name(&pdev->dev), priv->debug_root);
++	debugfs_create_file("version", 0444, priv->debug, pdev, &dbg_version_fops);
+ 	debugfs_create_file("sensors", 0444, priv->debug, pdev, &dbg_sensors_fops);
+ }
+ #else
+-- 
+cgit 
+
+
+From 8848c0d7a0782c263a7827697d5acfcc09a19a5f Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Fri, 2 Dec 2022 17:23:49 +0100
+Subject: dt-bindings: thermal: imx8mm-thermal: Document optional nvmem-cells
+
+The TMU TASR, TCALIVn, TRIM registers must be explicitly programmed with
+calibration values from OCOTP. Document optional phandle to OCOTP nvmem
+provider.
+
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ Documentation/devicetree/bindings/thermal/imx8mm-thermal.yaml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/imx8mm-thermal.yaml b/Documentation/devicetree/bindings/thermal/imx8mm-thermal.yaml
+index 89c54e08ee61b..b90726229ac9c 100644
+--- a/Documentation/devicetree/bindings/thermal/imx8mm-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/imx8mm-thermal.yaml
+@@ -32,6 +32,13 @@ properties:
+   clocks:
+     maxItems: 1
+ 
++  nvmem-cells:
++    maxItems: 1
++    description: Phandle to the calibration data provided by ocotp
++
++  nvmem-cell-names:
++    const: calib
++
+   "#thermal-sensor-cells":
+     description: |
+       Number of cells required to uniquely identify the thermal
+-- 
+cgit 
+
+
+From 403291648823f819f7baaccd47589fcf87187c32 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Fri, 2 Dec 2022 17:23:53 +0100
+Subject: thermal/drivers/imx: Add support for loading calibration data from
+ OCOTP
+
+The TMU TASR, TCALIVn, TRIM registers must be explicitly programmed with
+calibration values in OCOTP. Add support for reading the OCOTP calibration
+data and programming those into the TMU hardware.
+
+The MX8MM/MX8MN TMUv1 uses only one OCOTP cell, while MX8MP TMUv2 uses 4,
+the programming differs in each case.
+
+Based on U-Boot commits:
+70487ff386c ("imx8mm: Load fuse for TMU TCALIV and TASR")
+ebb9aab318b ("imx: load calibration parameters from fuse for i.MX8MP")
+
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/imx8mm_thermal.c | 164 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
+
+diff --git a/drivers/thermal/imx8mm_thermal.c b/drivers/thermal/imx8mm_thermal.c
+index 182cc207afe90..e709c03bc4b9f 100644
+--- a/drivers/thermal/imx8mm_thermal.c
++++ b/drivers/thermal/imx8mm_thermal.c
+@@ -10,9 +10,11 @@
+ #include <linux/err.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
++#include <linux/nvmem-consumer.h>
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
++#include <linux/slab.h>
+ #include <linux/thermal.h>
+ 
+ #include "thermal_core.h"
+@@ -20,6 +22,22 @@
+ #define TER			0x0	/* TMU enable */
+ #define TPS			0x4
+ #define TRITSR			0x20	/* TMU immediate temp */
++/* TMU calibration data registers */
++#define TASR			0x28
++#define TASR_BUF_SLOPE_MASK	GENMASK(19, 16)
++#define TASR_BUF_VREF_MASK	GENMASK(4, 0)	/* TMU_V1 */
++#define TASR_BUF_VERF_SEL_MASK	GENMASK(1, 0)	/* TMU_V2 */
++#define TCALIV(n)		(0x30 + ((n) * 4))
++#define TCALIV_EN		BIT(31)
++#define TCALIV_HR_MASK		GENMASK(23, 16)	/* TMU_V1 */
++#define TCALIV_RT_MASK		GENMASK(7, 0)	/* TMU_V1 */
++#define TCALIV_SNSR105C_MASK	GENMASK(27, 16)	/* TMU_V2 */
++#define TCALIV_SNSR25C_MASK	GENMASK(11, 0)	/* TMU_V2 */
++#define TRIM			0x3c
++#define TRIM_BJT_CUR_MASK	GENMASK(23, 20)
++#define TRIM_BGR_MASK		GENMASK(31, 28)
++#define TRIM_VLSB_MASK		GENMASK(15, 12)
++#define TRIM_EN_CH		BIT(7)
+ 
+ #define TER_ADC_PD		BIT(30)
+ #define TER_EN			BIT(31)
+@@ -32,6 +50,25 @@
+ #define SIGN_BIT		BIT(7)
+ #define TEMP_VAL_MASK		GENMASK(6, 0)
+ 
++/* TMU OCOTP calibration data bitfields */
++#define ANA0_EN			BIT(25)
++#define ANA0_BUF_VREF_MASK	GENMASK(24, 20)
++#define ANA0_BUF_SLOPE_MASK	GENMASK(19, 16)
++#define ANA0_HR_MASK		GENMASK(15, 8)
++#define ANA0_RT_MASK		GENMASK(7, 0)
++#define TRIM2_VLSB_MASK		GENMASK(23, 20)
++#define TRIM2_BGR_MASK		GENMASK(19, 16)
++#define TRIM2_BJT_CUR_MASK	GENMASK(15, 12)
++#define TRIM2_BUF_SLOP_SEL_MASK	GENMASK(11, 8)
++#define TRIM2_BUF_VERF_SEL_MASK	GENMASK(7, 6)
++#define TRIM3_TCA25_0_LSB_MASK	GENMASK(31, 28)
++#define TRIM3_TCA40_0_MASK	GENMASK(27, 16)
++#define TRIM4_TCA40_1_MASK	GENMASK(31, 20)
++#define TRIM4_TCA105_0_MASK	GENMASK(19, 8)
++#define TRIM4_TCA25_0_MSB_MASK	GENMASK(7, 0)
++#define TRIM5_TCA105_1_MASK	GENMASK(23, 12)
++#define TRIM5_TCA25_1_MASK	GENMASK(11, 0)
++
+ #define VER1_TEMP_LOW_LIMIT	10000
+ #define VER2_TEMP_LOW_LIMIT	-40000
+ #define VER2_TEMP_HIGH_LIMIT	125000
+@@ -134,6 +171,129 @@ static void imx8mm_tmu_probe_sel_all(struct imx8mm_tmu *tmu)
+ 	writel_relaxed(val, tmu->base + TPS);
+ }
+ 
++static int imx8mm_tmu_probe_set_calib_v1(struct platform_device *pdev,
++					 struct imx8mm_tmu *tmu)
++{
++	struct device *dev = &pdev->dev;
++	u32 ana0;
++	int ret;
++
++	ret = nvmem_cell_read_u32(&pdev->dev, "calib", &ana0);
++	if (ret) {
++		dev_warn(dev, "Failed to read OCOTP nvmem cell (%d).\n", ret);
++		return ret;
++	}
++
++	writel(FIELD_PREP(TASR_BUF_VREF_MASK,
++			  FIELD_GET(ANA0_BUF_VREF_MASK, ana0)) |
++	       FIELD_PREP(TASR_BUF_SLOPE_MASK,
++			  FIELD_GET(ANA0_BUF_SLOPE_MASK, ana0)),
++	       tmu->base + TASR);
++
++	writel(FIELD_PREP(TCALIV_RT_MASK, FIELD_GET(ANA0_RT_MASK, ana0)) |
++	       FIELD_PREP(TCALIV_HR_MASK, FIELD_GET(ANA0_HR_MASK, ana0)) |
++	       ((ana0 & ANA0_EN) ? TCALIV_EN : 0),
++	       tmu->base + TCALIV(0));
++
++	return 0;
++}
++
++static int imx8mm_tmu_probe_set_calib_v2(struct platform_device *pdev,
++					 struct imx8mm_tmu *tmu)
++{
++	struct device *dev = &pdev->dev;
++	struct nvmem_cell *cell;
++	u32 trim[4] = { 0 };
++	size_t len;
++	void *buf;
++
++	cell = nvmem_cell_get(dev, "calib");
++	if (IS_ERR(cell))
++		return PTR_ERR(cell);
++
++	buf = nvmem_cell_read(cell, &len);
++	nvmem_cell_put(cell);
++
++	if (IS_ERR(buf))
++		return PTR_ERR(buf);
++
++	memcpy(trim, buf, min(len, sizeof(trim)));
++	kfree(buf);
++
++	if (len != 16) {
++		dev_err(dev,
++			"OCOTP nvmem cell length is %zu, must be 16.\n", len);
++		return -EINVAL;
++	}
++
++	/* Blank sample hardware */
++	if (!trim[0] && !trim[1] && !trim[2] && !trim[3]) {
++		/* Use a default 25C binary codes */
++		writel(FIELD_PREP(TCALIV_SNSR25C_MASK, 0x63c),
++		       tmu->base + TCALIV(0));
++		writel(FIELD_PREP(TCALIV_SNSR25C_MASK, 0x63c),
++		       tmu->base + TCALIV(1));
++		return 0;
++	}
++
++	writel(FIELD_PREP(TASR_BUF_VERF_SEL_MASK,
++			  FIELD_GET(TRIM2_BUF_VERF_SEL_MASK, trim[0])) |
++	       FIELD_PREP(TASR_BUF_SLOPE_MASK,
++			  FIELD_GET(TRIM2_BUF_SLOP_SEL_MASK, trim[0])),
++	       tmu->base + TASR);
++
++	writel(FIELD_PREP(TRIM_BJT_CUR_MASK,
++			  FIELD_GET(TRIM2_BJT_CUR_MASK, trim[0])) |
++	       FIELD_PREP(TRIM_BGR_MASK, FIELD_GET(TRIM2_BGR_MASK, trim[0])) |
++	       FIELD_PREP(TRIM_VLSB_MASK, FIELD_GET(TRIM2_VLSB_MASK, trim[0])) |
++	       TRIM_EN_CH,
++	       tmu->base + TRIM);
++
++	writel(FIELD_PREP(TCALIV_SNSR25C_MASK,
++			  FIELD_GET(TRIM3_TCA25_0_LSB_MASK, trim[1]) |
++			  (FIELD_GET(TRIM4_TCA25_0_MSB_MASK, trim[2]) << 4)) |
++	       FIELD_PREP(TCALIV_SNSR105C_MASK,
++			  FIELD_GET(TRIM4_TCA105_0_MASK, trim[2])),
++	       tmu->base + TCALIV(0));
++
++	writel(FIELD_PREP(TCALIV_SNSR25C_MASK,
++			  FIELD_GET(TRIM5_TCA25_1_MASK, trim[3])) |
++	       FIELD_PREP(TCALIV_SNSR105C_MASK,
++			  FIELD_GET(TRIM5_TCA105_1_MASK, trim[3])),
++	       tmu->base + TCALIV(1));
++
++	writel(FIELD_PREP(TCALIV_SNSR25C_MASK,
++			  FIELD_GET(TRIM3_TCA40_0_MASK, trim[1])) |
++	       FIELD_PREP(TCALIV_SNSR105C_MASK,
++			  FIELD_GET(TRIM4_TCA40_1_MASK, trim[2])),
++	       tmu->base + TCALIV(2));
++
++	return 0;
++}
++
++static int imx8mm_tmu_probe_set_calib(struct platform_device *pdev,
++				      struct imx8mm_tmu *tmu)
++{
++	struct device *dev = &pdev->dev;
++
++	/*
++	 * Lack of calibration data OCOTP reference is not considered
++	 * fatal to retain compatibility with old DTs. It is however
++	 * strongly recommended to update such old DTs to get correct
++	 * temperature compensation values for each SoC.
++	 */
++	if (!of_find_property(pdev->dev.of_node, "nvmem-cells", NULL)) {
++		dev_warn(dev,
++			 "No OCOTP nvmem reference found, SoC-specific calibration not loaded. Please update your DT.\n");
++		return 0;
++	}
++
++	if (tmu->socdata->version == TMU_VER1)
++		return imx8mm_tmu_probe_set_calib_v1(pdev, tmu);
++
++	return imx8mm_tmu_probe_set_calib_v2(pdev, tmu);
++}
++
+ static int imx8mm_tmu_probe(struct platform_device *pdev)
+ {
+ 	const struct thermal_soc_data *data;
+@@ -186,6 +346,10 @@ static int imx8mm_tmu_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, tmu);
+ 
++	ret = imx8mm_tmu_probe_set_calib(pdev, tmu);
++	if (ret)
++		goto disable_clk;
++
+ 	/* enable all the probes for V2 TMU */
+ 	if (tmu->socdata->version == TMU_VER2)
+ 		imx8mm_tmu_probe_sel_all(tmu);
+-- 
+cgit 
+
+
+From 3f9cb57962bcfad88bcac750f85ef7425475b102 Mon Sep 17 00:00:00 2001
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Date: Mon, 21 Nov 2022 16:47:10 +0100
+Subject: thermal: ti-soc-thermal: Drop comma after SoC match table sentinel
+
+It does not make sense to have a comma after a sentinel, as any new
+elements must be added before the sentinel.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Acked-by: Keerthy <j-keerthy@ti.com>
+Link: https://lore.kernel.org/r/1d6de2a80b919cb11199e56ac06ad21c273ebe57.1669045586.git.geert+renesas@glider.be
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/ti-soc-thermal/ti-bandgap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/ti-soc-thermal/ti-bandgap.c b/drivers/thermal/ti-soc-thermal/ti-bandgap.c
+index 67050a1a5b07f..a1c9a15301832 100644
+--- a/drivers/thermal/ti-soc-thermal/ti-bandgap.c
++++ b/drivers/thermal/ti-soc-thermal/ti-bandgap.c
+@@ -878,7 +878,7 @@ static struct ti_bandgap *ti_bandgap_build(struct platform_device *pdev)
+  */
+ static const struct soc_device_attribute soc_no_cpu_notifier[] = {
+ 	{ .machine = "OMAP4430" },
+-	{ /* sentinel */ },
++	{ /* sentinel */ }
+ };
+ 
+ /***   Device driver call backs   ***/
+-- 
+cgit 
+
+
+From c464856e63a4c9631add6a27340bd94beb9eb27f Mon Sep 17 00:00:00 2001
+From: Daniel Golle <daniel@makrotopia.org>
+Date: Wed, 30 Nov 2022 13:20:38 +0000
+Subject: dt-bindings: thermal: mediatek: add compatible string for MT7986 and
+ MT7981 SoC
+
+Document compatible string 'mediatek,mt7986-thermal' for V3 thermal
+unit found in MT7986 SoCs.
+'mediatek,mt7981-thermal' is also added as it is identical with the
+thermal unit of MT7986.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ Documentation/devicetree/bindings/thermal/mediatek-thermal.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/mediatek-thermal.txt b/Documentation/devicetree/bindings/thermal/mediatek-thermal.txt
+index 5c7e7bdd029ab..38b32bb447e39 100644
+--- a/Documentation/devicetree/bindings/thermal/mediatek-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/mediatek-thermal.txt
+@@ -13,6 +13,8 @@ Required properties:
+   - "mediatek,mt2701-thermal" : For MT2701 family of SoCs
+   - "mediatek,mt2712-thermal" : For MT2712 family of SoCs
+   - "mediatek,mt7622-thermal" : For MT7622 SoC
++  - "mediatek,mt7981-thermal", "mediatek,mt7986-thermal" : For MT7981 SoC
++  - "mediatek,mt7986-thermal" : For MT7986 SoC
+   - "mediatek,mt8183-thermal" : For MT8183 family of SoCs
+   - "mediatek,mt8516-thermal", "mediatek,mt2701-thermal : For MT8516 family of SoCs
+ - reg: Address range of the thermal controller
+-- 
+cgit 
+
+
+From 6f8941646234e2d6e589377aea0dd1ba52365623 Mon Sep 17 00:00:00 2001
+From: Johan Hovold <johan+linaro@kernel.org>
+Date: Wed, 2 Nov 2022 16:26:30 +0100
+Subject: thermal: qcom-spmi-adc-tm5: suppress probe-deferral error message
+
+Drivers should not be logging errors on probe deferral. Switch to using
+dev_err_probe() to log failures when parsing the devicetree to avoid
+errors like:
+
+	qcom-spmi-adc-tm5 c440000.spmi:pmic@0:adc-tm@3400: get dt data failed: -517
+
+when a channel is not yet available.
+
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
+Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
+Link: https://lore.kernel.org/r/20221102152630.696-1-johan+linaro@kernel.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/qcom-spmi-adc-tm5.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/thermal/qcom/qcom-spmi-adc-tm5.c b/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
+index 1b2c43eab27d1..88462a4628fb5 100644
+--- a/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
++++ b/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
+@@ -1030,10 +1030,8 @@ static int adc_tm5_probe(struct platform_device *pdev)
+ 		return irq;
+ 
+ 	ret = adc_tm5_get_dt_data(adc_tm, node);
+-	if (ret) {
+-		dev_err(dev, "get dt data failed: %d\n", ret);
+-		return ret;
+-	}
++	if (ret)
++		return dev_err_probe(dev, ret, "get dt data failed\n");
+ 
+ 	ret = adc_tm->data->init(adc_tm);
+ 	if (ret) {
+-- 
+cgit 
+
+
+From de95d1341a3e682b95ad759bd58b86224819fbec Mon Sep 17 00:00:00 2001
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+Date: Tue, 26 Jul 2022 14:23:31 +0200
+Subject: thermal/drivers/imx8mm: Add hwmon support
+
+Expose thermal sensors as HWMON devices.
+
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+Link: https://lore.kernel.org/r/20220726122331.323093-1-alexander.stein@ew.tq-group.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/imx8mm_thermal.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/thermal/imx8mm_thermal.c b/drivers/thermal/imx8mm_thermal.c
+index e709c03bc4b9f..d247b48696cb6 100644
+--- a/drivers/thermal/imx8mm_thermal.c
++++ b/drivers/thermal/imx8mm_thermal.c
+@@ -18,6 +18,7 @@
+ #include <linux/thermal.h>
+ 
+ #include "thermal_core.h"
++#include "thermal_hwmon.h"
+ 
+ #define TER			0x0	/* TMU enable */
+ #define TPS			0x4
+@@ -342,6 +343,9 @@ static int imx8mm_tmu_probe(struct platform_device *pdev)
+ 			goto disable_clk;
+ 		}
+ 		tmu->sensors[i].hw_id = i;
++
++		if (devm_thermal_add_hwmon_sysfs(tmu->sensors[i].tzd))
++			dev_warn(&pdev->dev, "failed to add hwmon sysfs attributes\n");
+ 	}
+ 
+ 	platform_set_drvdata(pdev, tmu);
+-- 
+cgit 
+
+
+From de04f680b0ab71d2b9085903fe608a15541f66cb Mon Sep 17 00:00:00 2001
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Date: Sat, 26 Nov 2022 11:42:25 +0100
+Subject: thermal/core/power allocator: Remove a useless include
+
+This file does not use rcu, so there is no point in including
+<linux/rculist.h>.
+
+Remove it.
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Reviewed-by: Lukasz Luba <lukasz.luba@arm.com>
+Link: https://lore.kernel.org/r/9adeec47cb5a8193016272d5c8bf936235c1711d.1669459337.git.christophe.jaillet@wanadoo.fr
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/gov_power_allocator.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/thermal/gov_power_allocator.c b/drivers/thermal/gov_power_allocator.c
+index 2d1aeaba38a88..d5d4eae16771b 100644
+--- a/drivers/thermal/gov_power_allocator.c
++++ b/drivers/thermal/gov_power_allocator.c
+@@ -8,7 +8,6 @@
+ 
+ #define pr_fmt(fmt) "Power allocator: " fmt
+ 
+-#include <linux/rculist.h>
+ #include <linux/slab.h>
+ #include <linux/thermal.h>
+ 
+-- 
+cgit 
+
+
+From fa17c4136db0bc91e698bd227cb478c648863d11 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Wed, 16 Nov 2022 12:31:40 +0100
+Subject: dt-bindings: thermal: qcom-tsens: narrow interrupts for SC8280XP,
+ SM6350 and SM8450
+
+Narrow number of interrupts per variants: SC8280XP, SM6350 and SM8450.
+The compatibles are already used and described.  They only missed the
+constraints of number of interrupts.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221116113140.69587-1-krzysztof.kozlowski@linaro.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ Documentation/devicetree/bindings/thermal/qcom-tsens.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+index f0bd4b979e28a..5bcfddc877d36 100644
+--- a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
++++ b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+@@ -146,11 +146,14 @@ allOf:
+               - qcom,sc7180-tsens
+               - qcom,sc7280-tsens
+               - qcom,sc8180x-tsens
++              - qcom,sc8280xp-tsens
+               - qcom,sdm630-tsens
+               - qcom,sdm845-tsens
++              - qcom,sm6350-tsens
+               - qcom,sm8150-tsens
+               - qcom,sm8250-tsens
+               - qcom,sm8350-tsens
++              - qcom,sm8450-tsens
+               - qcom,tsens-v2
+     then:
+       properties:
+-- 
+cgit 
+
+
+From 8763f8acbf8aef22a2321d4c978cd078aa3b8f64 Mon Sep 17 00:00:00 2001
+From: Luca Weiss <luca.weiss@fairphone.com>
+Date: Thu, 20 Oct 2022 16:52:37 +0200
+Subject: thermal/drivers/qcom/temp-alarm: Fix inaccurate warning for gen2
+
+On gen2 chips the stage2 threshold is not 140 degC but 125 degC.
+
+Make the warning message clearer by using this variable and also by
+including the temperature that was checked for.
+
+Fixes: aa92b3310c55 ("thermal/drivers/qcom-spmi-temp-alarm: Add support for GEN2 rev 1 PMIC peripherals")
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+Reviewed-by: Amit Kucheria <amitk@kernel.org>
+Link: https://lore.kernel.org/r/20221020145237.942146-1-luca.weiss@fairphone.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/qcom-spmi-temp-alarm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/qcom/qcom-spmi-temp-alarm.c b/drivers/thermal/qcom/qcom-spmi-temp-alarm.c
+index be785ab37e53d..ad84978109e6f 100644
+--- a/drivers/thermal/qcom/qcom-spmi-temp-alarm.c
++++ b/drivers/thermal/qcom/qcom-spmi-temp-alarm.c
+@@ -252,7 +252,8 @@ static int qpnp_tm_update_critical_trip_temp(struct qpnp_tm_chip *chip,
+ 			disable_s2_shutdown = true;
+ 		else
+ 			dev_warn(chip->dev,
+-				 "No ADC is configured and critical temperature is above the maximum stage 2 threshold of 140 C! Configuring stage 2 shutdown at 140 C.\n");
++				 "No ADC is configured and critical temperature %d mC is above the maximum stage 2 threshold of %ld mC! Configuring stage 2 shutdown at %ld mC.\n",
++				 temp, stage2_threshold_max, stage2_threshold_max);
+ 	}
+ 
+ skip:
+-- 
+cgit 
+
+
+From 2baad2496383c6036bdb0945ef8aa6b1a5d18c19 Mon Sep 17 00:00:00 2001
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Date: Sat, 29 Oct 2022 10:59:33 +0530
+Subject: thermal/drivers/qcom: Demote error log of thermal zone register to
+ debug
+
+devm_thermal_of_zone_register() can fail with -ENODEV if thermal zone for
+the channel is not represented in DT. This is perfectly fine since not all
+sensors needs to be used for thermal zones but only a few in real world.
+
+So demote the error log to debug to avoid spamming users.
+
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Link: https://lore.kernel.org/r/20221029052933.32421-1-manivannan.sadhasivam@linaro.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/qcom-spmi-adc-tm5.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/qcom/qcom-spmi-adc-tm5.c b/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
+index 88462a4628fb5..ff47fc9ac9c5e 100644
+--- a/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
++++ b/drivers/thermal/qcom/qcom-spmi-adc-tm5.c
+@@ -678,7 +678,7 @@ static int adc_tm5_register_tzd(struct adc_tm5_chip *adc_tm)
+ 						    &adc_tm5_thermal_ops);
+ 		if (IS_ERR(tzd)) {
+ 			if (PTR_ERR(tzd) == -ENODEV) {
+-				dev_warn(adc_tm->dev, "thermal sensor on channel %d is not used\n",
++				dev_dbg(adc_tm->dev, "thermal sensor on channel %d is not used\n",
+ 					 adc_tm->channels[i].channel);
+ 				continue;
+ 			}
+-- 
+cgit 
+
+
+From 46cab93ab49f303a7abbcf920cf9ef95d02a113c Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:52 -0500
+Subject: thermal/drivers/k3_j72xx_bandgap: Simplify k3_thermal_get_temp()
+ function
+
+The k3_thermal_get_temp() function can be simplified to return only
+the result of k3_bgp_read_temp() without needing the 'ret' variable
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Link: https://lore.kernel.org/r/20221031232702.10339-2-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/k3_j72xx_bandgap.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/drivers/thermal/k3_j72xx_bandgap.c b/drivers/thermal/k3_j72xx_bandgap.c
+index c073b1023bbe7..a9f99a190cb61 100644
+--- a/drivers/thermal/k3_j72xx_bandgap.c
++++ b/drivers/thermal/k3_j72xx_bandgap.c
+@@ -249,14 +249,7 @@ static inline int k3_bgp_read_temp(struct k3_thermal_data *devdata,
+ /* Get temperature callback function for thermal zone */
+ static int k3_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
+ {
+-	struct k3_thermal_data *data = tz->devdata;
+-	int ret = 0;
+-
+-	ret = k3_bgp_read_temp(data, temp);
+-	if (ret)
+-		return ret;
+-
+-	return ret;
++	return k3_bgp_read_temp(tz->devdata, temp);
+ }
+ 
+ static const struct thermal_zone_device_ops k3_of_thermal_ops = {
+-- 
+cgit 
+
+
+From 311f328ffc7572219bee65db77645e5fedd4e8e6 Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:53 -0500
+Subject: thermal/drivers/k3_j72xx_bandgap: Use bool for i2128 erratum flag
+
+Some of TI's J721E SoCs require a software trimming method to report
+temperatures accurately. Currently we are using a few different data
+types to indicate when we should apply the erratum.
+
+Change the 'workaround_needed' variable's data type to a bool to align
+with how we are using this variable currently.
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Link: https://lore.kernel.org/r/20221031232702.10339-3-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/k3_j72xx_bandgap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/thermal/k3_j72xx_bandgap.c b/drivers/thermal/k3_j72xx_bandgap.c
+index a9f99a190cb61..b9d20026771a5 100644
+--- a/drivers/thermal/k3_j72xx_bandgap.c
++++ b/drivers/thermal/k3_j72xx_bandgap.c
+@@ -340,7 +340,7 @@ static void print_look_up_table(struct device *dev, int *ref_table)
+ }
+ 
+ struct k3_j72xx_bandgap_data {
+-	unsigned int has_errata_i2128;
++	const bool has_errata_i2128;
+ };
+ 
+ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+@@ -351,7 +351,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 	struct device *dev = &pdev->dev;
+ 	struct k3_j72xx_bandgap *bgp;
+ 	struct k3_thermal_data *data;
+-	int workaround_needed = 0;
++	bool workaround_needed = false;
+ 	const struct k3_j72xx_bandgap_data *driver_data;
+ 	struct thermal_zone_device *ti_thermal;
+ 	int *ref_table;
+@@ -522,11 +522,11 @@ static int k3_j72xx_bandgap_remove(struct platform_device *pdev)
+ }
+ 
+ static const struct k3_j72xx_bandgap_data k3_j72xx_bandgap_j721e_data = {
+-	.has_errata_i2128 = 1,
++	.has_errata_i2128 = true,
+ };
+ 
+ static const struct k3_j72xx_bandgap_data k3_j72xx_bandgap_j7200_data = {
+-	.has_errata_i2128 = 0,
++	.has_errata_i2128 = false,
+ };
+ 
+ static const struct of_device_id of_k3_j72xx_bandgap_match[] = {
+-- 
+cgit 
+
+
+From 156f0e2fda420c4a4a7b244a909df04086039bd6 Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:54 -0500
+Subject: thermal/drivers/k3_j72xx_bandgap: Remove fuse_base from structure
+
+'fuse_base' is only needed during the initial probe function to provide
+data for a software trimming method for some of TI's devices affected by
+the i2128 erratum. The devices not affected will not use this region
+
+Remove fuse_base from the main k3_j72xx_bandgap structure
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Link: https://lore.kernel.org/r/20221031232702.10339-4-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/k3_j72xx_bandgap.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/thermal/k3_j72xx_bandgap.c b/drivers/thermal/k3_j72xx_bandgap.c
+index b9d20026771a5..395a73cb37425 100644
+--- a/drivers/thermal/k3_j72xx_bandgap.c
++++ b/drivers/thermal/k3_j72xx_bandgap.c
+@@ -177,7 +177,6 @@ struct k3_j72xx_bandgap {
+ 	struct device *dev;
+ 	void __iomem *base;
+ 	void __iomem *cfg2_base;
+-	void __iomem *fuse_base;
+ 	struct k3_thermal_data *ts_data[K3_VTM_MAX_NUM_TS];
+ };
+ 
+@@ -276,7 +275,7 @@ static int k3_j72xx_bandgap_temp_to_adc_code(int temp)
+ }
+ 
+ static void get_efuse_values(int id, struct k3_thermal_data *data, int *err,
+-			     struct k3_j72xx_bandgap *bgp)
++			     void __iomem *fuse_base)
+ {
+ 	int i, tmp, pow;
+ 	int ct_offsets[5][K3_VTM_CORRECTION_TEMP_CNT] = {
+@@ -298,16 +297,16 @@ static void get_efuse_values(int id, struct k3_thermal_data *data, int *err,
+ 		/* Extract the offset value using bit-mask */
+ 		if (ct_offsets[id][i] == -1 && i == 1) {
+ 			/* 25C offset Case of Sensor 2 split between 2 regs */
+-			tmp = (readl(bgp->fuse_base + 0x8) & 0xE0000000) >> (29);
+-			tmp |= ((readl(bgp->fuse_base + 0xC) & 0x1F) << 3);
++			tmp = (readl(fuse_base + 0x8) & 0xE0000000) >> (29);
++			tmp |= ((readl(fuse_base + 0xC) & 0x1F) << 3);
+ 			pow = tmp & 0x80;
+ 		} else if (ct_offsets[id][i] == -1 && i == 2) {
+ 			/* 125C Case of Sensor 3 split between 2 regs */
+-			tmp = (readl(bgp->fuse_base + 0x4) & 0xF8000000) >> (27);
+-			tmp |= ((readl(bgp->fuse_base + 0x8) & 0xF) << 5);
++			tmp = (readl(fuse_base + 0x4) & 0xF8000000) >> (27);
++			tmp |= ((readl(fuse_base + 0x8) & 0xF) << 5);
+ 			pow = tmp & 0x100;
+ 		} else {
+-			tmp = readl(bgp->fuse_base + ct_offsets[id][i]);
++			tmp = readl(fuse_base + ct_offsets[id][i]);
+ 			tmp &= ct_bm[id][i];
+ 			tmp = tmp >> __ffs(ct_bm[id][i]);
+ 
+@@ -356,6 +355,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 	struct thermal_zone_device *ti_thermal;
+ 	int *ref_table;
+ 	struct err_values err_vals;
++	void __iomem *fuse_base;
+ 
+ 	const s64 golden_factors[] = {
+ 		-490019999999999936,
+@@ -387,9 +387,9 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 		return PTR_ERR(bgp->cfg2_base);
+ 
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
+-	bgp->fuse_base = devm_ioremap_resource(dev, res);
+-	if (IS_ERR(bgp->fuse_base))
+-		return PTR_ERR(bgp->fuse_base);
++	fuse_base = devm_ioremap_resource(dev, res);
++	if (IS_ERR(fuse_base))
++		return PTR_ERR(fuse_base);
+ 
+ 	driver_data = of_device_get_match_data(dev);
+ 	if (driver_data)
+@@ -428,7 +428,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	/* Workaround not needed if bit30/bit31 is set even for J721e */
+-	if (workaround_needed && (readl(bgp->fuse_base + 0x0) & 0xc0000000) == 0xc0000000)
++	if (workaround_needed && (readl(fuse_base + 0x0) & 0xc0000000) == 0xc0000000)
+ 		workaround_needed = false;
+ 
+ 	dev_dbg(bgp->dev, "Work around %sneeded\n",
+@@ -452,7 +452,7 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 			err_vals.refs[1] = PLUS30CREF;
+ 			err_vals.refs[2] = PLUS125CREF;
+ 			err_vals.refs[3] = PLUS150CREF;
+-			get_efuse_values(id, &data[id], err_vals.errs, bgp);
++			get_efuse_values(id, &data[id], err_vals.errs, fuse_base);
+ 		}
+ 
+ 		if (id == 0 && workaround_needed)
+-- 
+cgit 
+
+
+From 366444ebe7e2e1c987c6a07551f06db4b5b7c0ad Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:55 -0500
+Subject: thermal/drivers/k3_j72xx_bandgap: Map fuse_base only for erratum
+ workaround
+
+Some of TI's J721E SoCs require a software trimming procedure for the
+temperature monitors to function properly. To determine if a particular
+J721E is not affected by this erratum, both bits in the WKUP_SPARE_FUSE0
+region must be set. Other SoCs, not affected by this erratum, will not
+need this region.
+
+Map the 'fuse_base' region only when the erratum fix is needed.
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Link: https://lore.kernel.org/r/20221031232702.10339-5-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/k3_j72xx_bandgap.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/thermal/k3_j72xx_bandgap.c b/drivers/thermal/k3_j72xx_bandgap.c
+index 395a73cb37425..031ea1091909a 100644
+--- a/drivers/thermal/k3_j72xx_bandgap.c
++++ b/drivers/thermal/k3_j72xx_bandgap.c
+@@ -386,15 +386,32 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 	if (IS_ERR(bgp->cfg2_base))
+ 		return PTR_ERR(bgp->cfg2_base);
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
+-	fuse_base = devm_ioremap_resource(dev, res);
+-	if (IS_ERR(fuse_base))
+-		return PTR_ERR(fuse_base);
+-
+ 	driver_data = of_device_get_match_data(dev);
+ 	if (driver_data)
+ 		workaround_needed = driver_data->has_errata_i2128;
+ 
++	/*
++	 * Some of TI's J721E SoCs require a software trimming procedure
++	 * for the temperature monitors to function properly. To determine
++	 * if this particular SoC is NOT affected, both bits in the
++	 * WKUP_SPARE_FUSE0[31:30] will be set (0xC0000000) indicating
++	 * when software trimming should NOT be applied.
++	 *
++	 * https://www.ti.com/lit/er/sprz455c/sprz455c.pdf
++	 */
++	if (workaround_needed) {
++		res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
++		fuse_base = devm_ioremap_resource(dev, res);
++		if (IS_ERR(fuse_base))
++			return PTR_ERR(fuse_base);
++
++		if ((readl(fuse_base) & 0xc0000000) == 0xc0000000)
++			workaround_needed = false;
++	}
++
++	dev_dbg(bgp->dev, "Work around %sneeded\n",
++		workaround_needed ? "" : "not ");
++
+ 	pm_runtime_enable(dev);
+ 	ret = pm_runtime_get_sync(dev);
+ 	if (ret < 0) {
+@@ -427,13 +444,6 @@ static int k3_j72xx_bandgap_probe(struct platform_device *pdev)
+ 		goto err_free_ref_table;
+ 	}
+ 
+-	/* Workaround not needed if bit30/bit31 is set even for J721e */
+-	if (workaround_needed && (readl(fuse_base + 0x0) & 0xc0000000) == 0xc0000000)
+-		workaround_needed = false;
+-
+-	dev_dbg(bgp->dev, "Work around %sneeded\n",
+-		workaround_needed ? "" : "not ");
+-
+ 	if (!workaround_needed)
+ 		init_table(5, ref_table, golden_factors);
+ 	else
+-- 
+cgit 
+
+
+From effe8db0a421480fc4dad0c7bf380b8e245cbb8c Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:56 -0500
+Subject: dt-bindings: thermal: k3-j72xx: elaborate on binding description
+
+Elaborate on the function of this device node as well as some of the
+properties this node uses.
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221031232702.10339-6-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ .../devicetree/bindings/thermal/ti,j72xx-thermal.yaml | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml b/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
+index c74f124ebfc00..3bb870a26872f 100644
+--- a/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
+@@ -9,6 +9,19 @@ title: Texas Instruments J72XX VTM (DTS) binding
+ maintainers:
+   - Keerthy <j-keerthy@ti.com>
+ 
++description: |
++  The TI K3 family of SoCs typically have a Voltage & Thermal
++  Management (VTM) device to control up to 8 temperature diode
++  sensors to measure silicon junction temperatures from different
++  hotspots of the chip as well as provide temperature, interrupt
++  and alerting information.
++
++  The following polynomial equation can then be used to convert
++  value returned by this device into a temperature in Celsius
++
++  Temp(C) = (-9.2627e-12) * x^4 + (6.0373e-08) * x^3 + \
++            (-1.7058e-04) * x^2 + (3.2512e-01) * x   + (-4.9003e+01)
++
+ properties:
+   compatible:
+     enum:
+@@ -19,7 +32,11 @@ properties:
+     items:
+       - description: VTM cfg1 register space
+       - description: VTM cfg2 register space
+-      - description: VTM efuse register space
++      - description: |
++          A software trimming method must be applied to some Jacinto
++          devices to function properly. This eFuse region provides
++          the information needed for these SoCs to report
++          temperatures accurately.
+ 
+   power-domains:
+     maxItems: 1
+-- 
+cgit 
+
+
+From c4026d3e2578291016703cd75f3a6f786f60cd80 Mon Sep 17 00:00:00 2001
+From: Bryan Brattlof <bb@ti.com>
+Date: Mon, 31 Oct 2022 18:26:57 -0500
+Subject: dt-bindings: thermal: k3-j72xx: conditionally require efuse reg range
+
+Only some of TI's J721E SoCs will need a eFuse register range mapped to
+determine if they're affected by TI's i2128 erratum. All other SoC will
+not need this eFuse range to function properly
+
+Update the bindings for the k3_j72xx_bandgap thermal driver so other
+devices will only need two register ranges
+
+Signed-off-by: Bryan Brattlof <bb@ti.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221031232702.10339-7-bb@ti.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ .../devicetree/bindings/thermal/ti,j72xx-thermal.yaml    | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml b/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
+index 3bb870a26872f..0509c9cec224d 100644
+--- a/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/ti,j72xx-thermal.yaml
+@@ -37,6 +37,7 @@ properties:
+           devices to function properly. This eFuse region provides
+           the information needed for these SoCs to report
+           temperatures accurately.
++    minItems: 2
+ 
+   power-domains:
+     maxItems: 1
+@@ -44,6 +45,21 @@ properties:
+   "#thermal-sensor-cells":
+     const: 1
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: ti,j721e-vtm
++    then:
++      properties:
++        reg:
++          minItems: 3
++    else:
++      properties:
++        reg:
++          maxItems: 2
++
+ required:
+   - compatible
+   - reg
+-- 
+cgit 
+
+
+From bf438ed026199ff0182408d8592b6c11382d1a51 Mon Sep 17 00:00:00 2001
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Date: Tue, 15 Nov 2022 12:16:29 +0000
+Subject: dt-bindings: thermal: rzg2l-thermal: Document RZ/Five SoC
+
+The TSU block on the RZ/Five SoC is identical to one found on the RZ/G2UL
+SoC. "renesas,r9a07g043-tsu" compatible string will be used on the
+RZ/Five SoC so to make this clear, update the comment to include RZ/Five
+SoC.
+
+No driver changes are required as generic compatible string
+"renesas,rzg2l-tsu" will be used as a fallback on RZ/Five SoC.
+
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Acked-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Link: https://lore.kernel.org/r/20221115121629.1181667-1-prabhakar.mahadev-lad.rj@bp.renesas.com
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ Documentation/devicetree/bindings/thermal/rzg2l-thermal.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rzg2l-thermal.yaml b/Documentation/devicetree/bindings/thermal/rzg2l-thermal.yaml
+index 1d83733978481..03f4b926e53c9 100644
+--- a/Documentation/devicetree/bindings/thermal/rzg2l-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/rzg2l-thermal.yaml
+@@ -17,7 +17,7 @@ properties:
+   compatible:
+     items:
+       - enum:
+-          - renesas,r9a07g043-tsu # RZ/G2UL
++          - renesas,r9a07g043-tsu # RZ/G2UL and RZ/Five
+           - renesas,r9a07g044-tsu # RZ/G2{L,LC}
+           - renesas,r9a07g054-tsu # RZ/V2L
+       - const: renesas,rzg2l-tsu
+-- 
+cgit 
+
+
+From 33dc955c5a2795f17ff81751563836d498ac794f Mon Sep 17 00:00:00 2001
+From: Minghao Chi <chi.minghao@zte.com.cn>
+Date: Thu, 17 Nov 2022 14:09:52 +0800
+Subject: thermal/drivers/st: Use devm_platform_get_and_ioremap_resource()
+
+Convert platform_get_resource(), devm_ioremap_resource() to a single
+call to devm_platform_get_and_ioremap_resource(), as this is exactly
+what this function does.
+
+Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Link: https://lore.kernel.org/r/202211171409524332954@zte.com.cn
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/st/stm_thermal.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/thermal/st/stm_thermal.c b/drivers/thermal/st/stm_thermal.c
+index 78feb802a87d2..e7834ccc7976b 100644
+--- a/drivers/thermal/st/stm_thermal.c
++++ b/drivers/thermal/st/stm_thermal.c
+@@ -488,7 +488,6 @@ MODULE_DEVICE_TABLE(of, stm_thermal_of_match);
+ static int stm_thermal_probe(struct platform_device *pdev)
+ {
+ 	struct stm_thermal_sensor *sensor;
+-	struct resource *res;
+ 	void __iomem *base;
+ 	int ret;
+ 
+@@ -506,8 +505,7 @@ static int stm_thermal_probe(struct platform_device *pdev)
+ 
+ 	sensor->dev = &pdev->dev;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	base = devm_ioremap_resource(&pdev->dev, res);
++	base = devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
+ 	if (IS_ERR(base))
+ 		return PTR_ERR(base);
+ 
+-- 
+cgit 
+
+
+From 4a9f20112c22cdcd6b81fafb18534a2a5a629a14 Mon Sep 17 00:00:00 2001
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Date: Wed, 16 Nov 2022 11:09:50 +0100
+Subject: dt-bindings: thermal: qcom-tsens: Add compatible for sm8550
+
+The Qualcomm SM8550 platform has three instances of the tsens block,
+add a compatible for these instances.
+
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Amit Kucheria <amitk@kernel.org>
+Link: https://lore.kernel.org/r/20221114-narmstrong-sm8550-upstream-tsens-v1-0-0e169822830f@linaro.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ Documentation/devicetree/bindings/thermal/qcom-tsens.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+index 5bcfddc877d36..7e04804b6e80b 100644
+--- a/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
++++ b/Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
+@@ -58,6 +58,7 @@ properties:
+               - qcom,sm8250-tsens
+               - qcom,sm8350-tsens
+               - qcom,sm8450-tsens
++              - qcom,sm8550-tsens
+           - const: qcom,tsens-v2
+ 
+       - description: v2 of TSENS with combined interrupt
+-- 
+cgit 
+
+
+From 46a891e45be97c6781ac34f5ec777d69370e252b Mon Sep 17 00:00:00 2001
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+Date: Wed, 16 Mar 2022 11:03:22 -0700
+Subject: thermal/drivers/qcom/lmh: Fix irq handler return value
+
+After enough invocations the LMh irq is eventually reported as bad, because the
+handler doesn't return IRQ_HANDLED, fix this.
+
+Fixes: 53bca371cdf7 ("thermal/drivers/qcom: Add support for LMh driver")
+Reported-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Link: https://lore.kernel.org/r/20220316180322.88132-1-bjorn.andersson@linaro.org
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/qcom/lmh.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/thermal/qcom/lmh.c b/drivers/thermal/qcom/lmh.c
+index d3d9b9fa49e81..4122a51e98741 100644
+--- a/drivers/thermal/qcom/lmh.c
++++ b/drivers/thermal/qcom/lmh.c
+@@ -45,7 +45,7 @@ static irqreturn_t lmh_handle_irq(int hw_irq, void *data)
+ 	if (irq)
+ 		generic_handle_irq(irq);
+ 
+-	return 0;
++	return IRQ_HANDLED;
+ }
+ 
+ static void lmh_enable_interrupt(struct irq_data *d)
+-- 
+cgit 
+
+
+From 5011a110295d25418f5918a6af7bfcdb00dd4e34 Mon Sep 17 00:00:00 2001
+From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Date: Mon, 12 Dec 2022 23:02:17 +0100
+Subject: thermal/drivers/imx_sc_thermal: Drop empty platform remove function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A remove callback just returning 0 is equivalent to no remove callback
+at all. So drop the useless function.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Link: https://lore.kernel.org/r/20221212220217.3777176-1-u.kleine-koenig@pengutronix.de
+Signed-off-by: Daniel Lezcano <daniel.lezcano@kernel.org>
+---
+ drivers/thermal/imx_sc_thermal.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/thermal/imx_sc_thermal.c b/drivers/thermal/imx_sc_thermal.c
+index 5d92b70a5d53a..4df925e3a80bd 100644
+--- a/drivers/thermal/imx_sc_thermal.c
++++ b/drivers/thermal/imx_sc_thermal.c
+@@ -127,11 +127,6 @@ static int imx_sc_thermal_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static int imx_sc_thermal_remove(struct platform_device *pdev)
+-{
+-	return 0;
+-}
+-
+ static int imx_sc_sensors[] = { IMX_SC_R_SYSTEM, IMX_SC_R_PMIC_0, -1 };
+ 
+ static const struct of_device_id imx_sc_thermal_table[] = {
+@@ -142,7 +137,6 @@ MODULE_DEVICE_TABLE(of, imx_sc_thermal_table);
+ 
+ static struct platform_driver imx_sc_thermal_driver = {
+ 		.probe = imx_sc_thermal_probe,
+-		.remove	= imx_sc_thermal_remove,
+ 		.driver = {
+ 			.name = "imx-sc-thermal",
+ 			.of_match_table = imx_sc_thermal_table,
+-- 
+cgit 
+

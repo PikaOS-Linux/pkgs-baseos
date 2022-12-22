@@ -1,0 +1,47 @@
+.NOTPARALLEL:
+binary-arch: binary-arch_amd64
+binary-arch_amd64: binary-arch_amd64_none binary-arch_amd64_real
+binary-arch_amd64_none: binary-arch_amd64_none_real binary-arch_amd64_none_xanmod-amd64
+binary-arch_amd64_none_real:
+binary-arch_amd64_none_xanmod-amd64: binary-arch_amd64_none_xanmod-amd64_real
+binary-arch_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real binary-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+binary-arch_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real binary-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+binary-arch_amd64_real:
+binary-indep:: binary-indep_none setup
+binary-indep::
+	$(MAKE) -f debian/rules.real binary-indep ABINAME='6.1.0-1-x64v2' ALL_FEATURESETS='none' ALL_TRIPLETS='amd64_none_xanmod-amd64 amd64_none_xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+binary-indep_none: binary-indep_none_real
+binary-indep_none_real:
+build-arch: build-arch_amd64
+build-arch_amd64: build-arch_amd64_none build-arch_amd64_real
+build-arch_amd64_none: build-arch_amd64_none_real build-arch_amd64_none_xanmod-amd64
+build-arch_amd64_none_real:
+build-arch_amd64_none_xanmod-amd64: build-arch_amd64_none_xanmod-amd64_real
+build-arch_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real build-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+build-arch_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real build-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+build-arch_amd64_real:
+build-indep:: build-indep_none
+build-indep::
+	$(MAKE) -f debian/rules.real build-indep ABINAME='6.1.0-1-x64v2' ALL_FEATURESETS='none' ALL_TRIPLETS='amd64_none_xanmod-amd64 amd64_none_xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+build-indep_none: build-indep_none_real
+build-indep_none_real:
+setup: setup_amd64 setup_none
+setup_amd64: setup_amd64_none setup_amd64_real
+setup_amd64_none: setup_amd64_none_real setup_amd64_none_xanmod-amd64
+setup_amd64_none_real:
+setup_amd64_none_xanmod-amd64: setup_amd64_none_xanmod-amd64_real
+setup_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real setup-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+setup_amd64_none_xanmod-amd64_real::
+	$(MAKE) -f debian/rules.real setup-arch-flavour ABINAME='6.1.0-1-x64v2' ARCH='amd64' COMPILER='gcc' FEATURESET='none' FLAVOUR='xanmod-amd64' IMAGE_FILE='arch/x86/boot/bzImage' IMAGE_INSTALL_STEM='vmlinuz' KCONFIG='debian/config/config debian/config/kernelarch-x86/config debian/config/kernelarch-x86/config-arch-64' KERNEL_ARCH='x86' LOCALVERSION='-xanmod-amd64' LOCALVERSION_HEADERS='' LOCALVERSION_IMAGE='-xanmod-amd64' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'
+setup_amd64_real:
+setup_none: setup_none_real
+setup_none_real:
+source: source_none
+source_none: source_none_real
+source_none_real::
+	$(MAKE) -f debian/rules.real source-featureset ABINAME='6.1.0-1-x64v2' FEATURESET='none' SOURCEVERSION='6.1-99pika1' UPSTREAMVERSION='6.1' VERSION='6.1'

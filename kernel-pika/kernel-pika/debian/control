@@ -9,7 +9,7 @@ Standards-Version: 4.6.1
 Package: kernel-pika
 Section: kernel
 Architecture: amd64
-Depends: ${misc:Depends}, linux-image-yellowbirb-amd64, linux-headers-yellowbirb-amd64, kernel-pika-config
+Depends: ${misc:Depends}, linux-image-xanmod-amd64, linux-headers-xanmod-amd64, kernel-pika-config
 Description: metapackage for installing PikaOS kernel
 
 
@@ -18,3 +18,6 @@ Section: kernel
 Architecture: amd64
 Depends: ${misc:Depends}
 Description: settings for the PikaOS kernel
+Conflicts: linux-cosmo-config
+Replaces: linux-cosmo-config
+Provides: linux-cosmo-config
