@@ -22,7 +22,11 @@ monospace-font-name = 'Monospace 11'
 document-font-name = 'Sans 11'
 font-name = 'Cantarell 11'
 enable-animations = true
+font-antialiasing ='rgba'
+font-hinting = 'full'
 
 [org.gnome.shell]
 favorite-apps = ['pika-calamares.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
 
+[org.gnome.desktop.peripherals.mouse]
+accel-profile = 'flat'
