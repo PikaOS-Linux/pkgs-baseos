@@ -1,0 +1,8 @@
+ dpkg-buildpackage -us -uc -ui -S -sd -d
+dpkg-buildpackage: info: source package gnome-shell-launch-new-instance
+dpkg-buildpackage: info: source version 43.0.1-99pika1
+dpkg-buildpackage: info: source distribution kinetic
+dpkg-buildpackage: info: source changed by Ward Nakchbandi <hotrod.master@hotmail.com>
+ dpkg-source --before-build .
+dpkg-source: error: source package has two conflicting values - gnome-shell-extension-launch-new-instance and gnome-shell-launch-new-instance
+dpkg-buildpackage: error: dpkg-source --before-build . subprocess returned exit status 25

@@ -1,0 +1,44 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Sat, 01 Oct 2022 14:50:00 +0200
+Source: gnome-shell-extension-launch-new-instance
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 43.0.1-99pika1
+Distribution: kinetic
+Urgency: medium
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Changed-By: Ward Nakchbandi <hotrod.master@hotmail.com>
+Changes:
+ gnome-shell-extension-launch-new-instance (43.0.1-99pika1) kinetic; urgency=medium
+ .
+   * Initial Creation
+Checksums-Sha1:
+ e412e563c99027c17a2a1ad379e989c592d4d7e7 1530 gnome-shell-extension-launch-new-instance_43.0.1-99pika1.dsc
+ 5d078985c39266f8582ad624add686797d3f299f 1448 gnome-shell-extension-launch-new-instance_43.0.1-99pika1.tar.xz
+ 208f9061a1e32c338c69fa68bf1ade6875770c8a 37808 gnome-shell-extension-launch-new-instance_43.0.1-99pika1_source.buildinfo
+Checksums-Sha256:
+ 21183afe69ba30d1c01dc99495c4667a455bfe83acf2648447a324f7179b4980 1530 gnome-shell-extension-launch-new-instance_43.0.1-99pika1.dsc
+ af8e76cbacaeb12b4d83509650f078fe73f179d1a2e68aff98ba39c26973cbd6 1448 gnome-shell-extension-launch-new-instance_43.0.1-99pika1.tar.xz
+ bc33d2595a7245695cbf8236080dd247a5f9b73a18bdd345669234d9ef664195 37808 gnome-shell-extension-launch-new-instance_43.0.1-99pika1_source.buildinfo
+Files:
+ a1e2fd6191f0f1029da36d98d7098c63 1530 gnome optional gnome-shell-extension-launch-new-instance_43.0.1-99pika1.dsc
+ 958c2825bee4f58d7770d54999fe6349 1448 gnome optional gnome-shell-extension-launch-new-instance_43.0.1-99pika1.tar.xz
+ 7d513d9cbbbeb5b01ef4e8504006179b 37808 gnome optional gnome-shell-extension-launch-new-instance_43.0.1-99pika1_source.buildinfo
+
+-----BEGIN PGP SIGNATURE-----
+
+iQHOBAEBCgA4FiEENrUrA60f9xwTTeWmNgCHxbUOsxsFAmOlp74aHGhvdHJvZC5t
+YXN0ZXJAaG90bWFpbC5jb20ACgkQNgCHxbUOsxtdwgv9HXpxmltniXb/pxD9o5RK
+Qb8hOh9fVnbNlG6LO6VUQMBu97yOySfRMkgoOkpk32kDirIdj7GZtgm1m4ulJ+Ag
+3i5C5fs6p3wTLq9a10LQUZhP+suoTwDWjiRWNKDd9aRJVf1vWujSmGcQeLg7KYjG
+3HmLgg14iZMcxWD90i0WHaPxFhrYwvT9NRjRpDPPrs2AH8DrwcbWv7gqOENsqU/A
+fJVIieJ2G9pVPdW4iSNf6/29zmQ36Ghn6IXcArIzZTFABKYXewI+V0hRUVFgkPLf
+uun+QxVYLD0VvuG4Sa3IBVMrivh3b00JRaMX0q3sGy3+CIdrOTdKTEaCGkx3vVIz
+m8jARlofG1GJYK5l9PXI/KQbkxZsRDI3rRws8W5T0nAnXu6W4/h5AuvfjGc5VHnd
+Se4hnNTedW4d7pGdD4qY3oAOE6mEjY0dovFK//qGZ04/gZEbJh1P+t8CGauVdlhL
+zZ//xFtGDarCGJ2NT5GCpg/8SKu8bKWhvW66Ku9cc2pO
+=fpXR
+-----END PGP SIGNATURE-----

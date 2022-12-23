@@ -1,0 +1,17 @@
+Source: gnome-shell-extension-launch-new-instance
+Section: gnome
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper (>= 10),
+               dh-translations,
+               libglib2.0-bin,
+Standards-Version: 4.1.1
+
+Package: gnome-shell-extension-launch-new-instance
+Architecture: all
+Depends: gnome-shell (<< 44),
+         gnome-shell (>= 40),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: Always launch a new instance when clicking in the dash or the application view.
+	This extension is part of Classic Mode and is officially supported by GNOME. Please do not report bugs using the form below, use GNOME's GitLab instance instead.
