@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@ --with translations
+
+override_dh_install:
+	dh_install
+
+override_dh_translations:
+	make ./po/dashtodock.pot
+	dh_translations
+
+override_dh_auto_test:
+	env ESLINT_TAP=1 dh_auto_test
