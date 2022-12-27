@@ -75,7 +75,8 @@ Depends:
     pipewire-pulse,
     pulseaudio-utils,
     wireplumber,
-Recommends: plasma-nm (>= 4:5.26.4)
+Recommends: 
+    plasma-nm (>= 4:5.26.4),
 # Applications
     firefox,
     gucharmap,
