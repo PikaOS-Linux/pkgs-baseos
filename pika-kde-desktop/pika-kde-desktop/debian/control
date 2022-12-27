@@ -38,13 +38,14 @@ Depends:
     polkit-kde-agent-1 (>= 4:5.26.4), 
     pika-kde-settings, 
     pika-sources, 
+    pika-package-manager,
 # Hardware
     pika-amdgpu-core,
     alsa-base,
     bluez,
     bluez-cups,
     cups-bsd,
-    cups,
+    cups,pika
     fwupd,
     fwupdate,
     gstreamer1.0-alsa,
@@ -90,6 +91,7 @@ Recommends:
     supergfxctl
 Suggests: skanlite
 Section: metapackages
+Conflicts: plasma-discover
 Priority: optional
 Homepage: https://www.kde.org
 Description:  PikaOS Minimal KDE Desktop Metapackage
