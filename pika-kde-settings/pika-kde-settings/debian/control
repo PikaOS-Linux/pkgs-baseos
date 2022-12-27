@@ -1,0 +1,15 @@
+Source: pika-kde-settings
+Section: metapackages
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Standards-Version: 4.6.1
+Build-Depends: debhelper-compat (= 13)
+Rules-Requires-Root: no
+
+Package: pika-kde-settings
+Source: meta-kde
+Architecture: amd64
+Section: metapackages
+Priority: optional
+Homepage: https://www.kde.org
+Description:  PikaOS KDE Default Config
