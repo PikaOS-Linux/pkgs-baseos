@@ -45,7 +45,7 @@ Depends:
     bluez,
     bluez-cups,
     cups-bsd,
-    cups,pika
+    cups,
     fwupd,
     fwupdate,
     gstreamer1.0-alsa,
