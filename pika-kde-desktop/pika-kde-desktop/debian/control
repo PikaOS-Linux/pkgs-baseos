@@ -8,10 +8,7 @@ Rules-Requires-Root: no
 
 Package: pika-kde-desktop-minimal
 Source: meta-kde
-Version: 5.26
 Architecture: amd64
-Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
-Installed-Size: 11
 Depends: 
 # KDE Base
     kwin-x11 (>= 4:5.26.4),
