@@ -17,7 +17,6 @@ Depends:
     kdegraphics-thumbnailers,
     svgpart,
     plasma-pa,
-    ffmpegthumbs,
     kdenetwork-filesharing,
     kde-zeroconf,
     dolphin-plugins,
