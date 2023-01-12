@@ -1,0 +1,6 @@
+X-Repolib-Name: Kubuntu KDE Backports Sources
+Enabled: yes
+Types: deb deb-src
+URIs: https://ppa.launchpadcontent.net/kubuntu-ppa/backports/ubuntu
+Suites: kinetic
+Components: main
