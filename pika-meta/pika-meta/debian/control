@@ -14,6 +14,7 @@ Depends: ${misc:Depends},
 	mintupdate, 
 	python-apt-common,
 	gdebi,
+	apx-subsystem-settings,
 	repoman
 Description: A Meta package to install pika's collection of package management software.
 
@@ -285,16 +286,31 @@ Depends: ${misc:Depends},
 	gstreamer1.0-plugins-ugly:i386,
 	intel-media-va-driver-non-free:i386,
 	gstreamer1.0-vaapi,
+	webp-pixbuf-loader,
+	heif-gdk-pixbuf,
+	heif-thumbnailer
+Recommends:
+	gnome-sushi	
 Description: A Meta package to install pika's collection of codec software.
 
 Package: pika-rocm-meta
 Architecture: all
 Depends: ${misc:Depends}, 
 	pika-amdgpu-core,
+	comgr,
+	hip-runtime-amd,
+	hsa-rocr,
+	openmp-extras-runtime,
 	rocm-core,
-	rocm-opencl-runtime,
+	rocm-device-libs,
 	rocm-hip-runtime,
-	rocm-hip-runtime-dev
+	rocm-hip-runtime-dev,
+	rocm-language-runtime,
+	rocm-llvm,
+	rocm-ocl-icd,
+	rocm-opencl,
+	rocm-opencl-runtime,
+	rocminfo,	
 Description: A Meta package to install pika's collection of ROCm software.
 
 Package: pika-office-meta

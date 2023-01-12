@@ -1,0 +1,1 @@
+SUBSYSTEM=="kfd", KERNEL=="kfd", TAG+="uaccess", GROUP="video"

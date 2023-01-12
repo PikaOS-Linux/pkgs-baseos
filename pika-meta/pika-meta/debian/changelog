@@ -1,3 +1,9 @@
+pika-meta (10:1.0-99pika6) kinetic; urgency=medium
+
+  * Update ROCm meta & add apx to package manager, a few additions to codec meta
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
 pika-meta (10:1.0-99pika5) kinetic; urgency=medium
 
   * Add flathub post install
