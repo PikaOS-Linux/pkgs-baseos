@@ -7,35 +7,30 @@ Build-Depends: debhelper-compat (= 13)
 Rules-Requires-Root: no
 
 Package: pika-kde-desktop-minimal
-Source: meta-kde
 Architecture: amd64
 Depends: 
 # KDE Base
-    kwin-x11 (>= 4:5.26.4),
-    sddm (>= 0.11),
-    xserver-xorg,
-    kdeconnect,
-    plasma-workspace-wayland,
+    kde-plasma-desktop,
+    kamera,
+    kgamma5,
+    kdegraphics-mobipocket,
+    kdegraphics-thumbnailers,
+    svgpart,
+    plasma-pa,
+    kdenetwork-filesharing,
+    kde-zeroconf,
+    dolphin-plugins,
+    kwalletmanager,
+    print-manager,
 # Applications
-    akregator (>= 4:22.08.3), 
-    ark (>= 4:22.04.3), 
-    mpv, 
-    gwenview (>= 4:22.04.3), 
-    kate (>= 4:22.04.3), 
-    kcalc (>= 4:22.04.3), 
-    kde-spectacle (>= 22.04.3), 
-    khelpcenter (>= 4:22.04.3), 
-    kmail (>= 4:22.08.3), 
-    knotes (>= 4:22.08.3), 
-    korganizer (>= 4:22.08.3), 
-    kwalletmanager (>= 4:22.04.3), 
-    okular (>= 4:22.04.3), 
-    plasma-dataengines-addons (>= 4:5.26.4), 
-    plasma-pa (>= 5.26.4), 
-    plasma-runners-addons (>= 4:5.26.4), 
-    plasma-wallpapers-addons (>= 4:5.26.4), 
-    plasma-widgets-addons (>= 4:5.26.4), 
-    polkit-kde-agent-1 (>= 4:5.26.4), 
+    ark,
+    filelight,
+    kgpg,
+    gwenview,
+    kde-spectacle,
+    okular,
+    mpv,
+    kcalc, 
     pika-kde-settings, 
     pika-sources, 
     pika-package-manager,
@@ -91,7 +86,7 @@ Recommends:
     supergfxctl
 Suggests: skanlite
 Section: metapackages
-Conflicts: plasma-discover
+Conflicts: plasma-discover, pika-gnome-layouts
 Priority: optional
 Homepage: https://www.kde.org
 Description:  PikaOS Minimal KDE Desktop Metapackage
