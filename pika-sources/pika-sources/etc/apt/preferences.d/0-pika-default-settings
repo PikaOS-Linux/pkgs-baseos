@@ -1,11 +1,16 @@
 # Base OS Priority Override
 Package: *
-Pin: release o=LP-PPA-cosmohq-baseos-test
+Pin: release o=LP-PPA-pikaos-baseos
 Pin-Priority: 1000
 
 # Multimedia Priority Override
 Package: *
-Pin: release o=LP-PPA-cosmohq-multimedia-test
+Pin: release o=LP-PPA-pikaos-multimedia
+Pin-Priority: 1000
+
+# Mesa Priority Override
+Package: *
+Pin: release o=LP-PPA-kisak-kisak-mesa
 Pin-Priority: 1000
 
 # Firefox Priority Override

@@ -1,3 +1,9 @@
+pika-sources (3.0-99pika12) kinetic; urgency=low
+
+  * Fix PPA priorities typo
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-sources (3.0-99pika11) kinetic; urgency=low
 
   * Switch Steam Repos fix to systemd service
