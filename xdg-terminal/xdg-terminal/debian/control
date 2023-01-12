@@ -1,0 +1,11 @@
+Source: xdg-terminal
+Section: admin
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+
+Package: xdg-terminal
+Architecture: all
+Depends: xdg-utils
+Description: Utility script to open the registered terminal emulator.
