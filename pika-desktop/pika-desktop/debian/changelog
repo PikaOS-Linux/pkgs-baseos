@@ -1,3 +1,9 @@
+pika-desktop (3.0.0) kinetic; urgency=medium
+
+  * Adapt to BaseOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
 pika-desktop (2.0.0) kinetic; urgency=medium
 
   * Replace Adwaita with papirus
