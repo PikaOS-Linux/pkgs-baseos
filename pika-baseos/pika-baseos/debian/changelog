@@ -1,0 +1,35 @@
+pika-meta (10:1.0-99pika6) kinetic; urgency=medium
+
+  * Update ROCm meta & add apx to package manager, a few additions to codec meta
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+pika-meta (10:1.0-99pika5) kinetic; urgency=medium
+
+  * Add flathub post install
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
+pika-meta (10:1.0-99pika4) kinetic; urgency=medium
+
+  * Replace intel-va driver with non-free version
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
+pika-meta (10:1.0-99pika3) kinetic; urgency=medium
+
+  * Add more codecs
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
+pika-meta (10:1.0-99pika2) kinetic; urgency=medium
+
+  * Add office meta
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300
+
+pika-meta (10:1.0-99pika1) kinetic; urgency=medium
+
+  * First Relase
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Fri, 09 Oct 2022 21:38:00 +0300

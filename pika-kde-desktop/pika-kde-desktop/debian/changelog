@@ -1,3 +1,9 @@
+pika-kde-desktop (1.0.4) kinetic; urgency=medium
+
+  * Add fixes and adapt to pika-baseos
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
 pika-kde-desktop (1.0.3) kinetic; urgency=medium
 
   * Add the missing pika-package-manager
