@@ -92,7 +92,7 @@ Description:  PikaOS Minimal KDE Desktop Metapackage
     kdialog,
     kio-fuse,
     kaccounts-integration,
-    supergfxctl-plasmoid,
+    plasma-supergfxctl,
     plasma-browser-integration,
     plasma-calendar-addons,
     plasma-dataengines-addons,
