@@ -1,3 +1,7 @@
+#########################
+# PikaOS Gnome settings #
+#########################
+
 [org.gnome.desktop.background]
 picture-uri = 'file:///usr/share/backgrounds/gnome/adwaita-l.webp'
 picture-uri-dark = 'file:///usr/share/backgrounds/gnome/adwaita-d.webp'
@@ -26,7 +30,13 @@ font-antialiasing ='rgba'
 font-hinting = 'full'
 
 [org.gnome.shell]
-favorite-apps = ['pika-calamares.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
+favorite-apps = ['pika-installer.desktop', 'pika-welcome-welcome.desktop', 'firefox.desktop', 'repoman.desktop', 'mintinstall.desktop', 'mintupdate.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'gnome-system-monitor.desktop']
 
 [org.gnome.desktop.peripherals.mouse]
 accel-profile = 'flat'
+
+[org.gnome.shell]
+enabled-extensions = ['legacyschemeautoswitcher@joshimukul29.gmail.com', 'supergfxctl-gex@asus-linux.org']
+
+[org.gnome.mutter]
+check-alive-timeout = 30000
