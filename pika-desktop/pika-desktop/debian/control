@@ -51,7 +51,7 @@ Depends: ${misc:Depends},
     language-selector-gnome,
     gnome-remote-desktop,
     gnome-shell-extension-legacy-gtk3-theme-scheme-auto-switcher,
-    gnome-shell-extension-legacy-supergfxctl-gex,
+    gnome-shell-extension-supergfxctl-gex,
     nautilus-share,
 # Applications
     gnome-control-center,
