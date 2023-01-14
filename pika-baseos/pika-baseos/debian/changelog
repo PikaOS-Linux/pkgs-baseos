@@ -1,3 +1,10 @@
+pika-baseos (1.0.2) kinetic; urgency=medium
+
+  * Add supergfxctl profile.d script
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
 pika-baseos (1.0.1) kinetic; urgency=medium
 
   * Add profile.d scripts
