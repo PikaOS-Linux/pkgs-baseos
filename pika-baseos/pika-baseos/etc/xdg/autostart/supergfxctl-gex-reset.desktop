@@ -1,7 +1,0 @@
-[Desktop Entry]
-Icon=device_pci
-Name=Reset SuperGFXCTL-GEX
-Exec=/etc/supergfxctl-gex-reset
-Terminal=false
-Type=Application
-NoDisplay=true
