@@ -81,7 +81,6 @@ Depends: ${misc:Depends},
     hidpi-daemon,
 ## Power saving and laptops
     laptop-detect,
-    auto-cpufreq,
     supergfxctl,
     acpi,
     acpi-call-dkms,
@@ -135,5 +134,6 @@ Depends: ${misc:Depends},
     pulseaudio-utils,
     wireplumber,
     gstreamer1.0-alsa,
+Recommends: power-profiles-daemon
 Conflicts: pulseaudio, pipewire-media-session
 Description: The backbone of PikaOS

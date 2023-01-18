@@ -1,3 +1,9 @@
+pika-baseos (1.0.6) kinetic; urgency=medium
+
+  * remove auto-cpufreq
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
 pika-baseos (1.0.5) kinetic; urgency=medium
 
   * remove supergfxctl-gex-reset
