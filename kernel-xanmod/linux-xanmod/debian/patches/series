@@ -14,3 +14,5 @@ pika/0001-Allow-to-set-custom-USB-pollrate-for-specific-device.patch
 pika/0001-acpi-proc-idle-skip-dummy-wait.patch
 # xanmod Patches
 xanmod.patch
+# temp fix
+removefullcone.patch
