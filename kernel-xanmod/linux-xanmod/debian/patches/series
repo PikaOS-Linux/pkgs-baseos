@@ -2,7 +2,6 @@
 pika/0000-add-steam-deck-platform-driver.patch
 pika/amdgpu-si-cik-default.patch
 pika/vmd-m16-apsm.patch
-pika/linux-surface.patch
 pika/asus-linux.patch
 pika/acpi-pre_reqs.patch
 pika/set-ps4-bt-poll-rate-1000hz.patch
