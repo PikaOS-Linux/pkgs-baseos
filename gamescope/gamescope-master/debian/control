@@ -1,0 +1,56 @@
+Source: gamescope
+Section: games
+Priority: optional
+Maintainer: Debian Games Team <team+pkg-games@tracker.debian.org>
+Uploaders: Stephan Lachnit <stephanlachnit@debian.org>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ meson,
+ pkg-config,
+ libx11-dev,
+ libxdamage-dev,
+ libxcomposite-dev,
+ libxrender-dev,
+ libxext-dev,
+ libxfixes-dev,
+ libxxf86vm-dev,
+ libxtst-dev,
+ libxres-dev,
+ libdrm-dev,
+ libvulkan-dev,
+ libwayland-dev,
+ wayland-protocols,
+ libxkbcommon-dev,
+ libcap-dev,
+ libsdl2-dev,
+ libpipewire-0.3-dev,
+ libstb-dev,
+ libwlroots-dev,
+ libliftoff-dev,
+ glslang-tools,
+ cmake,
+ hwdata,
+ libopenvr-dev,
+Standards-Version: 4.6.1
+Homepage: https://github.com/Plagman/gamescope
+Vcs-Browser: https://salsa.debian.org/games-team/gamescope
+Vcs-Git: https://salsa.debian.org/games-team/gamescope.git
+
+Package: gamescope
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ xwayland,
+Suggests:
+ libcap2-bin,
+Description: Micro-compositor for game scaling
+ Gamescope wraps your games to give them scaling and fullscreen options. It
+ provides a Wayland compositor to your games, but gamescope runs under both
+ Wayland and X.org.
+ .
+ Your game sees a virtual display at the resolution you specified. You see a
+ scaled view in a window or fullscreen. This is useful when either the game or
+ your system do not permit running the game at native window/screen sizes. You
+ can also use integer scaling to keep your pixels sharp and pixelated.

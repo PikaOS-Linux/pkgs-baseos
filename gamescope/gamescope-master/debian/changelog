@@ -1,0 +1,11 @@
+gamescope (3.11.58.7bd30dd-99pika4) kinetic; urgency=medium
+
+  * Update to git to support HDR
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
+
+gamescope (3.11.47-1) kinetic; urgency=medium
+
+  * Initial Push to PPA
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
