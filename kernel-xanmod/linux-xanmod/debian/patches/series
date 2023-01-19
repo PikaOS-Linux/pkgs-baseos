@@ -14,5 +14,4 @@ pika/0001-drm-i915-quirks-disable-async-flipping-on-specific-d.patch
 pika/0001-Allow-to-set-custom-USB-pollrate-for-specific-device.patch
 pika/0001-acpi-proc-idle-skip-dummy-wait.patch
 # xanmod Patches
-##xanmod.patch (broken)
-tkg.patch
+xanmod.patch
