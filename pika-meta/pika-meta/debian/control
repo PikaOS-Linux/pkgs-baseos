@@ -14,8 +14,9 @@ Depends: ${misc:Depends},
 	mintupdate, 
 	python-apt-common,
 	gdebi,
-	repoman
-Recommends: apx-subsystem-settings
+	repoman,
+	pikman,
+	apx-subsystem-settings,
 Description: A Meta package to install pika's collection of package management software.
 
 Package: pika-gameutils-meta

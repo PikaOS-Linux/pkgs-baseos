@@ -1,6 +1,6 @@
 pika-meta (10:3.0-99pika1) kinetic; urgency=medium
 
-  * Move apx to recommends and add gamescope-session to game-utils
+  * add pikman to package manager and add gamescope-session to game-utils
 
  -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
 
