@@ -134,6 +134,6 @@ Depends: ${misc:Depends},
     pulseaudio-utils,
     wireplumber,
     gstreamer1.0-alsa,
-Recommends: power-profiles-daemon, steamdeck-jupiter-driver, custom-device-pollrates
+Recommends: power-profiles-daemon, custom-device-pollrates
 Conflicts: pulseaudio, pipewire-media-session
 Description: The backbone of PikaOS
