@@ -1,0 +1,12 @@
+Source: display-info
+Section: utils
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13), git, meson, pkg-config, build-essential, cmake, hwdata-dev
+Standards-Version: 4.6.1
+
+Package: libdisplay-info
+Architecture: amd64
+Depends: ${misc:Depends}
+Provides: libdisplay-info-dev
+Description: EDID and DisplayID library.

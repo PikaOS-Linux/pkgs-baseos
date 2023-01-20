@@ -1,0 +1,12 @@
+Source: vkroots
+Section: utils
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13), git, meson
+Standards-Version: 4.6.1
+
+Package: vkroots
+Architecture: amd64
+Depends: ${misc:Depends}
+Provides: vkroots-dev
+Description: A stupid simple method of making Vulkan layers, at home!

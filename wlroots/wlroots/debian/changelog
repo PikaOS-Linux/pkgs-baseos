@@ -1,0 +1,356 @@
+wlroots (0.16.1-99pika7) kinetic; urgency=medium
+
+  * upstream update
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Tue, 19 Jul 2022 13:11:34 +0000
+
+wlroots (0.15.1-3build1) kinetic; urgency=medium
+
+  * No-change rebuild against libavcodec59
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 19 Jul 2022 13:11:34 +0000
+
+wlroots (0.15.1-3) unstable; urgency=medium
+
+  * [01320b4] Backport upstream patch to fix build with ffmpeg 5.0
+    (Closes: #1004792)
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 24 Jun 2022 11:54:33 +0200
+
+wlroots (0.15.1-2) unstable; urgency=medium
+
+  * [d2f0630] xdg-activation: Deduplicate token creation code
+    Backport a (not yet merged) MR to fix a crash in the
+    xdg-activation code.
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 26 Mar 2022 19:34:50 +0100
+
+wlroots (0.15.1-1) unstable; urgency=medium
+
+  * Upload to unstable
+  * d/control: Fix typo (Closes: #984583)
+  * d/copyright: Fix source URL
+  * d/control: Fix homepage URL.
+    Project moved to gitlab (Closes: #1001154)
+  * New upstream version (Closes: #1005892)
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 25 Mar 2022 11:57:45 +0100
+
+wlroots (0.15.0-3) experimental; urgency=medium
+
+  * [f909925] d/control: Bump meson and wayland-protocol dependencies.
+    Adjust to what the project requires (Closes: #966176)
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 18 Mar 2022 15:11:32 +0100
+
+wlroots (0.15.0-2) experimental; urgency=medium
+
+  * [7c01dd7] Use libdrm 2.4.109.
+    This allows us to drop the reverted upstream change.
+  * [1784c6e] Use wayland 1.20.
+    This allows us to revert the reverted upstream change
+  * [f60b70a] Bump standards version
+  * [838be17] d/copyright: Drop unused pattern
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 14 Feb 2022 15:25:46 +0100
+
+wlroots (0.15.0-1) experimental; urgency=medium
+
+  * New upstream release
+  * [bb15cc9] d/control: Bump build-deps according to meson dependencies
+  * [bf804d6] Rediff patches
+  * [c551f31] d/rules: Enable all optional backends
+  * [1d55195] Adjust to soname bump
+  * Use headless backend in tests
+  * Revert several patches so we can build against libdrm and libwayland
+    currently in Debian.
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 17 Dec 2021 15:15:52 +0100
+
+wlroots (0.14.1-5) unstable; urgency=medium
+
+  * Upload to unstable
+  * [865f2f1] Drop patches backported form upstream
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 16 Dec 2021 09:39:07 +0100
+
+wlroots (0.14.1-4) experimental; urgency=medium
+
+  [ Birger Schacht ]
+  * [3fafe04] Add x11 backend build dependencies also to the -dev package
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 08 Nov 2021 18:53:18 +0100
+
+wlroots (0.14.1-3) experimental; urgency=medium
+
+  * [59c2af5] d/control: Add more dependencies for x11 backend.
+    This reenables the x11 backend
+  * [d1c7991] d/rules: Force x11 backend.
+    This makes sure it doesn't get disabled again due to lack of
+    dependencies
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 06 Nov 2021 11:42:15 +0100
+
+wlroots (0.14.1-2) experimental; urgency=medium
+
+  [ Birger Schacht ]
+  * [d512fe8] Enable XWayland again
+
+  [ Guido Günther ]
+  * [9f1d30d] d/control: Build-depend on libseat-dev
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 05 Nov 2021 21:37:46 +0100
+
+wlroots (0.14.1-1) experimental; urgency=medium
+
+  * New upstream version 0.14.1
+  * Bump soname to 9
+  * d/control: Build-depend on libseat-dev
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 27 Sep 2021 22:36:50 +0200
+
+wlroots (0.13.0-1) experimental; urgency=medium
+
+  * New upstream version 0.13.0
+  * Adust to soname change
+  * d/control: Bump libwayland-dev to 0.19
+  * autopkgtest: Adjust to API change
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 13 Apr 2021 11:02:16 +0200
+
+wlroots (0.12.0-3) unstable; urgency=medium
+
+  * [02be191] examples/dmabuf-capture: stop using av_init_packet
+    (Closes: #996500)
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 26 Oct 2021 10:13:01 +0200
+
+wlroots (0.12.0-2) unstable; urgency=medium
+
+  [ nicoo ]
+  * Team upload
+  * Kick off to unstable
+
+  [ Léo Andrès ]
+  * [2524851] libwlroots0: fix typo in description.
+
+ -- nicoo <nicoo@debian.org>  Sun, 14 Feb 2021 12:31:16 +0100
+
+wlroots (0.12.0-1) experimental; urgency=medium
+
+  * Upload to experimental
+  * [45e00a5] Drop patches. All applied upstream
+  * [ee0f2eb] Revert "layer-shell: error on 0 dimension without anchors"
+    Undo this until phosh has a fixed release.
+  * [6866955] d/gbp.conf: Use xz when generating tarballs
+  * [788b999] debian: Adjust to soname change
+  * [32602cb] d/control: Bump standards version
+  * [efa76a2] d/upstream/metadata: Add upstream bug tracker URLs
+  * [2ac8de7] d/rules: Enable all hardening opts
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 01 Jan 2021 15:29:35 +0100
+
+wlroots (0.11.0-3) unstable; urgency=medium
+
+  * [c95d2e9] output-management-v1: send complete head state on enable change.
+    Fixes a phosh crash when the compositor fails to send updated
+    state.
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 12 Oct 2020 12:40:11 +0200
+
+wlroots (0.11.0-2) unstable; urgency=medium
+
+  * Upload to unstable
+  * [0b2ae69] libwlroots-examples: Install more examples
+  * [da6f836] Build-depend on libav*-dev.
+    This allows to build the screencopy-dmabuf example
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 24 Jul 2020 10:22:21 +0200
+
+wlroots (0.11.0-1) experimental; urgency=medium
+
+  * Upload to experimental
+  * New upstream version 0.11.0
+    (Closes: #957935)
+  * Drop all patches - all are part of 0.11.0
+  * Adjust to soname change
+  * Update d/copyright
+  * Switch to dh 13
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 20 Jul 2020 13:42:36 +0200
+
+wlroots (0.10.1-2) unstable; urgency=medium
+
+  [ Vincent Bernat ]
+  * [4e52cb5] d/control: add build-dependencies to enable X11 backend
+    (Closes: #962748)
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 25 Jun 2020 13:51:18 +0200
+
+wlroots (0.10.1-1) unstable; urgency=medium
+
+  * New upstream version 0.10.1
+  * [e0d4333] Bump meson build-dep.
+    Thanks to Martin Michlmayr
+    (Closes: #954099)
+  * [2f4b173] Version build-depends according to meson.build.
+    This makes backporting simpler
+  * [6ef4e2d] Use Rules-Requires-Root
+  * [93ff8c3] Rediff patches
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 27 Mar 2020 09:23:06 +0100
+
+wlroots (0.10.0-3) unstable; urgency=medium
+
+  * [0cc2c1d] Backport wlr-output-power-management.
+    These are straight cherry-picks from upstream master
+
+ -- Guido Günther <agx@sigxcpu.org>  Sun, 01 Mar 2020 13:40:32 +0100
+
+wlroots (0.10.0-2) unstable; urgency=medium
+
+  [ Birger Schacht ]
+  * Add libx11-xcb-dev and libxcb-xinput-dev to Dependencies
+    of libwlroots-dev (Closes: #951109)
+
+ -- Birger Schacht <birger@rantanplan.org>  Sun, 16 Feb 2020 20:03:45 +0100
+
+wlroots (0.10.0-1) unstable; urgency=medium
+
+  [ Jonas Meurer ]
+  * [dfb8ec6] d/gbp.conf: set 'pristine-tar = True'
+
+  [ Guido Günther ]
+  * Upload to unstable (Closes: #947851)
+  * [4c3f687] Add watch file
+  * [88745ae] Switch to so version 5
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 27 Jan 2020 11:51:37 +0100
+
+wlroots (0.8.1-1) experimental; urgency=medium
+
+  * Bump shlibs version
+  * d/control: Remove trailing whitespace
+  * d/control: Remove trailing whitespace
+  * Update standards version to 4.4.1, no changes needed.
+  * Bump debhelper from old 10 to 12.
+  * Set debhelper-compat version in Build-Depends.
+  * Set upstream metadata fields: Repository, Repository-Browse.
+  * New upstream version 0.8.1
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 06 Dec 2019 12:37:11 +0100
+
+wlroots (0.7.0-2) experimental; urgency=medium
+
+  [ Birger Schacht ]
+  * [b6376e4] d/libwlroots3.shlibs: Bump version
+
+  [ Guido Günther ]
+  * [85d31e8] mark autopkgtest as superficial
+
+ -- Birger Schacht <birger@rantanplan.org>  Wed, 18 Sep 2019 12:25:24 +0200
+
+wlroots (0.7.0-1) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * New upstream version 0.7.0 (Closes: #936081)
+  * [a62850e] Update examples
+    rootston and screenshot got dropped, there's screencopy now
+
+  [ Birger Schacht ]
+  * [caf3a84] d/copyright: Update since files got dropped
+  * [be3aa96] d/control: add libpng-dev to build-depends (for
+    examples/screencopy.c)
+  * [f972935] d/control: Set maintainer to team address and move Guido to
+    uploaders
+  * [1f69b85] d/control: Bump Standards-Version: no changes required
+  * [ea9aae9] d/control: add myself to uploaders
+
+ -- Birger Schacht <birger@rantanplan.org>  Wed, 11 Sep 2019 21:38:51 +0200
+
+wlroots (0.6.0-1) experimental; urgency=medium
+
+  * New upstream version 0.6.0
+  * Adjust to soname bump
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 16 May 2019 17:25:26 +0200
+
+wlroots (0.5.0-2) experimental; urgency=medium
+
+  [ Birger Schacht ]
+  * [3fa04fe] Update copyright file
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 23 Apr 2019 09:46:18 +0200
+
+wlroots (0.5.0-1) experimental; urgency=medium
+
+  * New upstream version 0.5.0
+  * [0f1aaa4] Adjust to upstream soname bump
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 22 Mar 2019 13:27:29 +0100
+
+wlroots (0.4.1-1) experimental; urgency=medium
+
+  * New upstream version 0.4.1
+  * [109f084] Add shlibs file.  Upstream intends to bump so names on ABI
+    breaks. (Closes: #921884)
+  * [56e169d] Rename library package due to soname bump
+  * [1612b99] Bump standards version to 4.3.0
+  * [1230e30] d/copyright: Update since some code got dropped
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 01 Mar 2019 11:39:22 +0100
+
+wlroots (0.3-1) experimental; urgency=medium
+
+  * New upstream version 0.3
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 08 Feb 2019 14:37:15 +0100
+
+wlroots (0.2-1) experimental; urgency=medium
+
+  * New upstream release
+  * [bb72a5c] d/control: Add Vcs-* URLs
+  * [1850149] d/control: Switch Vcs-* URLs to swaywm-team
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 01 Dec 2018 17:56:04 +0100
+
+wlroots (0.0.0~git20181009-1) experimental; urgency=medium
+
+  * New upstream git snapshot
+  * [7a6de38] libwlroots-dev: Depend on required dev packages based on the pc
+    file.
+    Thanks to Charles-David <droper@analphabet.me>
+  * [de444f4] Add minimal autopkgtests.  This ensures we can properly include
+    and link against libwlroots.
+  * [7411028] Drop rpath patch.  Not needed anymore
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 01 Dec 2018 17:55:56 +0100
+
+wlroots (0.0.0~git20180524-1) experimental; urgency=medium
+
+  * New upstream git snapshot
+  * [7976cdb] Drop empty usr/bin
+  * [6279466] Drop debian/rules template comments
+  * [177604f] Update copyright information
+  * [1f7ee13] gbp.conf: Use upstream/latest for upstream sources
+  * [1f9b1a3] gbp.conf: Use id-length
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 24 May 2018 16:31:42 +0200
+
+wlroots (0.0.0~git20180223-1) experimental; urgency=medium
+
+  * New upstream snapshot
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 23 Feb 2018 10:19:02 +0100
+
+wlroots (0.0.0~git20180130-1) unstable; urgency=medium
+
+  * New upstream snapshot
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 23 Feb 2018 10:18:44 +0100
+
+wlroots (0.0.0~git20180126-1) unstable; urgency=medium
+
+  * Initial release (Closes: #888848)
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 26 Jan 2018 17:23:38 +0100

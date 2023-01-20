@@ -31,7 +31,14 @@ Build-Depends:
  glslang-tools,
  cmake,
  hwdata,
+ hwdata-dev,
  libopenvr-dev,
+ vkroots-dev,
+ libxmuu-dev,
+ libxmu-dev,
+ libdisplay-info-dev,
+ libjsoncpp-dev,
+ xwayland,
 Standards-Version: 4.6.1
 Homepage: https://github.com/Plagman/gamescope
 Vcs-Browser: https://salsa.debian.org/games-team/gamescope

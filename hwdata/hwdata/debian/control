@@ -1,0 +1,20 @@
+Source: hwdata
+Section: misc
+Priority: optional
+Maintainer: Pino Toscano <pino@debian.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+Rules-Requires-Root: no
+Homepage: https://github.com/vcrhonek/hwdata
+Vcs-Browser: https://salsa.debian.org/pino/hwdata
+Vcs-Git: https://salsa.debian.org/pino/hwdata.git
+
+Package: hwdata
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}, pci.ids
+Provides: hwdata-dev, usb.ids
+Description: hardware identification / configuration data
+ This package contains various hardware identification and configuration data,
+ such as the pci.ids database, or the XFree86/xorg Cards database.
+ It is needed for the kudzu hardware detection.

@@ -1,0 +1,106 @@
+Source: wlroots
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Sway and related packages team <team+swaywm@tracker.debian.org>
+Uploaders: Guido Günther <agx@sigxcpu.org>, Birger Schacht <birger@rantanplan.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ libavformat-dev,
+ libavcodec-dev,
+ libcap-dev,
+ libdrm-dev (>= 2.4.109),
+ libegl1-mesa-dev,
+ libgbm-dev (>= 17.1.0),
+ libgles2-mesa-dev,
+ libinput-dev (>= 1.9.0),
+ libpixman-1-dev,
+ libpng-dev,
+ libseat-dev,
+ libsystemd-dev,
+ libwayland-dev (>= 1.20),
+ libxcb1-dev,
+ libxcb-composite0-dev,
+ libxcb-dri3-dev,
+ libxcb-icccm4-dev,
+ libxcb-image0-dev,
+ libxcb-present-dev,
+ libxcb-render0-dev,
+ libxcb-render-util0-dev,
+ libxcb-res0-dev,
+ libxcb-xfixes0-dev,
+ libxcb-xinput-dev,
+ libx11-xcb-dev,
+ libxkbcommon-dev,
+ meson (>= 0.58.1),
+ pkg-config,
+ wayland-protocols (>= 1.27),
+ xwayland,
+ cmake,
+ hwdata-dev,
+Standards-Version: 4.6.0
+Section: libs
+Homepage: https://gitlab.freedesktop.org/wlroots/wlroots/
+Vcs-Git: https://salsa.debian.org/swaywm-team/wlroots.git
+Vcs-Browser: https://salsa.debian.org/swaywm-team/wlroots
+Rules-Requires-Root: no
+
+Package: libwlroots-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ libwlroots11 (= ${binary:Version}),
+ libcap-dev,
+ libdrm-dev,
+ libegl1-mesa-dev,
+ libgbm-dev (>= 17.1.0),
+ libgles2-mesa-dev,
+ libinput-dev (>= 1.14.0),
+ libpixman-1-dev,
+ libseat-dev,
+ libsystemd-dev,
+ libwayland-dev (>= 1.20),
+ libxcb1-dev,
+ libxcb-composite0-dev,
+ libxcb-dri3-dev,
+ libxcb-icccm4-dev,
+ libxcb-image0-dev,
+ libxcb-present-dev,
+ libxcb-render0-dev,
+ libxcb-render-util0-dev,
+ libxcb-res0-dev,
+ libxcb-xfixes0-dev,
+ libxcb-xinput-dev,
+ libxkbcommon-dev,
+ libx11-xcb-dev,
+ wayland-protocols (>= 1.27),
+Description: Modular wayland compositor library - development headers
+ wlroots is a set of pluggable, composable modules to build a Wayland
+ compositor.
+ .
+ This package contains the development headers.
+
+Package: libwlroots11
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: Modular wayland compositor library - shared library
+ wlroots is a set of pluggable, composable modules to build a Wayland
+ composior.
+ .
+ This package contains the shared library.
+
+Package: libwlroots-examples
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: Modular wayland compositor library - binaries
+ wlroots is a set of pluggable, composable modules to build a Wayland
+ composior.
+ .
+ This package contains the reference compositor rootston and other
+ examples.

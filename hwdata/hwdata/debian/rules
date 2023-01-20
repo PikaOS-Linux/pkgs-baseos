@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+override_dh clean:
+	echo "disabled"
+override_dh_auto_clean:
+	echo "disabled"	
+override_dh_auto_test:
+	echo "disabled"	
+
+%:
+	dh $@

@@ -1,0 +1,4 @@
+version=4
+opts="filenamemangle=s%(?:.*?)?v?(\d[\d.]*)\.tar\.gz%hwdata-$1.tar.gz%" \
+https://github.com/vcrhonek/hwdata/tags \
+(?:.*?/)?v?(\d[\d.]*)\.tar\.gz

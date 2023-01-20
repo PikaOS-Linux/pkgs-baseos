@@ -1,0 +1,47 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ gamescope (3.11.58.7bd30dd-99pika4) kinetic; urgency=medium
+ .
+   * Update to git to support HDR
+Author: Ward Nakchbandi <hotrod.master@hotmail.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2023-01-19
+
+--- gamescope-3.11.58.7bd30dd.orig/meson.build
++++ gamescope-3.11.58.7bd30dd/meson.build
+@@ -36,7 +36,7 @@ dep_x11 = dependency('x11')
+ vulkan_dep = dependency('vulkan')
+ 
+ if get_option('enable_openvr_support')
+-  openvr_dep = dependency('openvr_api', required : false)
++  openvr_dep = dependency('openvr', required : false)
+   if not openvr_dep.found()
+     cmake = import('cmake')
+     openvr_var = cmake.subproject_options()
+--- gamescope-3.11.58.7bd30dd.orig/src/vr_session.hpp
++++ gamescope-3.11.58.7bd30dd/src/vr_session.hpp
+@@ -7,7 +7,7 @@
+ 
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+-#include "../subprojects/openvr/headers/openvr.h"
++#include <openvr.h>
+ #pragma GCC diagnostic pop
+ 
+ bool vr_init(int argc, char **argv);

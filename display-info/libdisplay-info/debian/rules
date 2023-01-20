@@ -1,0 +1,6 @@
+#!/usr/bin/make -f
+
+DEB_BUILD_OPTIONS=nocheck
+
+%:
+	dh ${@} --build-system=meson
