@@ -12,6 +12,8 @@ pika/0001-Revert-drm-display-dp_mst-move-all-payload-info-into-the-atomic-state.
 pika/0001-drm-i915-quirks-disable-async-flipping-on-specific-d.patch
 pika/0001-Allow-to-set-custom-USB-pollrate-for-specific-device.patch
 pika/0001-acpi-proc-idle-skip-dummy-wait.patch
+pika/v4-wifi-mac80211-fix-initialization-of-rx--link-and-rx--link_sta.patch
+#pika/linux-surface.patch
 # xanmod Patches
 xanmod.patch
 # temp fix
