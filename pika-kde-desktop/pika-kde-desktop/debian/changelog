@@ -1,3 +1,10 @@
+pika-kde-desktop (3.1) kinetic; urgency=medium
+
+  * Move firefox to recommends
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
 pika-kde-desktop (3.0) kinetic; urgency=medium
 
   * Fix depends

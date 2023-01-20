@@ -1,3 +1,9 @@
+pika-desktop (3.2.0) kinetic; urgency=medium
+
+  * Move firefox to recommends
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
 pika-desktop (3.1.0) kinetic; urgency=medium
 
   * Fix broken deps

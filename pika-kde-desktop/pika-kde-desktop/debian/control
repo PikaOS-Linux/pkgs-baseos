@@ -102,7 +102,6 @@ Depends: ${misc:Depends},
     kwalletmanager,
     print-manager,
     fonts-noto-color-emoji,
-    firefox,
     firmware-manager,
     gucharmap,
     ibus-table-emoji,
@@ -127,6 +126,7 @@ Depends: ${misc:Depends},
     gwenview,
 ## Last to replace mime information
     ark,
+Recommends: firefox
 Conflicts: plasma-discover, pika-gnome-layouts
 Suggests: skanlite 
  

@@ -64,7 +64,6 @@ Depends: ${misc:Depends},
     gnome-tweaks,
     baobab,
     eog,
-    firefox,
     firmware-manager,
     geary,
     gnome-text-editor,
@@ -86,6 +85,7 @@ Depends: ${misc:Depends},
 ## Last to replace mime information
     file-roller,
 Description: PikaOS Minimal Gnome Desktop Metapackage
+Recommends: firefox
 
 Package: pika-gnome-desktop
 Architecture: linux-any

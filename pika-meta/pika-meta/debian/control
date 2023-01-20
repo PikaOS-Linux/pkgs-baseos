@@ -14,8 +14,8 @@ Depends: ${misc:Depends},
 	mintupdate, 
 	python-apt-common,
 	gdebi,
-	apx-subsystem-settings,
 	repoman
+Recommends: apx-subsystem-settings
 Description: A Meta package to install pika's collection of package management software.
 
 Package: pika-gameutils-meta
@@ -260,6 +260,7 @@ Depends: ${misc:Depends},
 	libgamemodeauto0:i386,
 	intel-media-va-driver-non-free:i386,
 	goverlay,
+	gamescope-session,
 Description: A Meta package to install pika's collection of gaming software.
 
 Package: pika-codecs-meta
