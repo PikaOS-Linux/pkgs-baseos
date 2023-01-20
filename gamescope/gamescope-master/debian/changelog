@@ -1,3 +1,9 @@
+gamescope (3.11.58.d6c1df4.openvr-99pika15) kinetic; urgency=medium
+
+  * Fix missing deps
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 15 Oct 2022 18:58:00 +0300
+
 gamescope (3.11.58.d6c1df4.openvr-99pika10) kinetic; urgency=medium
 
   * Update to git to support HDR

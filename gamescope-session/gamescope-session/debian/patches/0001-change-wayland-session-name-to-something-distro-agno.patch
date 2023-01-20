@@ -1,0 +1,24 @@
+From 55e7d0c200f21d6d0d4b858b8ca8a42a2558426d Mon Sep 17 00:00:00 2001
+From: GloriousEggroll <gloriouseggroll@gmail.com>
+Date: Wed, 11 Jan 2023 10:13:04 -0700
+Subject: [PATCH] change wayland session name to something distro-agnostic
+
+---
+ usr/share/wayland-sessions/gamescope-session.desktop | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/share/wayland-sessions/gamescope-session.desktop b/usr/share/wayland-sessions/gamescope-session.desktop
+index a6c1746..ee48bfa 100644
+--- a/usr/share/wayland-sessions/gamescope-session.desktop
++++ b/usr/share/wayland-sessions/gamescope-session.desktop
+@@ -1,6 +1,6 @@
+ [Desktop Entry]
+ Encoding=UTF-8
+-Name=ChimeraOS (gamescope)
++Name=Steam Deck Mode
+ Comment=Steam Big Picture session
+ Exec=gamescope-session
+ Type=Application
+-- 
+2.39.0
+

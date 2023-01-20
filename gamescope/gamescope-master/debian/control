@@ -50,6 +50,9 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  xwayland,
+ vkroots,
+ libdisplay-info,
+ hwdata,
 Suggests:
  libcap2-bin,
 Description: Micro-compositor for game scaling

@@ -1,0 +1,15 @@
+Source: gamescope-session
+Section: games
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+Homepage: https://github.com/KyleGospo/gamescope-session
+
+Package: gamescope-session
+Section: games
+Architecture: all
+Depends: ${misc:Depends}, gamescope, python3
+Multi-Arch: foreign
+Description: Steam Big Picture Mode/Gamemode session based on gamescope
+
