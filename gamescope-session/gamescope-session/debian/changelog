@@ -1,3 +1,9 @@
+gamescope-session (0.0.git.92.60c3f5f9-99pika2) kinetic; urgency=low
+
+  * Fix return to desktop
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 gamescope-session (0.0.git.92.60c3f5f9-99pika1) kinetic; urgency=low
 
   * Initial Creation
