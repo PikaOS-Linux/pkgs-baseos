@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Wine Windows Runtime
+Comment=Run Windows Applications Natively Under Linux
+Exec=wine %U
+Icon=wine
+Terminal=false
+Type=Application
+MimeType=application/x-ms-dos-executable
+Categories=Utility;
+
+
