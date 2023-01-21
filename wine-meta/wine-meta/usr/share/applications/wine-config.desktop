@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Wine Prefix Configuration
+Comment=Configure the default prefix settings
+Exec=winecfg
+Icon=wine
+Terminal=false
+Type=Application
+Categories=Utility;

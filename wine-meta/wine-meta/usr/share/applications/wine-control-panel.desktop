@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Wine Control Panel
+Comment=Windows Control Panel Under Wine
+Exec=wine control.exe
+Icon=wine
+Terminal=false
+Type=Application
+Categories=Utility;

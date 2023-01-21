@@ -7,12 +7,9 @@ Standards-Version: 4.6.1
 
 Package: wine
 Architecture: amd64
-Depends:${misc:Depends}, winehq-staging, wine-staging, wine-staging-amd64, wine-staging-i386, winbind, dosbox (>= 0.74-4.2~), exe-thumbnailer | kio-extras
+Depends:${misc:Depends}, wine-staging | wine-devel | wine-stable, wine-staging-amd64 | wine-devel-amd64 | wine-stable-amd64, wine-staging-i386 | wine-devel-i386 | wine-stable-i386, winbind, dosbox | dosbox-staging, exe-thumbnailer | kio-extras
 Conflicts: wine64, wine32
+Provides: winehq-staging, winehq-stable, winehq-devel
 Description:  Windows API implementation - standard suite
  Wine is a free MS-Windows API implementation.
- .
- This package provides essential wrappers and convenience tools for the
- standard Wine components. It also employs the Debian alternatives system to
- provide the usual command names, e.g. "wine" instead of "wine-stable".
 

@@ -7,5 +7,4 @@ Terminal=false
 Type=Application
 MimeType=application/x-ms-dos-executable
 Categories=Utility;
-
-
+NoDisplay=true
