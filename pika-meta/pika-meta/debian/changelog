@@ -1,3 +1,9 @@
+pika-meta (10:3.0-99pika2) kinetic; urgency=medium
+
+  * make wine an actual dependency and allow other branches of winehq
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
 pika-meta (10:3.0-99pika1) kinetic; urgency=medium
 
   * add pikman to package manager and add gamescope-session to game-utils
