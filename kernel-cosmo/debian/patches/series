@@ -1,0 +1,33 @@
+# asus-linux: ACPI pre-reqs from 8-Dec
+pika/acpi-pre_reqs.patch
+# asus-linux
+pika/asus-linux.patch
+# linux-fsync patches
+pika/tkg.patch
+pika/fsync.patch
+pika/OpenRGB.patch
+pika/amdgpu-si-cik-default.patch
+pika/acso.patch
+# device specific patches
+pika/0000-add-steam-deck-platform-driver.patch
+#pika/linux-surface.patch
+# asus-linux: VMD fixes for M16
+pika/vmd-m16-apsm.patch
+# temporary patches
+pika/0001-Revert-PCI-Add-a-REBAR-size-quirk-for-Sapphire-RX-56.patch
+pika/mt76_-mt7921_-Disable-powersave-features-by-default.patch
+pika/v4-wifi-mac80211-fix-initialization-of-rx--link-and-rx--link_sta.patch
+pika/0001-Revert-drm-display-dp_mst-move-all-payload-info-into-the-atomic-state.patch
+pika/0001-acpi-proc-idle-skip-dummy-wait.patch	
+pika/0001-drm-i915-quirks-disable-async-flipping-on-specific-d.patch
+# gamescope HDR
+pika/gamescope-hdr.patch
+# Allow to set custom USB pollrate for specific devices like so: 
+# usbcore.interrupt_interval_override=045e:00db:16,1bcf:0005:1
+# useful for setting polling rate of wired PS4/PS5 controller to 1000Hz
+# https://github.com/KarsMulder/Linux-Pollrate-Patch
+# https://gitlab.com/GloriousEggroll/nobara-images/-/issues/64
+pika/0001-Allow-to-set-custom-USB-pollrate-for-specific-device.patch
+# Also set the PS controller bluetooth polling rate to 1000Hz
+pika/set-ps4-bt-poll-rate-1000hz.patch
+
