@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+systemctl enable --now link-opt-wine-to-bin.service || echo "link-opt-wine-to-bin service could not be enabled"
+
