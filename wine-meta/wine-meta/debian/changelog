@@ -1,3 +1,9 @@
+wine-meta (100:1.0.winehq-99pika3) kinetic; urgency=low
+
+  * Add a service to link installed winehq bin to /usr/bin for legacy support
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 wine-meta (100:1.0.winehq-99pika2) kinetic; urgency=low
 
   * Initial Creation

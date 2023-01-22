@@ -1,0 +1,8 @@
+[Unit]
+Description=Links binaries from opt path to bin
+
+[Service]
+ExecStart=/usr/bin/wine-linker
+
+[Install]
+WantedBy=multi-user.target

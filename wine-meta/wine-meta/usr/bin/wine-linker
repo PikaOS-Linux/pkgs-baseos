@@ -1,0 +1,28 @@
+#! /bin/bash
+
+if dpkg -s wine-stable
+then
+	echo "winehq stable detected!"
+	ln -sf /opt/wine-stable/bin* /usr/bin/ && exit 0 || exit 1
+fi
+
+if dpkg -s wine-staging
+then
+	echo "winehq staging detected!"
+	ln -sf /opt/wine-staging/bin* /usr/bin/ && exit 0 || exit 1
+fi
+
+if dpkg -s wine-devel
+then
+	echo "winehq devel detected!"
+	ln -sf /opt/wine-devel/bin* /usr/bin/ && exit 0 || exit 1
+fi
+
+
+
+
+
+
+
+
+
