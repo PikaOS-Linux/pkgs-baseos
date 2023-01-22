@@ -9,7 +9,7 @@ Standards-Version: 4.6.1
 Package: kernel-pika
 Section: kernel
 Architecture: amd64
-Depends: ${misc:Depends}, linux-image-xanmod-amd64, linux-headers-xanmod-amd64, kernel-pika-config
+Depends: ${misc:Depends}, linux-image-cosmo-amd64, linux-headers-cosmo-amd64, kernel-pika-config
 Description: metapackage for installing PikaOS kernel
 
 

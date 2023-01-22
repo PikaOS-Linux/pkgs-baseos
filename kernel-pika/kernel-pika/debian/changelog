@@ -1,3 +1,10 @@
+kernel-pika (1.5) kinetic; urgency=low
+
+  * Switch to fully custom kernel
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+
 kernel-pika (1.4) kinetic; urgency=low
 
   * Switch to custom xanmod kernel
