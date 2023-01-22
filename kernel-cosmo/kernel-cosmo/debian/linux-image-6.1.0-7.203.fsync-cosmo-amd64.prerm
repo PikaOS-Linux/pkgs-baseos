@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-version=6.107.0-203.fsync-cosmo-amd64
+version=6.1.0-7.203.fsync-cosmo-amd64
 image_path=/boot/vmlinuz-$version
 
 if [ "$1" != remove ]; then

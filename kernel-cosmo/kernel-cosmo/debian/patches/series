@@ -1,3 +1,4 @@
+fix-localversion.diff
 # asus-linux: ACPI pre-reqs from 8-Dec
 pika/acpi-pre_reqs.patch
 # asus-linux

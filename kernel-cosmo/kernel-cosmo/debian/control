@@ -6,21 +6,21 @@ Standards-Version: 3.9.8
 Build-Depends: debhelper, cpio, python3-six, bc, bison, libelf-dev, libssl-dev, flex, xz-utils, pahole | dwarves:native, libcap-dev, libpci-dev, asciidoctor, libaudit-dev, libbabeltrace-dev, libdw-dev, libiberty-dev, libnewt-dev, libnuma-dev, libperl-dev, libunwind-dev, python3-dev, python3-setuptools, zstd, gcc [amd64]
 Homepage: https://github.com/PikaOS-Linux
 
-Package: linux-image-6.107.0-203.fsync-cosmo-amd64
+Package: linux-image-6.1.0-7.203.fsync-cosmo-amd64
 Architecture: amd64
 Provides: wireguard-modules
 Depends: kmod, linux-base (>= 4.3~), ${misc:Depends}, initramfs-tools [amd64] | linux-initramfs-tool [amd64]
 Recommends: ${kernel:Recommends}, firmware-linux-free | linux-firmware, firmware-linux-nonfree | linux-firmware
-Suggests: linux-doc-6.107, crda [amd64], grub-pc [amd64] | extlinux [amd64] | grub-efi-amd64 [amd64]
-Description: Linux 6.107 for 64-bit PCs
- The Linux kernel 6.107 and modules for use on PCs with AMD64 or Intel 64
+Suggests: linux-doc-6.1, crda [amd64], grub-pc [amd64] | extlinux [amd64] | grub-efi-amd64 [amd64]
+Description: Linux 6.1 for 64-bit PCs
+ The Linux kernel 6.1 and modules for use on PCs with AMD64 or Intel 64
  processors.
 
 Package: linux-image-cosmo-amd64
 Architecture: amd64
 Section: metapackages
 Priority: extra
-Depends: linux-image-6.107.0-203.fsync-cosmo-amd64 (= ${binary:Version}), ${misc:Depends}
+Depends: linux-image-6.1.0-7.203.fsync-cosmo-amd64 (= ${binary:Version}), ${misc:Depends}
 Recommends: linux-headers-cosmo-amd64 (= ${binary:Version})
 Description: Linux image for pika kernel on 64-bit PCs
  This metapackage depends on the latest binary image for Linux kernel on
@@ -31,19 +31,19 @@ Architecture: amd64
 Section: metapackages
 Priority: extra
 Provides: linux-headers
-Depends: linux-headers-6.107.0-203.fsync-cosmo-amd64 (= ${binary:Version}), ${misc:Depends}
+Depends: linux-headers-6.1.0-7.203.fsync-cosmo-amd64 (= ${binary:Version}), ${misc:Depends}
 Description: Linux headers for pika kernel on 64-bit PCs
  This metapackage depends on the latest binary image for Linux kernel on
  PCs with AMD64 or Intel 64 processors machines for pika kernel.
 
-Package: linux-headers-6.107.0-203.fsync-cosmo-amd64
+Package: linux-headers-6.1.0-7.203.fsync-cosmo-amd64
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, libelf-dev, gcc
-Description: Header files for Linux 6.107.0-203.fsync-cosmo-amd64
+Description: Header files for Linux 6.1.0-7.203.fsync-cosmo-amd64
  This package provides the architecture-specific kernel header files for
- Linux kernel 6.107.0-203.fsync-cosmo-amd64, generally used for building
+ Linux kernel 6.1.0-7.203.fsync-cosmo-amd64, generally used for building
  out-of-tree kernel modules.  These files are going to be installed into
- /usr/src/linux-headers-6.107.0-203.fsync-cosmo-amd64, and can be used for
+ /usr/src/linux-headers-6.1.0-7.203.fsync-cosmo-amd64, and can be used for
  building modules that load into the kernel provided by the
- linux-image-6.107.0-203.fsync-cosmo-amd64 package.
+ linux-image-6.1.0-7.203.fsync-cosmo-amd64 package.
 

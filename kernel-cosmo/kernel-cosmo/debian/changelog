@@ -1,0 +1,11 @@
+linux-cosmo (6.1.7-99pika13) kinetic; urgency=medium
+
+  * Fix typo
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+linux-cosmo (6.1.7-99pika12) kinetic; urgency=medium
+
+  * Initial Creation
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200

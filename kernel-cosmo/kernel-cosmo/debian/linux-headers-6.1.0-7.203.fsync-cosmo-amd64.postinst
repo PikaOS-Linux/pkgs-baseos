@@ -5,7 +5,7 @@
 #         Debian linux-image postinst script.
 
 $|=1;
-my $version  = "6.107.0-203.fsync-cosmo-amd64";
+my $version  = "6.1.0-7.203.fsync-cosmo-amd64";
 
 if (-d "/etc/kernel/header_postinst.d") {
   system ("run-parts --report --exit-on-error --arg=$version " .
