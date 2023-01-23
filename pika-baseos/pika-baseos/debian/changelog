@@ -1,3 +1,10 @@
+pika-baseos (1.0.9) kinetic; urgency=medium
+
+  * Add davinci resolve depends
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
 pika-baseos (1.0.8) kinetic; urgency=medium
 
   * Add custom-device-pollrates to recommends
