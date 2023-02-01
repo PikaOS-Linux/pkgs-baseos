@@ -8,7 +8,6 @@ Rules-Requires-Root: no
 
 Package: pika-kde-desktop-minimal
 Architecture: amd64 
-Priority: optional
 Homepage: https://www.kde.org
 Description:  PikaOS Minimal KDE Desktop Metapackage
 Depends: ${misc:Depends},

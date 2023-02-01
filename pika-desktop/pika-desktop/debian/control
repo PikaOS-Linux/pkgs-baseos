@@ -8,7 +8,6 @@ Rules-Requires-Root: no
 
 Package: pika-gnome-desktop-minimal
 Architecture: linux-any
-Essential: yes
 Depends: ${misc:Depends},
 # BaseOS
     pika-baseos,
