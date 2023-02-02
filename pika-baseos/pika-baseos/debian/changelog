@@ -1,0 +1,58 @@
+pika-baseos (2.0.0) kinetic; urgency=medium
+
+  * Add all meta desktop dependencies to suggest to prevent them from autoremoval
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
+pika-baseos (1.0.9) kinetic; urgency=medium
+
+  * Add davinci resolve depends
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
+pika-baseos (1.0.8) kinetic; urgency=medium
+
+  * Add custom-device-pollrates to recommends
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
+pika-baseos (1.0.6) kinetic; urgency=medium
+
+  * remove auto-cpufreq
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+pika-baseos (1.0.5) kinetic; urgency=medium
+
+  * remove supergfxctl-gex-reset
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
+pika-baseos (1.0.3) kinetic; urgency=medium
+
+  * fix supergfxctl profile.d script
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+pika-baseos (1.0.2) kinetic; urgency=medium
+
+  * Add supergfxctl profile.d script
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+
+pika-baseos (1.0.1) kinetic; urgency=medium
+
+  * Add profile.d scripts
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
+pika-baseos (1.0) kinetic; urgency=medium
+
+  * Initial Release
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300

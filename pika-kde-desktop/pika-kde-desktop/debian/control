@@ -1,0 +1,153 @@
+Source: pika-kde-desktop
+Section: metapackages
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Standards-Version: 4.6.1
+Build-Depends: debhelper-compat (= 13)
+Rules-Requires-Root: no
+
+Package: pika-kde-desktop-minimal
+Architecture: amd64 
+Homepage: https://www.kde.org
+Description:  PikaOS Minimal KDE Desktop Metapackage
+Depends: ${misc:Depends},
+# BaseOS
+    pika-baseos,
+# Basic Session
+    kde-plasma-desktop,
+    kamera,
+    kgamma5,
+    svgpart,
+    plasma-pa,
+    plasma-nm,
+    pika-kde-settings,
+    plasma-workspace-wayland,
+    kwin-x11,
+    sddm,
+# Fonts
+    fonts-cantarell,
+    fonts-dejavu-core,
+    fonts-freefont-ttf,
+    fonts-liberation,
+    fonts-indic,
+    fonts-kacst-one,
+    fonts-khmeros-core,
+    fonts-lao,
+    fonts-liberation,
+    fonts-lklug-sinhala,
+    fonts-noto-cjk,
+    fonts-noto-color-emoji,
+    fonts-sil-abyssinica,
+    fonts-sil-padauk,
+    fonts-thai-tlwg,
+    fonts-tibetan-machine,
+    fonts-ubuntu,
+# Theming
+    breeze,
+    breeze-icon-theme,
+    breeze-gtk-theme,
+    sddm-theme-breeze,
+    papirus-icon-theme,
+    sound-theme-freedesktop,
+# Plugins
+    ghostscript-x,
+    inputattach,
+    libatk-adaptor,
+    libcanberra-gtk-module,
+    appmenu-gtk2-module,
+    appmenu-gtk3-module,
+    kdenetwork-filesharing,
+    kde-zeroconf,
+    dolphin-plugins,
+    kdegraphics-mobipocket,
+    kdegraphics-thumbnailers,
+    kdeconnect,
+    kde-cli-tools,
+    baloo-kf5,
+    frameworkintegration,
+    inputattach,
+    khelpcenter,
+    khotkeys,
+    kinfocenter,
+    kio,
+    kio-extras,
+    kmenuedit,
+    kwrited,
+    language-selector-common,
+    bluedevil,
+    powerdevil,
+    desktop-file-utils,
+    kde-config-gtk-style,
+    kde-config-gtk-style-preview,
+    kde-config-sddm,
+    xdg-desktop-portal-kde,
+    kde-config-tablet,
+    polkit-kde-agent-1,
+    go-mtpfs,
+    kdialog,
+    kimageformat-plugins,
+    kio-audiocd,
+    krdc,
+    kscreen,
+    kdialog,
+    kio-fuse,
+    kaccounts-integration,
+    plasma-supergfxctl,
+    plasma-browser-integration,
+    plasma-calendar-addons,
+    plasma-dataengines-addons,
+    dbus-x11,
+# Applications
+    kwalletmanager,
+    print-manager,
+    fonts-noto-color-emoji,
+    firmware-manager,
+    gucharmap,
+    ibus-table-emoji,
+    pika-welcome,
+    pavucontrol-qt,
+    filelight,
+    kgpg,
+    gwenview,
+    kde-spectacle,
+    okular,
+    mpv,
+    kcalc,
+    dolphin,
+    kate,
+    konsole,
+    plasma-disks,
+    plasma-firewall,
+    plasma-systemmonitor,
+    plasma-vault,
+    ksystemlog,
+    partitionmanager,
+    gwenview,
+## Last to replace mime information
+    ark,
+Recommends: firefox
+Conflicts: plasma-discover, pika-gnome-layouts
+Suggests: skanlite 
+ 
+Package: pika-kde-desktop
+Architecture: linux-any
+Depends: ${misc:Depends},
+# Pull minimal desktop
+    pika-kde-desktop-minimal,
+# Essential Apps
+    build-essential,
+    wget,
+    git,
+    curl,
+# Gaming Utils
+    pika-gameutils-meta,
+# AMDGPU Utils
+    pika-amdgpu-switcher,
+    pika-rocm-meta,
+Recommends:
+    va-driver-all,
+    vdpau-driver-all,
+    vlc,
+    pika-codecs-meta,
+    pika-office-meta,
+Description: PikaOS KDE Desktop Metapackage

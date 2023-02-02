@@ -1,0 +1,39 @@
+pika-kde-desktop (3.3.0) kinetic; urgency=medium
+
+  * Make the package non essential
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-kde-desktop (3.1) kinetic; urgency=medium
+
+  * Move firefox to recommends
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-kde-desktop (3.0) kinetic; urgency=medium
+
+  * Fix depends
+ 
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-kde-desktop (2.0) kinetic; urgency=medium
+
+  * Add fixes and adapt to pika-baseos
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+pika-kde-desktop (1.0.3) kinetic; urgency=medium
+
+  * Add the missing pika-package-manager
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+pika-kde-desktop (1.0.1) kinetic; urgency=medium
+
+  * First release
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300

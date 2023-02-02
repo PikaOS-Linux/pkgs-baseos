@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+ln -s /usr/bin/kreadconfig5 /usr/bin/kreadconfig
+

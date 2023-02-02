@@ -1,0 +1,44 @@
+pika-desktop (3.3.0) kinetic; urgency=medium
+
+  * Make the package non essential
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-desktop (3.2.0) kinetic; urgency=medium
+
+  * Move firefox to recommends
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+pika-desktop (3.1.0) kinetic; urgency=medium
+
+  * Fix broken deps
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-desktop (3.0.0) kinetic; urgency=medium
+
+  * Adapt to BaseOS
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+pika-desktop (2.0.0) kinetic; urgency=medium
+
+  * Replace Adwaita with papirus
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+
+pika-desktop (1.0.1) kinetic; urgency=medium
+
+  * Change office depends to pika-meta
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
+pika-desktop (1.0.0) kinetic; urgency=medium
+
+  * First release
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
