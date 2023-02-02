@@ -36,7 +36,7 @@ favorite-apps = ['pika-installer.desktop', 'pika-welcome-welcome.desktop', 'fire
 accel-profile = 'flat'
 
 [org.gnome.shell]
-enabled-extensions = ['legacyschemeautoswitcher@joshimukul29.gmail.com', 'supergfxctl-gex@asus-linux.org']
+enabled-extensions = ['legacyschemeautoswitcher@joshimukul29.gmail.com']
 
 [org.gnome.mutter]
 check-alive-timeout = 30000

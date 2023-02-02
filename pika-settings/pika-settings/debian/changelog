@@ -1,3 +1,9 @@
+pika-settings (2.0-99pika10) kinetic; urgency=low
+
+  * Disable supergfxctl-gex by default
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-settings (2.0-99pika9) kinetic; urgency=low
 
   * Enable supergfxctl-gex and legacy gtk3 switcher by default and increase mutter timeout to 30000ms
