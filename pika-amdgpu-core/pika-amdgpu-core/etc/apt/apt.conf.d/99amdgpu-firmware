@@ -1,0 +1,2 @@
+DPkg::Pre-Install-Pkgs {"/usr/share/dpkg/scripts/amdgpu-firmware-hook.sh pre";};
+DPkg::Post-Invoke {"/usr/share/dpkg/scripts/amdgpu-firmware-hook.sh post";};
