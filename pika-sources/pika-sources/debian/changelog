@@ -1,3 +1,10 @@
+pika-sources (3.0-99pika13) kinetic; urgency=low
+
+  * Add update post scripts for ISO
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
+
 pika-sources (3.0-99pika12) kinetic; urgency=low
 
   * Fix PPA priorities typo and add KDE-Backports
