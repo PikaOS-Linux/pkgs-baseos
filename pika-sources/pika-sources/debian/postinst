@@ -4,5 +4,3 @@ set -e
 
 systemctl enable --now steam-repos-fix.service || echo "steam-repos-fix service could not be enabled"
 
-apt-get update
-
