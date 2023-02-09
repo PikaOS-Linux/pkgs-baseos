@@ -1,0 +1,8 @@
+X-Repolib-Name: Ubuntu System Sources
+Enabled: yes
+Types: deb deb-src
+URIs: http://archive.ubuntu.com/ubuntu/
+Suites: kinetic kinetic-security kinetic-updates kinetic-backports kinetic-proposed
+Components: main restricted universe multiverse
+X-Repolib-ID: system
+X-Repolib-Default-Mirror: http://archive.ubuntu.com/ubuntu/

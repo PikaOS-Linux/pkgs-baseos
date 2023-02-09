@@ -1,0 +1,9 @@
+Package: pika-sources
+Version: 3.0-99pika14
+Architecture: all
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Installed-Size: 69
+Section: misc
+Priority: optional
+Homepage: https://github.com/PikaOS-Linux/
+Description: APT Source files and keyrings for the repositories we use/provide.

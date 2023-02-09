@@ -1,0 +1,15 @@
+Package: *
+Pin: release o=repo.radeon.com
+Pin-Priority: 200
+
+Package: libhsa-runtime64*
+Pin: release o=Ubuntu
+Pin-Priority: 100
+
+Package: rocm*
+Pin: release o=Ubuntu
+Pin-Priority: 100
+
+Package: amdgpu-core amdgpu-pro-core amdgpu-dkms amdgpu-pro-lib32
+Pin: release a=*
+Pin-Priority: -10

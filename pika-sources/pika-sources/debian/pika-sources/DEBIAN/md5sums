@@ -1,0 +1,12 @@
+3fb87b6cc4b25bf6ef3e4e0a5560de25  usr/share/doc/pika-sources/changelog.Debian.gz
+e124ddff7ff1ed2576386c5dc3b2bbc7  usr/share/keyrings/amdvlk.gpg.key
+a3868eced58c8672642c73dc508dd0c6  usr/share/keyrings/kisak-mesa.gpg.key
+e2c6aae61045b48b964a4f6b01bc23ef  usr/share/keyrings/kubuntu-ppa.gpg.key
+76cef3f1e93a78af2ad3a870b21665f5  usr/share/keyrings/mozillateam-ubuntu-ppa.gpg.key
+d2def3d81adb732cef85d496ccf526ef  usr/share/keyrings/pika-keyring.gpg.key
+cca0b4c4a2fb92811ebd6177bc3f20b0  usr/share/keyrings/rocm-keyring.gpg.key
+6e678da66cd58fd43723b087a08b5b74  usr/share/keyrings/steam_pika.gpg.key
+4fdb7de985264c6471f4e55397ad531e  usr/share/keyrings/winehq-archive.key
+23a1c843e97fa8a350f30caaf68a85b1  usr/share/keyrings/xtradeb-ubuntu-apps.gpg.key
+23a1c843e97fa8a350f30caaf68a85b1  usr/share/keyrings/xtradeb-ubuntu-play.gpg.key
+9f31db222f6759e5c23f7a82fc649b5b  usr/share/keyrings/xtradeb.asc.key

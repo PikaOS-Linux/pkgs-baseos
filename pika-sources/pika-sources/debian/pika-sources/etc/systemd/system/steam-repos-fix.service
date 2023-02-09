@@ -1,0 +1,8 @@
+[Unit]
+Description=Removes broken steam.list from apt.
+
+[Service]
+ExecStart=/usr/bin/bash -c "rm -rf /etc/apt/sources.list.d/steam.list || echo "no steam repos""
+
+[Install]
+WantedBy=multi-user.target
