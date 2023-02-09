@@ -1,3 +1,9 @@
+pika-settings (2.0-99pika11) kinetic; urgency=low
+
+  * Move sources init to pika-sources
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-settings (2.0-99pika10) kinetic; urgency=low
 
   * Disable supergfxctl-gex by default

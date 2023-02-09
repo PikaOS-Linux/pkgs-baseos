@@ -1,3 +1,9 @@
+pika-sources (3.0-99pika16) kinetic; urgency=low
+
+  * Add sources fix script
+  
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0200
+
 pika-sources (3.0-99pika15) kinetic; urgency=low
 
   * Move keys to /usr/share/keyrings

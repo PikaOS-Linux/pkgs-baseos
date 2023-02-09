@@ -8,12 +8,8 @@ export PKG_ROOT = debian/pika-settings
 override_dh_install:
 	dh_install
 	mkdir -p $(PKG_ROOT)
-	mkdir -p $(PKG_ROOT)/etc/rc2.d
-	mkdir -p $(PKG_ROOT)/etc/rc3.d
 	mkdir -p $(PKG_ROOT)/usr/share
 	cp -r debian/data/usr $(PKG_ROOT)/
 	cp -r debian/data/etc $(PKG_ROOT)/
-	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc2.d/S01calamares-sources-undo
-	ln -sf /etc/init.d/calamares-sources-undo $(PKG_ROOT)/etc/rc3.d/S01calamares-sources-undo
 	ln -sf /usr/share/ubuntu $(PKG_ROOT)/usr/share/pika
 	ln -sf /usr/share/ubuntu-wayland $(PKG_ROOT)/usr/share/pika-wayland
