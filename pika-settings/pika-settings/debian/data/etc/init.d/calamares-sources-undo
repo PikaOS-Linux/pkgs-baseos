@@ -1,5 +1,0 @@
-#! /bin/bash
-
-# Undo the calamares sources modifactions
-
-printf "## This file is deprecated in PikaOS.\n## See /etc/apt/sources.list.d/system.sources." | tee /etc/apt/sources.list > /dev/null

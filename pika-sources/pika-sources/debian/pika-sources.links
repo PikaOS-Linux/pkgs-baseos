@@ -1,0 +1,2 @@
+/etc/init.d/calamares-sources-undo /etc/rc2.d/S01calamares-sources-undo
+/etc/init.d/calamares-sources-undo /etc/rc3.d/S01calamares-sources-undo

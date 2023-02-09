@@ -10,6 +10,5 @@ override_dh_install:
 	mkdir -p $(PKG_ROOT)
 	mkdir -p $(PKG_ROOT)/usr/share
 	cp -r debian/data/usr $(PKG_ROOT)/
-	cp -r debian/data/etc $(PKG_ROOT)/
 	ln -sf /usr/share/ubuntu $(PKG_ROOT)/usr/share/pika
 	ln -sf /usr/share/ubuntu-wayland $(PKG_ROOT)/usr/share/pika-wayland

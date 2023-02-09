@@ -1,4 +1,4 @@
-pika-settings (2.0-99pika11) kinetic; urgency=low
+pika-settings (2.0-99pika12) kinetic; urgency=low
 
   * Move sources init to pika-sources
 
