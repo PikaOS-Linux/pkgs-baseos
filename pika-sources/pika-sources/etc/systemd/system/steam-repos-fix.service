@@ -2,7 +2,7 @@
 Description=Removes broken steam.list from apt.
 
 [Service]
-ExecStart=/usr/bin/bash -c "rm -rf /etc/apt/sources.list.d/steam.list || echo "no steam repos""
+ExecStart=/usr/bin/bash -c "rm -rf /etc/apt/sources.list.d/steam.list || echo 'no steam repos' " && /usr/bin/bash -c "rm -rf /etc/apt/sources.list.d/pika.list || echo 'no pika iso repos' "
 
 [Install]
 WantedBy=multi-user.target
