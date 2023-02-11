@@ -1,0 +1,45 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Sat, 15 Oct 2022 20:50:00 +0300
+Source: base-files
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 12.2ubuntu99~99pika5
+Distribution: kinetic
+Urgency: medium
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Ward Nakchbandi <hotrod.master@hotmail.com>
+Changes:
+ base-files (12.2ubuntu99~99pika5) kinetic; urgency=medium
+ .
+   * Move profile.d scripts to pika-baseos
+Checksums-Sha1:
+ 50f2a8a6dd4b90595e9a35f56a818cfddd68b252 1496 base-files_12.2ubuntu99~99pika5.dsc
+ 61df8ac73e950c83196e0cb85635df1c5f324ea1 80072 base-files_12.2ubuntu99~99pika5.tar.xz
+ 1f0f803b97d468a7dc4e7faa9cacf6b16c4985e1 14166 base-files_12.2ubuntu99~99pika5_source.buildinfo
+Checksums-Sha256:
+ 4ec77abc65906982c6307ccf4870ed00809357b232effb19ea7da6b52fa21925 1496 base-files_12.2ubuntu99~99pika5.dsc
+ 004427b7510b41c07160f164176acfa8db12e92299796a8a6747329e32290abb 80072 base-files_12.2ubuntu99~99pika5.tar.xz
+ f2f694c4bd77e446a77b6a1aff4ccfd3fe83c7c649b167025aac049e4719b120 14166 base-files_12.2ubuntu99~99pika5_source.buildinfo
+Files:
+ 8484c35d071fbf2fcfffa56d35569922 1496 admin required base-files_12.2ubuntu99~99pika5.dsc
+ 5a8984406d2000f675c295f712f1c8fc 80072 admin required base-files_12.2ubuntu99~99pika5.tar.xz
+ d4c9ed15c78efdcf195bb3e2f86efb32 14166 admin required base-files_12.2ubuntu99~99pika5_source.buildinfo
+Original-Maintainer: Santiago Vila <sanvila@debian.org>
+
+-----BEGIN PGP SIGNATURE-----
+
+iQHOBAEBCgA4FiEENrUrA60f9xwTTeWmNgCHxbUOsxsFAmPnm44aHGhvdHJvZC5t
+YXN0ZXJAaG90bWFpbC5jb20ACgkQNgCHxbUOsxvQAwv/ZCT5+JNM0ozM0K+4ztFk
+qYDK2gZ4oepugfRTRiF2QvzHezyJpo65VsjUNmbesHGb+XPr7oqM2Y2oA87NoCRl
+K7aZYf4PYwLQNoS9S5iKTZ0b9d1EpUy5f5QlAua8sLySbnx8UZk90cqV8BUrAwjD
+DWoD/MH8SdpHiDhON9LR68I/ON9VbOkDUECzdEjDdE7HSxdLt7SmMP3GrmtvLU3G
+B45HbX5lB0qZEJxqe3UdhUyVQClsCAfLiXgjCvpUbSsdmNQVsjePKjjHQocVhPpb
+qhHiwf2u8Ohp4GNBEfOZjSdBgzKENBliseegbPpJMxjocXvjCpiR4iTQr0jVYqm4
+Nl9lCiY3z7849EgW029NjpGgS6PP6k9mAVL98wR5ovIAU+o1Lg5SlC8rFHq8Km2P
+XNx0D+8yIuglRjyeojxiAs9eOl0P9q+ppQBi0BfC/xM81EBKtaHjKsEdPSoZZoc3
+/FR419WtxWd2KcADZF+jBBVaZzzSy7zhOttB1gdCZ8f4
+=bJYL
+-----END PGP SIGNATURE-----

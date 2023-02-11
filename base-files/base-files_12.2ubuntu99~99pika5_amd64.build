@@ -1,0 +1,127 @@
+ dpkg-buildpackage -us -uc -ui
+dpkg-buildpackage: info: source package base-files
+dpkg-buildpackage: info: source version 12.2ubuntu99~99pika5
+dpkg-buildpackage: info: source distribution kinetic
+dpkg-buildpackage: info: source changed by Ward Nakchbandi <hotrod.master@hotmail.com>
+ dpkg-source --before-build .
+dpkg-buildpackage: info: host architecture amd64
+ fakeroot debian/rules clean
+dh clean
+dh: warning: LTO opimize is enable in buildflags. But cgo doesn't support it. LTO flags will be stripped in cgo.
+   dh_clean
+ dpkg-source -b .
+dpkg-source: info: using source format '3.0 (native)'
+dpkg-source: info: building base-files in base-files_12.2ubuntu99~99pika5.tar.xz
+dpkg-source: info: building base-files in base-files_12.2ubuntu99~99pika5.dsc
+ debian/rules build
+dh build
+   dh_update_autotools_config
+   dh_autoreconf
+dh: warning: LTO opimize is enable in buildflags. But cgo doesn't support it. LTO flags will be stripped in cgo.
+   debian/rules override_dh_auto_build
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+cc -g -O2 -ffile-prefix-map=/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -o locale-check locale-check.c
+sh debian/check-md5sum-etc profile
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" debian/copyright.in > debian/copyright
+sed -e "s/#VENDORFILE#/ubuntu/g" debian/postinst.in > debian/postinst
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+dh: warning: LTO opimize is enable in buildflags. But cgo doesn't support it. LTO flags will be stripped in cgo.
+   create-stamp debian/debhelper-build-stamp
+ fakeroot debian/rules binary
+dh binary
+   dh_testroot
+   dh_prep
+   dh_installdirs
+   debian/rules override_dh_auto_install
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+install -p -m 644 etc/*      debian/base-files/etc
+install -p -m 755 motd/*     debian/base-files/etc/update-motd.d
+install -p -m 644 debian/motd-news.service debian/base-files/lib/systemd/system/
+install -p -m 644 debian/motd-news.timer debian/base-files/lib/systemd/system/
+install -p -m 644 licenses/* debian/base-files/usr/share/common-licenses
+install -p -m 644 origins/*  debian/base-files/etc/dpkg/origins
+install -p -m 644 share/*    debian/base-files/usr/share/base-files
+mkdir debian/base-files/usr/share/pixmaps
+install -p -m 644 logos/*    debian/base-files/usr/share/pixmaps
+install -p -m 644 share/*    debian/base-files/usr/share/
+install -p -m 644 profile.d/* debian/base-files/etc/profile.d
+install -p -m 755 locale-check debian/base-files/usr/bin
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" share/motd     > debian/base-files/usr/share/base-files/motd
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" share/info.dir > debian/base-files/usr/share/base-files/info.dir
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" etc/issue      > debian/base-files/etc/issue
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" etc/issue.net  > debian/base-files/etc/issue.net
+sed -e "s&#OSNAME#&"GNU/`uname | sed -e 's/GNU\///'`"&g" etc/os-release > debian/base-files/etc/os-release
+mv debian/base-files/etc/os-release debian/base-files/usr/lib/os-release
+ln -s ../usr/lib/os-release debian/base-files/etc/os-release
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+   dh_install
+   dh_installdocs
+   dh_installchangelogs
+   dh_installman
+   debian/rules override_dh_installsystemd
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+dh_installsystemd -pbase-files motd-news.timer
+dh_installsystemd -pbase-files motd-news.service
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+   dh_lintian
+   dh_perl
+   debian/rules override_dh_link
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+dh_link -X os-release
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+   dh_strip_nondeterminism
+   debian/rules override_dh_compress
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+dh_compress -X README
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+   debian/rules override_dh_fixperms
+make[1]: Entering directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+dh_fixperms
+cd debian/base-files && chown root:staff   var/local
+cd debian/base-files && chmod 755  `find . -type d`
+cd debian/base-files && chmod 1777 `cat ../1777-dirs`
+cd debian/base-files && chmod 2775 `cat ../2775-dirs`
+cd debian/base-files && chmod 700 root
+make[1]: Leaving directory '/home/ward/projects/pikaos/pkgs-baseos/base-files/basefiles'
+   dh_missing
+   dh_dwz -a
+   dh_strip -a
+16af850a59b7c383d1816c60a5ec6a8caab8607a
+   dh_makeshlibs -a
+   dh_shlibdeps -a
+   dh_installdeb
+   dh_gencontrol
+dpkg-gencontrol: warning: Depends field of package motd-news-config: substitution variable ${shlibs:Depends} used, but is not defined
+   dh_md5sums
+   dh_builddeb
+dpkg-deb: building package 'motd-news-config' in '../motd-news-config_12.2ubuntu99~99pika5_all.deb'.
+dpkg-deb: building package 'base-files' in '../base-files_12.2ubuntu99~99pika5_amd64.deb'.
+dpkg-deb: building package 'base-files-dbgsym' in 'debian/.debhelper/scratch-space/build-base-files/base-files-dbgsym_12.2ubuntu99~99pika5_amd64.deb'.
+	Renaming base-files-dbgsym_12.2ubuntu99~99pika5_amd64.deb to base-files-dbgsym_12.2ubuntu99~99pika5_amd64.ddeb
+ dpkg-genbuildinfo -O../base-files_12.2ubuntu99~99pika5_amd64.buildinfo
+ dpkg-genchanges -O../base-files_12.2ubuntu99~99pika5_amd64.changes
+dpkg-genchanges: warning: the current version (12.2ubuntu99~99pika5) is earlier than the previous one (12.99pika2)
+dpkg-genchanges: info: including full source code in upload
+ dpkg-source --after-build .
+dpkg-buildpackage: info: full upload; Debian-native package (full source is included)
+Now running lintian base-files_12.2ubuntu99~99pika5_amd64.changes ...
+E: base-files: file-directly-in-usr-share [usr/share/dot.bashrc]
+E: base-files: file-directly-in-usr-share [usr/share/dot.profile.md5sums]
+E: base-files: file-directly-in-usr-share [usr/share/dot.profile]
+E: base-files: file-directly-in-usr-share [usr/share/info.dir]
+E: base-files: file-directly-in-usr-share [usr/share/motd]
+E: base-files: file-directly-in-usr-share [usr/share/networks]
+E: base-files: file-directly-in-usr-share [usr/share/profile.md5sums]
+E: base-files: file-directly-in-usr-share [usr/share/profile]
+E: base-files: file-directly-in-usr-share [usr/share/staff-group-for-usr-local]
+E: base-files: latest-changelog-entry-without-new-date [usr/share/doc/base-files/changelog.gz:1]
+E: motd-news-config: latest-changelog-entry-without-new-date [usr/share/doc/motd-news-config/changelog.gz:1]
+E: base-files source: latest-debian-changelog-entry-without-new-date [debian/changelog:1]
+E: base-files: relative-symlink ../usr/lib/os-release [etc/os-release]
+W: base-files: mismatched-override non-standard-dir-perm root/ 0700 != 0755 [usr/share/lintian/overrides/base-files:5]
+W: base-files: mismatched-override symlink-should-be-absolute etc/os-release ../usr/lib/os-release [usr/share/lintian/overrides/base-files:10]
+W: base-files source: no-debian-copyright-in-source
+W: base-files: no-manual-page [usr/bin/locale-check]
+W: base-files: non-standard-dir-perm 0700 != 0755 [root/]
+N: 0 hints overridden; 2 unused overrides
+Finished running lintian.

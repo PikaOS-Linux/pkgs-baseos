@@ -1,0 +1,40 @@
+Format: 1.8
+Date: Sat, 15 Oct 2022 20:50:00 +0300
+Source: base-files
+Binary: base-files motd-news-config
+Built-For-Profiles: noudeb
+Architecture: source amd64 all
+Version: 12.2ubuntu99~99pika5
+Distribution: kinetic
+Urgency: medium
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Ward Nakchbandi <hotrod.master@hotmail.com>
+Description:
+ base-files - Debian base system miscellaneous files
+ motd-news-config - Configuration for motd-news shipped in base-files
+Changes:
+ base-files (12.2ubuntu99~99pika5) kinetic; urgency=medium
+ .
+   * Move profile.d scripts to pika-baseos
+Checksums-Sha1:
+ 15a043d93e03b2679620a3ebce5da342fbe2f6c6 751 base-files_12.2ubuntu99~99pika5.dsc
+ 61df8ac73e950c83196e0cb85635df1c5f324ea1 80072 base-files_12.2ubuntu99~99pika5.tar.xz
+ 231fc2124d5ac42df38cd77d93b4743db012e697 5520 base-files-dbgsym_12.2ubuntu99~99pika5_amd64.ddeb
+ fa8d572f0e3c4bf7dff8368d657bf5e1ecbb2592 14362 base-files_12.2ubuntu99~99pika5_amd64.buildinfo
+ dcca120dcf9683b8c102d52438818d8a8c8da42b 85504 base-files_12.2ubuntu99~99pika5_amd64.deb
+ 0a983f484f6bdbc68ae7b620e8f64825e31d5fd6 3302 motd-news-config_12.2ubuntu99~99pika5_all.deb
+Checksums-Sha256:
+ 1c6fb219c96febf4574f829b9c64227023708f7fd09e307b2f1754f7c5d0a1a2 751 base-files_12.2ubuntu99~99pika5.dsc
+ 004427b7510b41c07160f164176acfa8db12e92299796a8a6747329e32290abb 80072 base-files_12.2ubuntu99~99pika5.tar.xz
+ 7967a730eb8f7a9073d361b74592a94657d2e7860755c5eda0d70b23777523ce 5520 base-files-dbgsym_12.2ubuntu99~99pika5_amd64.ddeb
+ 09380d4e773cbdee52b5eed244e3fc16a0041661585f548c2f98f21d6b522a60 14362 base-files_12.2ubuntu99~99pika5_amd64.buildinfo
+ 3bb95016a86c975b348942ee1148b27b5092531e93c3e74d56cb89ed71ba561e 85504 base-files_12.2ubuntu99~99pika5_amd64.deb
+ a282ed0db81a9480c5c62456d49dac25bd541458836f9f7bad3357597843101b 3302 motd-news-config_12.2ubuntu99~99pika5_all.deb
+Files:
+ 8bbf4206501ef7ded1daf718ae7e2085 751 admin required base-files_12.2ubuntu99~99pika5.dsc
+ 5a8984406d2000f675c295f712f1c8fc 80072 admin required base-files_12.2ubuntu99~99pika5.tar.xz
+ 55c2bfaf4d4ba5f4e3a07a9f6a00d1ee 5520 debug optional base-files-dbgsym_12.2ubuntu99~99pika5_amd64.ddeb
+ 4cc66ff8d0868f7107653bcd3716022c 14362 admin required base-files_12.2ubuntu99~99pika5_amd64.buildinfo
+ 656c161a9faa04309037b1c52bf4b77a 85504 admin required base-files_12.2ubuntu99~99pika5_amd64.deb
+ 840b57bb4fcb5213e36f39826846145f 3302 admin optional motd-news-config_12.2ubuntu99~99pika5_all.deb
+Original-Maintainer: Santiago Vila <sanvila@debian.org>
