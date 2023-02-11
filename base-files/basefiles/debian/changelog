@@ -1,4 +1,4 @@
-base-files (22.10-99pika1) kinetic; urgency=medium
+base-files (12.2~99pika5) kinetic; urgency=medium
 
   * Move profile.d scripts to pika-baseos
  
