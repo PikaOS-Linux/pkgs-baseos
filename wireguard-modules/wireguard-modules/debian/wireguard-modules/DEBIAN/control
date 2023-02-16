@@ -1,0 +1,10 @@
+Package: wireguard-modules
+Version: 0.0.20191219
+Architecture: all
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Installed-Size: 7
+Depends: wireguard (>= 0.0.20191219), wireguard-tools (>= 0.0.20191219)
+Provides: wireguard-dkms (= 0.0.20191219), wireguard-modules (= 0.0.20191219)
+Section: kernel
+Priority: optional
+Description: Transactional package from out-of-tree modules to in-tree modules for wireguard

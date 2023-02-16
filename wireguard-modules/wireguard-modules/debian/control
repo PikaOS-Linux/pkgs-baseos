@@ -1,0 +1,16 @@
+Source: wireguard-modules
+Section: kernel
+Priority: optional
+Maintainer: Ward Nakchbandi <hotrod.master@hotmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.1
+
+Package: wireguard-modules
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${perl:Depends},
+ wireguard (>= 0.0.20191219),
+ wireguard-tools (>= 0.0.20191219),
+Provides: wireguard-modules (= 0.0.20191219), wireguard-dkms (= 0.0.20191219)
+Description: Transactional package from out-of-tree modules to in-tree modules for wireguard
