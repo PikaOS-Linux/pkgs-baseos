@@ -1,3 +1,9 @@
+pika-baseos (2.0.1) kinetic; urgency=medium
+
+  * We forgot to make this package essential
+ 
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Thu, 12 Jan 2023 16:48:00 +0300
+
 pika-baseos (2.0.0) kinetic; urgency=medium
 
   * Add all meta desktop dependencies to suggest to prevent them from autoremoval

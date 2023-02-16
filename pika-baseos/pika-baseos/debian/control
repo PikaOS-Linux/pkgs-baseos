@@ -8,6 +8,7 @@ Rules-Requires-Root: no
 
 Package: pika-baseos
 Architecture: all
+Essential: yes
 Depends: ${misc:Depends}, 
 # Base
 ## General
