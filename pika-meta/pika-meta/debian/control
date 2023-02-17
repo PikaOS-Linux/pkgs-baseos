@@ -23,6 +23,8 @@ Package: pika-gameutils-meta
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends},
+	flatpak,
+	pika-codecs-meta,
 	gstreamer1.0-plugins-base,
 	i965-va-driver,
 	intel-media-va-driver-non-free,
@@ -253,7 +255,6 @@ Depends: ${misc:Depends},
 	steam-launcher,
 	winetricks,
 	lutris,
-	steamtinkerlaunch,
 	vkbasalt,
 	vkbasalt:i386,
 	mangohud,
