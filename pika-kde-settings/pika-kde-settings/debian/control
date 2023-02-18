@@ -9,6 +9,7 @@ Rules-Requires-Root: no
 Package: pika-kde-settings
 Source: meta-kde
 Architecture: amd64
+Depends: breeze
 Section: metapackages
 Priority: optional
 Homepage: https://www.kde.org

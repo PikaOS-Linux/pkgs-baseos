@@ -1,3 +1,9 @@
+pika-kde-settings (2.0.0) kinetic; urgency=medium
+
+  * First actual creation
+
+ -- Ward Nakchbandi <hotrod.master@hotmail.com>  Sat, 01 Oct 2022 14:50:00 +0300
+
 pika-kde-settings (1.0.0) kinetic; urgency=medium
 
   * First release
